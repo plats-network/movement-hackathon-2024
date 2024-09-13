@@ -1,0 +1,8 @@
+name = "nada_quickstart_programs"
+version = "0.1.0"
+authors = [""]
+
+[[programs]]
+path = "src/platscall.py"
+name = "platscall"
+prime_size = 128
