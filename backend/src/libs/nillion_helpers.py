@@ -10,13 +10,22 @@ from cosmpy.crypto.keypairs import PrivateKey
 
 from nillion_python_helpers import get_quote_and_pay, create_nillion_client, create_payments_config
 from src.config import settings
-
-
+import random
+import base64
+import nacl.utils
 load_dotenv()
-class NillionHealpers:
+class NillionHelpers:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(NillionHelpers, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self) -> None:
-        self.cluster_id, self.client, self.payments_client, self.payments_wallet = self.get_client()
-        self.permissions = nillion.Permissions.default_for_user(self.client.user_id)
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.cluster_id, self.client, self.payments_client, self.payments_wallet, self.permissions = self.get_client()
+            self.initialized = True
     
     
     def get_client(self):
@@ -35,7 +44,8 @@ class NillionHealpers:
             PrivateKey(bytes.fromhex(settings.NILLION_NILCHAIN_PRIVATE_KEY_0)),
             prefix="nillion",
         )
-        return cluster_id, client, payments_client, payments_wallet
+        permissions = nillion.Permissions.default_for_user(client.user_id)
+        return cluster_id, client, payments_client, payments_wallet, permissions
     
     async def store_blob(self, key: str, value: str) -> str:
         # Create a SecretBlob
@@ -87,7 +97,7 @@ class NillionHealpers:
         return store_id
             
             
-    async def retrieve_blob(self, store_id: str, key: str) -> str:
+    async def retrieve(self, store_id: str, key: str) -> str:
         # Get cost quote, then pay for operation to retrieve the secret
         receipt_retrieve = await get_quote_and_pay(
             self.client,
@@ -102,28 +112,28 @@ class NillionHealpers:
         )
         print(f"The secret name as a uuid is {result_tuple[0]}")
 
-        decoded_secret_value = result_tuple[1].value.decode("utf-8")
-        print(f"The secret value is '{decoded_secret_value}'")
-        return decoded_secret_value
+        value = result_tuple[1].value
+        if isinstance(value, int):
+            return value
+        return value.decode("utf-8")
     
-    
-    async def retrieve_integer(self, store_id: str) -> str:
-        # Get cost quote, then pay for operation to retrieve the secret
-        receipt_retrieve = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.retrieve_value(),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
+    # async def retrieve_integer(self, store_id: str, key: str) -> str:
+    #     # Get cost quote, then pay for operation to retrieve the secret
+    #     receipt_retrieve = await get_quote_and_pay(
+    #         self.client,
+    #         nillion.Operation.retrieve_value(),
+    #         self.payments_wallet,
+    #         self.payments_client,
+    #         self.cluster_id,
+    #     )
 
-        result_tuple = await self.client.retrieve_value(
-            self.cluster_id, store_id, self.secret_name, receipt_retrieve
-        )
-        print(f"The secret name as a uuid is {result_tuple[0]}")
+    #     result_tuple = await self.client.retrieve_value(
+    #         self.cluster_id, store_id, key, receipt_retrieve
+    #     )
+    #     print(f"The secret name as a uuid is {result_tuple[0]}")
 
-        decoded_secret_value = result_tuple[1].value
-        print(f"The secret value is '{decoded_secret_value}'")
-        return decoded_secret_value
+    #     decoded_secret_value = result_tuple[1].value
+    #     print(f"The secret value is '{decoded_secret_value}'")
+    #     return decoded_secret_value
     
     
