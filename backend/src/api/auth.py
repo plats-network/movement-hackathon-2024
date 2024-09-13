@@ -46,37 +46,53 @@ async def verify_signature(request: VerifyRequestDTO):
     #     verify_key.verify(nonce.encode("utf-8"), signature.encode("utf-8"))
     # except:
     #     return ResponseMsg.INVALID.to_json(msg="Verification failed")
+    # append public key to key users
+    user_id = Auth.create_authenticated_user()
+    print("user_id", user_id)
     
     # Create JWT token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = Auth.create_access_token(
-        data={"sub": publicKey}, expires_delta=access_token_expires
+        data={"sub": user_id}, expires_delta=access_token_expires
     )
     return ResponseMsg.SUCCESS.to_json(data={"accessToken": access_token}, msg="Verification successful")
 
 
 @router.post("/register")
 async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(Auth.verify_token)):
-    eoa = py_.get(registerInput, "eoa", None)
-    plat_id = py_.get(registerInput, "plat_id", None)
-    logger.info(f"Registering user with eoa: {eoa} and plat_id: {plat_id}")
-    response = Auth.register(eoa, plat_id)
-    if response is None:
-        return ResponseMsg.INVALID.to_json(msg="User exists")
-    return ResponseMsg.SUCCESS.to_json(data=response)    
+    try:
+        # get users from db
+        authenticated_user = Auth.get_current_user(token)
+        if authenticated_user is None:
+            return ResponseMsg.UNAUTHORIZED.to_json(msg="Unauthorized")
+        eoa = registerInput.eoa
+        plat_id = registerInput.plat_id
+        
+        logger.info(f"Registering user with eoa: {eoa} and plat_id: {plat_id}")
+        response = await Auth.register(authenticated_user, eoa, plat_id)
+        if response is None:
+            return ResponseMsg.INVALID.to_json(msg="User exists")
+        return ResponseMsg.SUCCESS.to_json(data=response)    
+    except Exception as e:
+        logger.error(f"Error registering user: {e}")
+        return ResponseMsg.ERROR.to_json(msg="Error registering user")
     
     
     
 
 @router.post("/login")
-async def login(loginInput: LoginInputDTO):
-    eoa = py_.get(loginInput, "eoa", None)
-    if eoa is None:
-        return ResponseMsg.INVALID.to_json(msg="Invalid request")
-    logger.info(f"Logging in user with eoa: {eoa}")
-    response = Auth.login(eoa)
+async def login(token: TokenData = Depends(Auth.verify_token)):
+    # get users from db
+    authenticated_user = Auth.get_current_user(token)
+    if authenticated_user is None:
+        return ResponseMsg.UNAUTHORIZED.to_json(msg="Unauthorized")
     
-    if not response:
-        return ResponseMsg.USER_NOT_FOUND.to_json(msg="User not found")
+    if authenticated_user['plat_id'] is None:
+        return ResponseMsg.INVALID.to_json(msg="User not registered")
+    response = {
+        "eoa": authenticated_user['eoa'],
+        "plat_id": authenticated_user['plat_id']
+    }
+    
     return ResponseMsg.SUCCESS.to_json(data=response)
     

@@ -9,3 +9,7 @@ redis
 pynacl
 pyjwt
 python-dotenv
+cosmpy
+nillion_python_helpers
+py_nillion_client
+protobuf==3.20.1

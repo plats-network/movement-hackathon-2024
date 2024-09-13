@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.dtos import TokenData
 import jwt
+from src.libs.nilion_helpers import NillionHealpers
 class Auth(object):
     
     security = HTTPBearer()
@@ -28,6 +29,21 @@ class Auth(object):
         return token_data
     
     
+    @staticmethod
+    def get_current_user(token_data: TokenData = Depends(verify_token)):
+        user = mUser.get_item(token_data.sub)
+        return user
+    
+    
+    @staticmethod
+    def create_authenticated_user():
+        user = mUser.insert({
+            "eoa": "",
+            "plat_id": "",
+        })
+        return str(user['_id'])
+        
+    
     @classmethod
     def create_access_token(cls, data: dict, expires_delta: timedelta = None):
         to_encode = data.copy()
@@ -41,26 +57,31 @@ class Auth(object):
     
     
     @classmethod
-    def register(cls, eoa, plat_id):
-        # check exist user
-        user = mUser.get_item_with({
-            "eoa": eoa
-        })
-        if user is not None:
+    async def register(cls,authenticated_user, eoa, plat_id):
+        print("authenticated_user", authenticated_user)
+        # check exist plat_id
+        if authenticated_user['plat_id']:
             return None
         
         # !TODO: Send transaction to blockchain
         
         
+        # !TODO: Store to nillion
+        nillion = NillionHealpers()
+        store_id = await nillion.store_blob(key=eoa, value=plat_id)
+        # Retrieve the value
+        # value = await nillion.retrieve_blob(store_id=store_id, key=eoa)
         # Save user to database
-        user = mUser.insert({
+        mUser.update(authenticated_user['_id'], {
             "eoa": eoa,
-            "plat_id": plat_id
+            "plat_id": plat_id,
+            "store_id": store_id,
         })
         
         return {
-            "eoa": user['eoa'],
-            "plat_id": user['plat_id'],
+            "eoa": eoa,
+            "plat_id": plat_id,
+            "store_id": store_id,
         }
     
     
