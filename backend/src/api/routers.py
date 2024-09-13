@@ -10,7 +10,7 @@ api_router = APIRouter()
 api_router.include_router(auth_router,
                           prefix="/auth", tags=["Auth"])
 api_router.include_router(user_router,
-                          prefix="/interal/user", tags=["User"])
+                          prefix="/internal/user", tags=["User"])
 api_router.include_router(nillion_router,
                           prefix="/internal/nillion", tags=["Nillion"])
 api_router.include_router(app_router,
