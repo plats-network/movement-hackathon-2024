@@ -41,6 +41,7 @@ async def verify_signature(request: VerifyRequestDTO):
     # Delete the nonce from Redis
     redis_client.delete(publicKey)
     
+    # ! Uncomment to verify signature
     # try:
     #     verify_key = VerifyKey(publicKey, encoder=Base64Encoder)
     #     verify_key.verify(nonce.encode("utf-8"), signature.encode("utf-8"))

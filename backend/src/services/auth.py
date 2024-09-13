@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.dtos import TokenData
 import jwt
-from src.libs.nilion_helpers import NillionHealpers
+from src.libs.nillion_helpers import NillionHelpers
 class Auth(object):
     
     security = HTTPBearer()
@@ -67,7 +67,7 @@ class Auth(object):
         
         
         # !TODO: Store to nillion
-        nillion = NillionHealpers()
+        nillion = NillionHelpers()
         store_id = await nillion.store_blob(key=eoa, value=plat_id)
         # Retrieve the value
         # value = await nillion.retrieve_blob(store_id=store_id, key=eoa)
