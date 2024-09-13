@@ -7,9 +7,9 @@ router = APIRouter()
 
 
 @router.get("/check-register")
-def check_register(address: str):
+def check_register(plat_id: str):
     try:
-        result = UserService.check_register(address)
+        result = UserService.check_register(plat_id)
         if result:
             return ResponseMsg.SUCCESS.to_json(data={"registered": True})
         return ResponseMsg.NOT_FOUND.to_json(data={"registered": False})

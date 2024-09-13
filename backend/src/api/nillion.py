@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from src.dtos import StoreInputDTO
+from src.dtos import StoreInputDTO, RetrieveInputDTO
 from src.utils import ResponseMsg
 from src.services import Auth
 import pydash as py_
@@ -19,18 +19,18 @@ async def store(storeInput: StoreInputDTO):
     try:
         key = storeInput.key
         value = storeInput.value
-        address = storeInput.address
-        store_id = await Nillion.store(address, key, value)
-        return ResponseMsg.SUCCESS.to_json(data={"store_id": store_id})
+        plat_id = storeInput.plat_id
+        await Nillion.store(plat_id, key, value)
+        return ResponseMsg.SUCCESS.to_json(data={})
     except Exception as e:
         logger.error(e)
         return ResponseMsg.ERROR.to_json(msg=str(e))
 
 
 @router.get('/retrieve')
-async def retrieve(address: str, key: str):
+async def retrieve(plat_id: str, key: str):
     try:
-        value = await Nillion.retrieve(address, key)
+        value = await Nillion.retrieve(plat_id, key)
         return ResponseMsg.SUCCESS.to_json(data={"value": value})
     except Exception as e:
         logger.error(e)
