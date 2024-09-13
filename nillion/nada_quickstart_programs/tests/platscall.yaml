@@ -1,0 +1,15 @@
+---
+program: platscall
+inputs:
+  secret_balance: 100
+  secret_volumn: 2000000
+  secret_twitter: 100
+  threshold_trade: 100
+  threshold_whale: 50
+  threshold_kol: 20
+
+
+expected_outputs:
+  result_trade: 0
+  result_whale: 1
+  result_twitter: 1
