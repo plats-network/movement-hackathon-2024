@@ -35,3 +35,14 @@ async def retrieve(plat_id: str, key: str):
     except Exception as e:
         logger.error(e)
         return ResponseMsg.ERROR.to_json(msg=str(e))
+    
+
+@router.post('/rank')
+async def rank():
+    try:
+        data = await Nillion.rank()
+        return ResponseMsg.SUCCESS.to_json(data=data)
+        
+    except Exception as e:
+        logger.error(e)
+        return ResponseMsg.ERROR.to_json(msg=str(e))

@@ -40,3 +40,7 @@ class Nillion(object):
         return value
         
     
+    @staticmethod
+    async def rank():
+        nillion = NillionHelpers()
+        return await nillion.rank()
