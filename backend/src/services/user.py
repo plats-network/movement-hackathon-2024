@@ -10,22 +10,39 @@ class UserService(object):
         
         
     @staticmethod
-    def register(plat_id: str, eoa: str):
-        # check exist plat_id
-        user = mUser.get_item_with({"plat_id": plat_id})
+    def register(plat_id: str, eoa: str, public_key: str):
+        # check exist public_key
+        user = mUser.get_item_with({"public_key": public_key})
         if user:
             return None
+        
+        if user['public_key'] == public_key:
+            return None
+        
+        if user['plat_id'] == plat_id:
+            return None
+        
         user = mUser.insert({
             "plat_id": plat_id,
-            "address": [eoa]
+            "address": [eoa],
+            "public_key": public_key
         })
         return user
         
     @staticmethod
     def get_user(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
+        # except ObjectId
+        if user:
+            user.pop('_id', None)
+            return user
+        return None
+    
+    @staticmethod
+    def get_user_by_public_key(public_key: str):
+        user = mUser.get_item_with({"public_key": public_key})
         return user
-        
+    
     
     @staticmethod
     def update_user(plat_id: str, eoa: str):

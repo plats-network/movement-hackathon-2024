@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.dtos import TokenData
 import jwt
+from src.utils import ResponseException, ResponseMsg
 from src.libs.nillion_helpers import NillionHelpers
 class Auth(object):
     
@@ -18,10 +19,10 @@ class Auth(object):
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             _: str = payload.get("sub")
             if _ is None:
-                raise Exception("Invalid token: Missing _")
+                raise ResponseException(ResponseMsg.INVALID, msg="Invalid token")
             token_data = TokenData(sub=_)
         except jwt.PyJWTError:
-            raise Exception("Invalid token")
+            raise ResponseException(ResponseMsg.INVALID, msg="JWT token is invalid")
         return token_data
 
     
