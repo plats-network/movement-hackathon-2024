@@ -1,5 +1,5 @@
 
-
+from fastapi import HTTPException
 class CodeMsg(object):
     def __init__(self, msg="success", code=200, data={}) -> None:
         self.msg = msg
@@ -35,3 +35,11 @@ class ResponseMsg(object):
     UNAUTHORIZED = CodeMsg("unauthorized", 401)
     BLOCK = CodeMsg("block", 403)
     LOGIN_CONFLICT = CodeMsg("conflict", 409)
+
+class ResponseException(HTTPException):
+    def __init__(self, code_msg: CodeMsg, msg="", data: dict = {}):
+        self.code_msg = code_msg
+        self.msg = msg
+        self.data = data
+        detail = self.code_msg.to_json(msg=self.msg, data=self.data)
+        super().__init__(status_code=self.code_msg.code, detail=detail)

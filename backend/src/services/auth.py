@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.dtos import TokenData
 import jwt
+from src.utils import ResponseException, ResponseMsg
 from src.libs.nillion_helpers import NillionHelpers
 class Auth(object):
     
@@ -16,33 +17,14 @@ class Auth(object):
         token = credentials.credentials
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-            public_key: str = payload.get("sub")
-            if public_key is None:
-                raise HTTPException(
-                    status_code=401, detail="Invalid token: subject not found"
-                )
-            token_data = TokenData(sub=public_key)
+            _: str = payload.get("sub")
+            if _ is None:
+                raise ResponseException(ResponseMsg.INVALID, msg="Invalid token")
+            token_data = TokenData(sub=_)
         except jwt.PyJWTError:
-            raise HTTPException(
-                status_code=401, detail="Invalid token"
-            )
+            raise ResponseException(ResponseMsg.INVALID, msg="JWT token is invalid")
         return token_data
-    
-    
-    @staticmethod
-    def get_current_user(token_data: TokenData = Depends(verify_token)):
-        user = mUser.get_item(token_data.sub)
-        return user
-    
-    
-    @staticmethod
-    def create_authenticated_user():
-        user = mUser.insert({
-            "eoa": "",
-            "plat_id": "",
-        })
-        return str(user['_id'])
-        
+
     
     @classmethod
     def create_access_token(cls, data: dict, expires_delta: timedelta = None):
@@ -55,34 +37,6 @@ class Auth(object):
         encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
     
-    
-    @classmethod
-    async def register(cls,authenticated_user, eoa, plat_id):
-        print("authenticated_user", authenticated_user)
-        # check exist plat_id
-        if authenticated_user['plat_id']:
-            return None
-        
-        # !TODO: Send transaction to blockchain
-        
-        
-        # !TODO: Store to nillion
-        nillion = NillionHelpers()
-        store_id = await nillion.store_blob(key=eoa, value=plat_id)
-        # Retrieve the value
-        # value = await nillion.retrieve_blob(store_id=store_id, key=eoa)
-        # Save user to database
-        mUser.update(authenticated_user['_id'], {
-            "eoa": eoa,
-            "plat_id": plat_id,
-            "store_id": store_id,
-        })
-        
-        return {
-            "eoa": eoa,
-            "plat_id": plat_id,
-            "store_id": store_id,
-        }
     
     
     @classmethod
