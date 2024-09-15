@@ -14,11 +14,11 @@ class UserService(object):
     def register(plat_id: str, eoa: str, public_key: str):
         # check exist public_key
         exist_user = mUser.get_item_with({"public_key": public_key})
-        exist_plat_id = py_.get(exist_user, 'plat_id', None)
+        exist_plat_id = mUser.get_item_with({"plat_id": plat_id})
         if exist_user:
             return None
 
-        if exist_plat_id == plat_id:
+        if exist_plat_id:
             return None
         
         user = mUser.insert({
