@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /root/.nilup/bin 
-./nillion-devnet
+./nillion-devnet --seed nillion-seed
