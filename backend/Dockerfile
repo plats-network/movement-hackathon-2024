@@ -1,7 +1,19 @@
 FROM python:3.11-slim
+
+# Install build-essential for C++ compiler
+RUN apt-get update && apt-get install -y build-essential
+
+
 WORKDIR /app
+
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip uninstall protobuf -y
+
+RUN pip install  -r requirements.txt
+
+RUN pip install protobuf==3.20.1
+
 
 # Install  Nillion SDK Tools
 # RUN apt-get update && apt-get install -y curl
