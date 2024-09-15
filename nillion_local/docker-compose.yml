@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+      - "54936:54936"
+      - "48102:48102"
+      - "26650:26650"
+      - "26649:26649"
+    container_name: nillion-local
