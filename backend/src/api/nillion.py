@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from src.dtos import StoreInputDTO, RetrieveInputDTO
 from src.utils import ResponseMsg
 from src.services import Auth
@@ -16,14 +16,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 @router.post('/store')
-async def store(storeInput: StoreInputDTO):
+async def store(storeInput: StoreInputDTO, background_tasks: BackgroundTasks):
     try:
         key = storeInput.key
         value = storeInput.value
         plat_id = storeInput.plat_id
 
-        data = await Nillion.store(plat_id, key, value)
-        return ResponseMsg.SUCCESS.to_json(data={"store_id": data})
+        # in background
+        background_tasks.add_task(Nillion.store, plat_id, key, value)
+
+        return ResponseMsg.SUCCESS.to_json(msg="Store operation is in progress")
     except Exception as e:
         logger.error(e)
         return ResponseMsg.ERROR.to_json(msg=str(e))
