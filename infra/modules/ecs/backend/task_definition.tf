@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "core" {
   memory                   = 2048
   container_definitions = jsonencode([
     {
-      name  = "plat-fellowship-backend-${var.environment_name}"
+      name  = "plat-fellowship-${var.environment_name}-backend"
       image = "${var.ecr_uri}:latest"
       links = []
       portMappings = [
@@ -132,5 +132,6 @@ resource "aws_ecs_task_definition" "core" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
+    Service     = "backend"
   }
 }

@@ -1,4 +1,4 @@
 resource "aws_secretsmanager_secret" "secret" {
-  name                    = "plat-fellowship-backend-${var.environment_name}"
+  name                    = "plat-fellowship-${var.environment_name}-backend"
   recovery_window_in_days = 0
 }

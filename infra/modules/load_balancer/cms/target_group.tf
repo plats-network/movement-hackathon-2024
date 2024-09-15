@@ -1,5 +1,5 @@
 resource "aws_lb_target_group" "target_group" {
-  name                              = "plat-fellowship-backend-${var.environment_name}"
+  name                              = "plat-fellowship-${var.environment_name}-backend"
   port                              = 80
   protocol                          = "HTTP"
   target_type                       = "ip"
@@ -31,6 +31,7 @@ resource "aws_lb_target_group" "target_group" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
+    Service     = "backend"
   }
 }
 

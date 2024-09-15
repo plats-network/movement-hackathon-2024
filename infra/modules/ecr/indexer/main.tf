@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "main" {
-  name                 = "plat-fellowship-${var.environment_name}-backend"
+  name                 = "plat-fellowship-${var.environment_name}-indexer"
   image_tag_mutability = "IMMUTABLE"
   force_delete         = true
 
@@ -10,6 +10,6 @@ resource "aws_ecr_repository" "main" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
-    Service     = "backend"
+    Service     = "indexer"
   }
 }
