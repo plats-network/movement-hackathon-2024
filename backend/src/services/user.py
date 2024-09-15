@@ -6,8 +6,9 @@ class UserService(object):
     def check_register(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
         if user:
-            return True
-        return False
+            user.pop('_id', None)
+            return user
+        return None
         
         
     @staticmethod
