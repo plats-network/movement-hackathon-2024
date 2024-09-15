@@ -20,8 +20,9 @@ async def store(storeInput: StoreInputDTO):
         key = storeInput.key
         value = storeInput.value
         plat_id = storeInput.plat_id
-        await Nillion.store(plat_id, key, value)
-        return ResponseMsg.SUCCESS.to_json(data={})
+
+        data = await Nillion.store(plat_id, key, value)
+        return ResponseMsg.SUCCESS.to_json(data={"store_id": data})
     except Exception as e:
         logger.error(e)
         return ResponseMsg.ERROR.to_json(msg=str(e))

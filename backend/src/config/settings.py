@@ -28,15 +28,6 @@ class Settings():
     REDIS_PUB_CHANNEL: str = os.getenv('REDIS_PUB_CHANNEL')
     REDIS_BROKER_URL: str = os.getenv('REDIS_BROKER_URL')
 
-    # Message queue settings
-    MESSAGE_BROKER_URL: str = os.getenv('MESSAGE_BROKER_URL')
-    MESSAGE_QUEUE_NAME: str = os.getenv('MESSAGE_QUEUE_NAME')
-    MESSAGE_BROKER_USERNAME: str = os.getenv('MESSAGE_BROKER_USERNAME')
-    MESSAGE_BROKER_PASSWORD: str = os.getenv('MESSAGE_BROKER_PASSWORD')
-    MESSAGE_BROKER_PORT: int = int(os.getenv('MESSAGE_BROKER_PORT'))
-    MESSAGE_BROKER_HOST: str = os.getenv('MESSAGE_BROKER_HOST')
-    MESSAGE_BROKER_VIRTUAL_HOST: str = os.getenv('MESSAGE_BROKER_VIRTUAL_HOST')
-
     # Server settings
     MODE: str = os.getenv('MODE', 'local')
     HOST: str = os.getenv('HOST', 'localhost')
