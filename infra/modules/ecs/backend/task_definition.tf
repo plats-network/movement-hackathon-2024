@@ -22,69 +22,18 @@ resource "aws_ecs_task_definition" "core" {
       command    = []
       environment = [
         {
-          "name" : "HOST",
-          "value" : "0.0.0.0"
+          "name" : "FOO",
+          "value" : "bar"
         },
-        {
-          "name" : "PORT",
-          "value" : "80"
-        },
-        {
-          "name" : "NODE_ENV",
-          "value" : "development"
-        }
+
       ]
       environmentFiles = []
       mountPoints      = []
       volumesFrom      = []
       secrets = [
         {
-          name      = "APP_KEYS",
-          valueFrom = "${var.secret_arn}:appKeys::"
-        },
-        {
-          name      = "API_TOKEN_SALT",
-          valueFrom = "${var.secret_arn}:apiTokenSalt::"
-        },
-        {
-          name      = "ADMIN_JWT_SECRET",
-          valueFrom = "${var.secret_arn}:adminJwtSecret::"
-        },
-        {
-          name      = "TRANSFER_TOKEN_SALT",
-          valueFrom = "${var.secret_arn}:transferTokenSalt::"
-        },
-        {
-          name      = "DATABASE_CLIENT",
-          valueFrom = "${var.secret_arn}:databaseClient::"
-        },
-        {
-          name      = "DATABASE_HOST",
-          valueFrom = "${var.secret_arn}:databaseHost::"
-        },
-        {
-          name      = "DATABASE_PORT",
-          valueFrom = "${var.secret_arn}:databasePort::"
-        },
-        {
-          name      = "DATABASE_NAME",
-          valueFrom = "${var.secret_arn}:databaseName::"
-        },
-        {
-          name      = "DATABASE_USERNAME",
-          valueFrom = "${var.secret_arn}:databaseUsername::"
-        },
-        {
-          name      = "DATABASE_PASSWORD",
-          valueFrom = "${var.secret_arn}:databasePassword::"
-        },
-        {
-          name      = "DATABASE_SSL",
-          valueFrom = "${var.secret_arn}:databaseSSL::"
-        },
-        {
-          name      = "JWT_SECRET",
-          valueFrom = "${var.secret_arn}:jwtSecret::"
+          name      = "FOO",
+          valueFrom = "${var.secret_arn}:bar::"
         }
       ]
       dnsServers            = []
