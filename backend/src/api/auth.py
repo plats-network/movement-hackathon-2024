@@ -44,11 +44,11 @@ async def verify_signature(request: VerifyRequestDTO):
     redis_client.delete(public_key)
     
     # ! Uncomment to verify signature
-    # try:
-    #     verify_key = VerifyKey(publicKey, encoder=Base64Encoder)
-    #     verify_key.verify(nonce.encode("utf-8"), signature.encode("utf-8"))
-    # except:
-    #     return ResponseMsg.INVALID.to_json(msg="Verification failed")
+    try:
+        verify_key = VerifyKey(public_key, encoder=Base64Encoder)
+        verify_key.verify(nonce.encode("utf-8"), signature.encode("utf-8"))
+    except:
+        return ResponseMsg.INVALID.to_json(msg="Verification failed")
     
     
     
