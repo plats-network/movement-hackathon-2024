@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "core" {
       volumesFrom      = []
       secrets = [
         {
-          name      = "FOO",
+          name      = "FOOO",
           valueFrom = "${var.secret_arn}:bar::"
         }
       ]

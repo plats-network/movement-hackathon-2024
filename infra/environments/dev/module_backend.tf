@@ -27,7 +27,7 @@ module "backend_load_balancer" {
   subnet_1a_load_balancer_id          = var.public_subnet_a_id
   subnet_1c_load_balancer_id          = var.public_subnet_b_id
   vpc_id                              = var.vpc_id
-  certificate_arn                     = module.certificate_manager.cert_arn
+  # certificate_arn                     = module.certificate_manager.cert_arn
 }
 
 module "backend_ecs" {

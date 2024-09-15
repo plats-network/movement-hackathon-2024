@@ -24,7 +24,7 @@ variable "vpc_id" {
 }
 
 
-variable "certificate_arn" {
-  type        = string
-  description = "certificate_arn"
-}
+# variable "certificate_arn" {
+#   type        = string
+#   description = "certificate_arn"
+# }
