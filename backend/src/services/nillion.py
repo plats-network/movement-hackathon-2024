@@ -15,8 +15,8 @@ class Nillion(object):
             store_id = await nillion.store_integer(key=key, value=value)
         
         # TODO: Store store_id and key(secret_name) to smart contract using plat_id
-            
-        return 
+        
+        return store_id 
         
     
     @staticmethod
@@ -40,3 +40,7 @@ class Nillion(object):
         return value
         
     
+    @staticmethod
+    async def rank():
+        nillion = NillionHelpers()
+        return await nillion.rank()
