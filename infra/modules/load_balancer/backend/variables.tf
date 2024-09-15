@@ -28,7 +28,7 @@ variable "vpc_cidr_block" {
   description = "vpc_cidr_block"
 }
 
-# variable "certificate_arn" {
-#   type        = string
-#   description = "certificate_arn"
-# }
+variable "certificate_arn" {
+  type        = string
+  description = "certificate_arn"
+}

@@ -28,7 +28,7 @@ module "backend_load_balancer" {
   subnet_1c_load_balancer_id          = var.public_subnet_b_id
   vpc_id                              = var.vpc_id
   vpc_cidr_block                      = module.network.vpc_cidr_block
-  # certificate_arn                     = module.certificate_manager.cert_arn
+  certificate_arn                     = module.certificate_manager.cert_arn
 }
 
 module "backend_ecs" {
@@ -45,9 +45,9 @@ module "backend_ecs" {
 }
 
 
-# module "backend_route_53" {
-#   source      = "../../modules/route53/record_backend"
-#   domain_name = var.domain_name
-#   lb_dns_name = module.backend_load_balancer.lb_dns_name
-#   lb_zone_id  = module.backend_load_balancer.lb_zone_id
-# }
+module "backend_route_53" {
+  source      = "../../modules/route53/record_backend"
+  domain_name = var.domain_name
+  lb_dns_name = module.backend_load_balancer.lb_dns_name
+  lb_zone_id  = module.backend_load_balancer.lb_zone_id
+}
