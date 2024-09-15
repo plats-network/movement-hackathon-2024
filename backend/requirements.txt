@@ -9,7 +9,6 @@ redis
 pynacl
 pyjwt
 python-dotenv
-cosmpy
 nillion_python_helpers
 py_nillion_client
-protobuf
+cosmpy
