@@ -8,6 +8,7 @@ import logging
 from nacl.signing import VerifyKey
 from nacl.encoding import Base64Encoder
 from src.services import Nillion
+from src.services import UserService
 
 router = APIRouter()
 
@@ -37,6 +38,16 @@ async def retrieve(plat_id: str, key: str):
         logger.error(e)
         return ResponseMsg.ERROR.to_json(msg=str(e))
     
+
+@router.get("/user")
+def check_register(plat_id: str):
+    try:
+        data = UserService.check_register(plat_id)
+        if data:
+            return ResponseMsg.SUCCESS.to_json(data=data)
+        return ResponseMsg.NOT_FOUND.to_json(data={})
+    except Exception as e:
+        return ResponseMsg.ERROR.to_json(msg=str(e))
 
 @router.post('/rank')
 async def rank():
