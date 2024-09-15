@@ -3,8 +3,8 @@ resource "aws_ecs_task_definition" "core" {
   family                   = aws_ecs_cluster.cluster.name
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 256
+  memory                   = 512
   container_definitions = jsonencode([
     {
       name  = "plat-fellowship-${var.environment_name}-backend"
