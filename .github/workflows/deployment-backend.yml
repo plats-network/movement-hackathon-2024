@@ -43,7 +43,7 @@ jobs:
 
       - name: Specify Deployment Role
         run: |
-          echo "AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN }}" >> $GITHUB_ENV
+          echo "AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN_PLAT }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
