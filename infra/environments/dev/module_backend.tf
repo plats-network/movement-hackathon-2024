@@ -42,3 +42,11 @@ module "backend_ecs" {
   public_subnet_id                = var.public_subnet_a_id
   target_group_arn                = module.backend_load_balancer.load_balancer_target_group_arn
 }
+
+
+# module "backend_route_53" {
+#   source      = "../../modules/route53/record_backend"
+#   domain_name = var.domain_name
+#   lb_dns_name = module.backend_load_balancer.lb_dns_name
+#   lb_zone_id  = module.backend_load_balancer.lb_zone_id
+# }
