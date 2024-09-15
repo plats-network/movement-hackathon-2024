@@ -20,11 +20,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 @router.get("/nonce")
-async def get_nonce(publicKey: str):
+async def get_nonce(public_key: str):
     nonce = base64.b64encode(nacl.utils.random(16)).decode("utf-8")
     
     # store the nonce in redis
-    redis_client.setex(publicKey, timedelta(seconds=60), nonce)
+    redis_client.setex(public_key, timedelta(seconds=60), nonce)
     
     return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
 

@@ -14,16 +14,6 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@router.get("/internal/check-register")
-def check_register(plat_id: str):
-    try:
-        result = UserService.check_register(plat_id)
-        if result:
-            return ResponseMsg.SUCCESS.to_json(data={"registered": True})
-        return ResponseMsg.NOT_FOUND.to_json(data={"registered": False})
-    except Exception as e:
-        return ResponseMsg.ERROR.to_json(msg=str(e))
-    
 
 @router.get('')
 async def get_user(token: TokenData = Depends(Auth.verify_token)):
