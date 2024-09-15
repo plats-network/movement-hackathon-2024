@@ -23,6 +23,7 @@ RUN . ~/.bashrc && nillion -V
 
 COPY . /webapps
 WORKDIR /webapps
+RUN chmod +x /webapps/run.sh
 
 # CMD tail -f /dev/null
 # CMD . ~/.bashrc && nillion-devnet
