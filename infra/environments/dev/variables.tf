@@ -21,3 +21,7 @@ variable "public_subnet_b_id" {
   type        = string
   description = "public_subnet_b_id"
 }
+variable "domain_name" {
+  type        = string
+  description = "domain_name"
+}
