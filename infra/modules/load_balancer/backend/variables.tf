@@ -23,6 +23,10 @@ variable "vpc_id" {
   description = "vpc_id"
 }
 
+variable "vpc_cidr_block" {
+  type        = string
+  description = "vpc_cidr_block"
+}
 
 # variable "certificate_arn" {
 #   type        = string

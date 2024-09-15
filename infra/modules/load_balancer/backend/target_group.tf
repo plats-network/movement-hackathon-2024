@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "target_group" {
     enabled             = true
     healthy_threshold   = 3
     interval            = 60
-    path                = "/health"
+    path                = "/api/v1/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = 20
