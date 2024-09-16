@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import api_router
 from .middleware.headers import CustomHeadersMiddleware
-
+from starlette.middleware.sessions import SessionMiddleware
 
 
 def create_app(config=None, app_name=None):
@@ -28,6 +28,7 @@ def create_app(config=None, app_name=None):
     
     # Add middleware
     app.add_middleware(CustomHeadersMiddleware)
+    app.add_middleware(SessionMiddleware, secret_key="!secret")
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
