@@ -29,6 +29,27 @@ resource "aws_lb_listener" "listener_https" {
 }
 
 
+resource "aws_lb_listener_rule" "internal_api_allow_http" {
+  listener_arn = aws_lb_listener.listener_http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/internal/*"]
+    }
+  }
+  condition {
+    source_ip {
+      values = [var.vpc_cidr_block]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "internal_api_allow" {
   listener_arn = aws_lb_listener.listener_https.arn
   priority     = 100
