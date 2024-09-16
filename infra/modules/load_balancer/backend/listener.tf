@@ -45,7 +45,10 @@ resource "aws_lb_listener_rule" "internal_api_allow" {
   }
   condition {
     source_ip {
-      values = [var.vpc_cidr_block]
+      values = [
+        var.vpc_cidr_block,
+        "171.252.188.6/32" # Aiden Sepiol home IP
+      ]
     }
   }
 }

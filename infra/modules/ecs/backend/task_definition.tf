@@ -52,6 +52,14 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "ACCESS_TOKEN_EXPIRE_MINUTES",
           "value" : "60"
+        },
+        {
+          "name" : "TWITTER_REDIRECT_URI",
+          "value" : "https://api.fellowship.plats.network/api/v1/twitter/callback"
+        },
+        {
+          "name" : "FRONTEND_URL",
+          "value" : "https://plat-frontend.vercel.app"
         }
       ]
       environmentFiles = []
@@ -133,6 +141,22 @@ resource "aws_ecs_task_definition" "core" {
         {
           name      = "NILLION_NILCHAIN_PRIVATE_KEY_0",
           valueFrom = "${var.secret_arn}:nillionNilchainPrivateKey0::"
+        },
+        {
+          name      = "TWITTER_CLIENT_ID",
+          valueFrom = "${var.secret_arn}:twitterClientId::"
+        },
+        {
+          name      = "TWITTER_CLIENT_SECRET",
+          valueFrom = "${var.secret_arn}:twitterClientSecret::"
+        },
+        {
+          name      = "TWITTER_CONSUMER_KEY",
+          valueFrom = "${var.secret_arn}:twitterConsumerKey::"
+        },
+        {
+          name      = "TWITTER_CONSUMER_SECRET",
+          valueFrom = "${var.secret_arn}:twitterConsumerSecret::"
         }
       ]
       dnsServers            = []
