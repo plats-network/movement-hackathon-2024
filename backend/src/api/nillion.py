@@ -42,9 +42,9 @@ async def retrieve(plat_id: str, key: str):
     
 
 @router.get("/user")
-def check_register(plat_id: str):
+def check_register(address: str):
     try:
-        data = UserService.check_register(plat_id)
+        data = UserService.check_register(address)
         if data:
             return ResponseMsg.SUCCESS.to_json(data=data)
         return ResponseMsg.NOT_FOUND.to_json(data={})

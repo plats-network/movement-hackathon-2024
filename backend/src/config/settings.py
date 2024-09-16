@@ -49,6 +49,18 @@ class Settings():
     NILLION_NILCHAIN_PRIVATE_KEY_0 = os.getenv("NILLION_NILCHAIN_PRIVATE_KEY_0")
     NILLION_SEED = os.getenv("NILLION_SEED")
     
+    # OAuth
+    TWITTER_CLIENT_ID = os.getenv("TWITTER_CLIENT_ID")
+    TWITTER_CLIENT_SECRET = os.getenv("TWITTER_CLIENT_SECRET")
+    TWITTER_REDIRECT_URI = os.getenv("TWITTER_REDIRECT_URI")
+    TWITTER_AUTHORIZATION_URL: str = "https://twitter.com/i/oauth2/authorize"
+    TWITTER_TOKEN_URL: str = "https://api.twitter.com/oauth2/token"
+    
+    # OAuth 1.0
+    TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
+    TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
+    FRONTEND_URL = os.getenv("FRONTEND_URL")
+    
 settings = Settings()
 
 

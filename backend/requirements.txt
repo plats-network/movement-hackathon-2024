@@ -12,3 +12,9 @@ python-dotenv
 nillion_python_helpers
 py_nillion_client
 cosmpy
+requests-oauthlib
+authlib
+tweepy
+starlette
+httpx
+itsdangerous
