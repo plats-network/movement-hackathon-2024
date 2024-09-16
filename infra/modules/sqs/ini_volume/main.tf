@@ -14,5 +14,3 @@ resource "aws_sqs_queue" "queue" {
     Service     = "ini-volume"
   }
 }
-
-
