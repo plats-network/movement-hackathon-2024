@@ -60,6 +60,10 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "FRONTEND_URL",
           "value" : "https://plat-frontend.vercel.app"
+        },
+        {
+          "name" : "TWITTER_API_URL",
+          "value" : "https://api.discover.getmoni.io/api/v1/twitters"
         }
       ]
       environmentFiles = []
@@ -157,6 +161,10 @@ resource "aws_ecs_task_definition" "core" {
         {
           name      = "TWITTER_CONSUMER_SECRET",
           valueFrom = "${var.secret_arn}:twitterConsumerSecret::"
+        },
+        {
+          name      = "TWITTER_API_KEY",
+          valueFrom = "${var.secret_arn}:twitterApiKey::"
         }
       ]
       dnsServers            = []
