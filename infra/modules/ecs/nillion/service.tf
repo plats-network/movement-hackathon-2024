@@ -3,7 +3,7 @@ resource "aws_ecs_service" "service" {
   name            = "plat-fellowship-${var.environment_name}-nillion"
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.core.arn
-  desired_count   = 1
+  desired_count   = 0
   launch_type     = "FARGATE"
 
   network_configuration {
