@@ -1,0 +1,201 @@
+import logging
+import traceback
+import time
+
+import requests
+from solana.rpc.api import Client
+from jsonrpcclient import request, parse, Ok
+import src.decorators as Decorator
+
+from src.config import BaseConfig as Conf
+
+
+class TransactionIndexer(object):
+    def __init__(self) -> None:
+        self.chain_base_asset_symbol = "SOL"
+        self.chain_base_asset_decimals = 9
+        self.start_block = self._get_current_block()
+        self.solana_client: Client = Client(Conf.RPC_URL)
+        self.symbol_to_latest_price = {}
+        '''
+        sample record in DB (legacy)
+        {
+            "block_timestamp": 1345594949,
+            "asset": "SOL"
+            "asset_volume": 1343493294,
+            "asset_decimals": 9,
+            "chain_name": "SOL",
+            "chain_id": 900,
+            "tx_hash": "0x134354623747834"
+            "usd_volume": 134432,
+            "unit_price": 23456789,
+            "usd_decimals":6
+        }
+        '''
+
+    def __call__(self):
+        self._sync_to_now()
+        while True:
+            latest_block = self._get_current_block()
+            # loop through blocks
+            for block_num in range(self.start_block, latest_block):
+                print("block_num: ", block_num)
+                blocks = self.solana_client.get_block(block_num, "jsonParsed", max_supported_transaction_version=0)
+
+                # loop through transactions in blocks
+                transactions = blocks.value.transactions
+                for transaction in transactions:
+                    message = transaction.transaction.message
+                    signatures = transaction.transaction.signatures
+
+                    # find signer addr
+                    signer_addr: str = ""
+                    for account_key in message.account_keys:
+                        if not account_key.signer:
+                            continue
+                        signer_addr = account_key.pubkey
+                        break
+                    if not signer_addr:
+                        continue
+
+                    # check if this is our users
+                    plat_id = self._get_plat_id(signer_addr)
+                    if not plat_id:
+                        continue
+
+                    print("signatures: ", signatures)
+                    print("signer_addr: ", signer_addr)
+                    # get base token volume (SOL)
+                    meta = transaction.meta
+                    pre_balance = meta.pre_balances
+                    post_balance = meta.post_balances
+
+                    print(f"Pre Balances: {pre_balance}")
+                    print(f"Post Balances: {post_balance}")
+
+                    total_transaction_volume = abs(pre_balance[0] - post_balance[0])
+                    print(total_transaction_volume)
+                    # add volume
+                    try:
+                        self._add_volume(
+                            plat_id=plat_id,
+                            asset_symbol=self.chain_base_asset_symbol,
+                            volume=total_transaction_volume
+                        )
+                    except Exception:
+                        traceback.print_exc()
+                    print("===" * 100)
+                    # get others token volume (coming soon)
+
+            time.sleep(1)
+            self.start_block = latest_block
+        return
+
+    def _get_current_block(self) -> int:
+        response = requests.post(
+            Conf.RPC_URL,
+            json=request("getBlockHeight")
+        )
+        parsed = parse(response.json())
+        if isinstance(parsed, Ok):
+            return parsed.result
+        else:
+            logging.error(parsed.message)
+
+    @Decorator.cache_filter(timeout=60, is_class=True)
+    def _get_price_by_asset(self, asset_symbol: str):
+        symbol_to_id = {
+            "SOL": "solana"
+        }
+        asset_id: str = symbol_to_id.get(asset_symbol)
+
+        if not asset_id:
+            return 0
+
+        url = "https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            "ids": asset_id,
+            "vs_currencies": "usd"
+        }
+
+        headers = {
+            "accept": "application/json"
+        }
+
+        response = requests.get(url, headers=headers, params=params)
+
+        # Check if the request was successful
+        if response.status_code != 200:
+            print(f"Get Price Error: {response.status_code}, {response.text}")
+            return self.symbol_to_latest_price.get(asset_symbol) or 0
+
+        price_in_usd = response.json().get(asset_id).get('usd')
+        self.symbol_to_latest_price[asset_symbol] = price_in_usd
+        return float(price_in_usd)
+
+    @Decorator.cache_filter(timeout=10, is_class=True, include_null=True)
+    def _get_plat_id(self, wallet_addr: str) -> str:
+        url = f"{Conf.BACKEND_URL}/api/v1/internal/nillion/user"
+        params = {"address": wallet_addr}
+        headers = {"accept": "application/json"}
+
+        response = requests.get(url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            # Print error message
+            print(f"Not Plat User: {response.status_code}, {response.text}")
+            return ""
+        # Print the response content
+        response_json = response.json()
+        plat_id = response_json.get('data').get('plat_id') or ""
+        return plat_id
+
+    def _add_volume(self, plat_id: str, asset_symbol: str, volume: int) -> None:
+        key = f"volume_{asset_symbol}_in_usd"
+
+        # get current volume
+        current_volume = 0
+        response = requests.get(
+            f"{Conf.BACKEND_URL}/api/v1/internal/nillion/retrieve",
+            headers={
+                "accept": "application/json"
+            },
+            params={
+                "plat_id": plat_id,
+                "key": key
+            }
+        )
+        if response.status_code == 200:
+            response_json = response.json()
+            current_volume = response_json.get('data').get('value') or 0
+            print("Has current volume: ", current_volume)
+
+        current_volume = float(current_volume)
+
+        # asset to usd
+        price_in_usd = self._get_price_by_asset(asset_symbol)
+        display_asset_volume: float = volume * 10 ** (-1 * self.chain_base_asset_decimals)
+        display_asset_in_usd_volume: float = display_asset_volume * price_in_usd
+
+        # add new volume
+        new_volume: float = abs(current_volume) + abs(display_asset_in_usd_volume)
+
+        # store new value
+        response = requests.post(
+            f"{Conf.BACKEND_URL}/api/v1/internal/nillion/store",
+            headers={
+                "accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            json={
+                "plat_id": plat_id,
+                "key": key,
+                "value": f"{new_volume}"
+            }
+        )
+        print(f"added volume {plat_id}: ", response.json())
+        return
+
+    def _sync_to_now(self):
+        # TODO: sync to now
+        return
