@@ -68,9 +68,9 @@ async def callback(oauth_token: str, oauth_verifier: str, request: Request, sess
         
         # TODO: Store to nillion
         
-        
-        
-        return ResponseMsg.SUCCESS.to_json(data={}, msg="Authentication successful")
+        return RedirectResponse(url=settings.FRONTEND_URL)
+        # return ResponseMsg.SUCCESS.to_json(data={}, msg="Authentication successful")
+
     except tweepy.TweepError as e:
         raise HTTPException(status_code=500, detail=f"Error during authentication: {str(e)}")
 

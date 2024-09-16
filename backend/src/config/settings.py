@@ -59,7 +59,7 @@ class Settings():
     # OAuth 1.0
     TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
     TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
-    
+    FRONTEND_URL = os.getenv("FRONTEND_URL")
     
 settings = Settings()
 
