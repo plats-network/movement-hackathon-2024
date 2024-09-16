@@ -3,11 +3,14 @@ import pydash as py_
 class UserService(object):
     
     @staticmethod
-    def check_register(plat_id: str):
-        user = mUser.get_item_with({"plat_id": plat_id})
+    def check_register(address: str):
+        # filter User in db has address array contains address
+        user = mUser.get_item_with({"address": {"$elemMatch": {"$eq": address}}})
         if user:
-            user.pop('_id', None)
-            return user
+            return {
+                "plat_id": user['plat_id'],
+                "address": user['address']
+            }
         return None
         
         
