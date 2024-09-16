@@ -51,4 +51,10 @@ class UserService(object):
             raise Exception("User not found")
         user['address'].append(eoa)
         mUser.update(user)
-        
+    
+    @staticmethod
+    def update_user_info(plat_id: str, data: dict):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise Exception("User not found")
+        mUser.update(user['_id'], data)

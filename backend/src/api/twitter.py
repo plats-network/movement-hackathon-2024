@@ -5,6 +5,9 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 from pydantic import BaseModel
 import tweepy
 from src.config import settings
+from src.services import UserService
+from src.utils import ResponseMsg
+
 
 router = APIRouter()
 
@@ -18,17 +21,22 @@ class Token(BaseModel):
     oauth_token: str
     oauth_token_secret: str
 
+
 async def get_session(request: Request):
     return request.session
 
 @router.get("/login")
-async def login(request: Request):
+async def login(request: Request, plat_id: str):
     try:
         auth_url = oauth1_user_handler.get_authorization_url()
         request.session['request_token'] = oauth1_user_handler.request_token
+        request.session['plat_id'] = plat_id
+        
         return RedirectResponse(auth_url)
-    except tweepy.TweepError:
+    except tweepy.TweepyException as e:
+        print(e)
         raise HTTPException(status_code=500, detail="Error getting authorization URL")
+
 
 @router.get("/callback")
 async def callback(oauth_token: str, oauth_verifier: str, request: Request, session: dict = Depends(get_session)):
@@ -52,39 +60,20 @@ async def callback(oauth_token: str, oauth_verifier: str, request: Request, sess
         user = api.verify_credentials()
         
         # Save screen name in session to db
-        
-        
-        return JSONResponse({
-            "message": "Authentication successful",
-            "user_id": user.id,
-            "screen_name": user.screen_name
+        plat_id = session.get('plat_id')
+        # Save user information in db temporarily
+        UserService.update_user_info(plat_id, {
+            "twitter": user.screen_name,
         })
+        
+        # TODO: Store to nillion
+        
+        
+        
+        return ResponseMsg.SUCCESS.to_json(data={}, msg="Authentication successful")
     except tweepy.TweepError as e:
         raise HTTPException(status_code=500, detail=f"Error during authentication: {str(e)}")
 
-@router.get("/protected")
-async def protected_route(session: dict = Depends(get_session)):
-    access_token = session.get('access_token')
-    access_token_secret = session.get('access_token_secret')
-    
-    if not access_token or not access_token_secret:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    auth = tweepy.OAuth1UserHandler(
-        settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET,
-        access_token, access_token_secret
-    )
-    api = tweepy.API(auth)
-    
-    try:
-        user = api.verify_credentials()
-        return JSONResponse({
-            "message": "Access granted to protected resource",
-            "user_id": user.id,
-            "screen_name": user.screen_name
-        })
-    except tweepy.TweepError as e:
-        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
 
 @router.get("/logout")
 async def logout(session: dict = Depends(get_session)):
