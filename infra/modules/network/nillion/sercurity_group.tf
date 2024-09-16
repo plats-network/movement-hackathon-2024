@@ -4,10 +4,13 @@ resource "aws_security_group" "ecs" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.vpc_cidr_block]
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = [
+      var.vpc_cidr_block,
+      "222.253.79.150/32" # Odin Hoang home IP
+    ]
   }
 
   egress {
