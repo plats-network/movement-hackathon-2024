@@ -21,7 +21,7 @@ async def get_user(token: TokenData = Depends(Auth.verify_token)):
     # With the access token (plat_id)
     try:
         # get user from db
-        user = UserService.get_user(token.sub)
+        user = await UserService.get_user(token.sub)
         if user is None:
             return ResponseMsg.INVALID.to_json(msg="Unauthorized or User not found")
         

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request, Depends, BackgroundTasks
 from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.config import Config
 from authlib.integrations.starlette_client import OAuth, OAuthError
@@ -7,7 +7,7 @@ import tweepy
 from src.config import settings
 from src.services import UserService
 from src.utils import ResponseMsg
-
+from src.services import Nillion, TwitterService
 
 router = APIRouter()
 
@@ -39,7 +39,7 @@ async def login(request: Request, plat_id: str):
 
 
 @router.get("/callback")
-async def callback(oauth_token: str, oauth_verifier: str, request: Request, session: dict = Depends(get_session)):
+async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_verifier: str, request: Request, session: dict = Depends(get_session) ):
     request_token = session.get('request_token')
     if not request_token:
         raise HTTPException(status_code=400, detail="No request token")
@@ -59,14 +59,14 @@ async def callback(oauth_token: str, oauth_verifier: str, request: Request, sess
         # Get user information
         user = api.verify_credentials()
         
-        # Save screen name in session to db
         plat_id = session.get('plat_id')
-        # Save user information in db temporarily
-        UserService.update_user_info(plat_id, {
-            "twitter": user.screen_name,
-        })
         
-        # TODO: Store to nillion
+        # Store to nillion
+        background_tasks.add_task(Nillion.store, plat_id, 'twitter', user.screen_name)
+        
+        # Save twitter score 
+        score = TwitterService.get_score(user.screen_name)
+        background_tasks.add_task(Nillion.store, plat_id, 'twitter_score', score)
         
         return RedirectResponse(url=settings.FRONTEND_URL)
         # return ResponseMsg.SUCCESS.to_json(data={}, msg="Authentication successful")
