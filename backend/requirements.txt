@@ -15,3 +15,6 @@ cosmpy
 requests-oauthlib
 authlib
 tweepy
+starlette
+httpx
+itsdangerous
