@@ -16,6 +16,11 @@ class Nillion(object):
         
         # TODO: Store store_id and key(secret_name) to smart contract using plat_id
         print("store_id", store_id)
+        
+        
+        # Temporary save to database
+        mUser.update(user['_id'], {key: store_id})
+        
         # return store_id 
         
     
@@ -31,7 +36,8 @@ class Nillion(object):
         # volume_id = ...
         # twitter_id = ...
         # balance_id = ...
-        return
+        # return
+        store_id = mUser.get_item_with({"plat_id": plat_id})[key]
 
         
         if not store_id:
