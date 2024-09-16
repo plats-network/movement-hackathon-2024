@@ -61,6 +61,10 @@ class Settings():
     TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
     FRONTEND_URL = os.getenv("FRONTEND_URL")
     
+    # Twitter
+    TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
+    TWITTER_API_URL = os.getenv("TWITTER_API_URL")
+    
 settings = Settings()
 
 

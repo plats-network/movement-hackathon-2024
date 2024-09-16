@@ -1,5 +1,7 @@
 from src.models import mUser
 import pydash as py_
+from .twitter import TwitterService
+from src.services import Nillion
 class UserService(object):
     
     @staticmethod
@@ -33,11 +35,17 @@ class UserService(object):
         return user
         
     @staticmethod
-    def get_user(plat_id: str):
+    async def get_user(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
         # except ObjectId
+        except_list = ['_id', 'public_key', 'plat_id', 'address', 'date_created', 'date_updated']
         if user:
-            user.pop('_id', None)
+            for key in except_list:
+                user.pop(key, None)
+            
+            for key in user:
+                value = await Nillion.retrieve(plat_id, key)
+                user[key] = value
             return user
         return None
     
