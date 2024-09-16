@@ -18,7 +18,7 @@ def get_cache_key(*args, **kwargs):
     return key
 
 
-def cache_filter(timeout=86400, key_prefix='plat_indexer', is_class=False, include_null=False):
+def cache_filter(timeout=86400, key_prefix='plat_fellowship:indexer', is_class=False, include_null=False):
     """
     Decorator for caching functions by filter
     Returns the cached value, or the function if the cache is disabled

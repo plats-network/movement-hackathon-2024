@@ -5,16 +5,24 @@ import time
 import requests
 from solana.rpc.api import Client
 from jsonrpcclient import request, parse, Ok
-import src.decorators as Decorator
 
+import src.decorators as Decorator
 from src.config import BaseConfig as Conf
+from src.extensions import redis_client
 
 
 class TransactionIndexer(object):
     def __init__(self) -> None:
+        self.latest_sync_block_key = "plat_fellowship:indexer:latest_sync_block"
         self.chain_base_asset_symbol = "SOL"
         self.chain_base_asset_decimals = 9
-        self.start_block = self._get_current_block()
+        # get latest block in redis
+        latest_sync_block = redis_client.get(self.latest_sync_block_key)
+        if latest_sync_block:
+            latest_sync_block = int(latest_sync_block) + 1
+        current_block = self._get_current_block()
+        self.start_block = min(latest_sync_block, latest_sync_block) if latest_sync_block else current_block
+
         self.solana_client: Client = Client(Conf.RPC_URL)
         self.symbol_to_latest_price = {}
         '''
@@ -84,14 +92,18 @@ class TransactionIndexer(object):
                         )
                     except Exception:
                         traceback.print_exc()
-                    print("===" * 100)
+                    print("===" * 30)
                     # get others token volume (coming soon)
+
+                # set latest block to redis
+                redis_client.set(self.latest_sync_block_key, block_num)
 
             time.sleep(1)
             self.start_block = latest_block
         return
 
     def _get_current_block(self) -> int:
+        # get current block
         response = requests.post(
             Conf.RPC_URL,
             json=request("getBlockHeight")
@@ -194,8 +206,4 @@ class TransactionIndexer(object):
             }
         )
         print(f"added volume {plat_id}: ", response.json())
-        return
-
-    def _sync_to_now(self):
-        # TODO: sync to now
         return
