@@ -42,7 +42,6 @@ class TransactionIndexer(object):
         '''
 
     def __call__(self):
-        self._sync_to_now()
         while True:
             latest_block = self._get_current_block()
             # loop through blocks
