@@ -17,13 +17,13 @@ resource "aws_ecs_task_definition" "core" {
           protocol      = "tcp"
         },
         {
-          containerPort = 37939
-          hostPort      = 37939
+          containerPort = 35403
+          hostPort      = 35403
           protocol      = "tcp"
         },
         {
-          containerPort = 54936
-          hostPort      = 54936
+          containerPort = 59322
+          hostPort      = 59322
           protocol      = "tcp"
         },
         {
