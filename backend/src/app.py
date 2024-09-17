@@ -17,14 +17,15 @@ def create_app(config=None, app_name=None):
         openapi_url=f"{settings.API_V1_STR}/openapi.json"
     )
 
-    # if settings.ALLOWED_ORIGINS:
-    #     app.add_middleware(
-    #         CORSMiddleware,
-    #         allow_origins=settings.ALLOWED_ORIGINS,
-    #         allow_credentials=True,
-    #         allow_methods=["*"],
-    #         allow_headers=["*"],
-    #     )
+    origins = ["*"]
+    # Add CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     
     # Add middleware
     app.add_middleware(CustomHeadersMiddleware)
