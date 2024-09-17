@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("G8bW54fy7ex4YxM2qh4JT87hzRFXiGbzYzDTqPqYz4VB");
+declare_id!("8QHxbx26WeD96Z6idcKH8X6aiEXoB5Ek42GWAsLFXcRG");
 
 #[program]
 pub mod plats_id {
@@ -21,52 +21,54 @@ pub mod plats_id {
         ctx: Context<RegisterIdentity>,
         owner: Pubkey,
         name_id: String,
-        secret_info: Vec<(String, String)>,
+        store_ids: Vec<String>,
+        secret_names: Vec<String>,
+        bump: u8
     ) -> Result<()> {
         let identity = &mut ctx.accounts.identity;
         let identity_management = &mut ctx.accounts.identity_management;
         let mut infos = Vec::new();
-        for (store_id, secret_name) in secret_info.into_iter() {
+        for (store_id, secret_name) in store_ids.iter().zip(secret_names.iter()) {
             let type_info = get_type(secret_name.clone())?;
-
-            let info = PrivacyInfo {
-                store_id,
-                secret_name,
-                type_info,
+            let privacy_info = PrivacyInfo {
+                store_id: store_id.clone(),
+                secret_name: secret_name.clone(),
+                type_info
             };
-            infos.push(info);
+            infos.push(privacy_info);
         }
 
-        identity.owner = owner.clone();
-        identity.name_id = name_id.clone();
-        identity.infos = infos.clone();
-        identity.bump = identity_management.profiles.len() as u8;
-        //identity.bump = 0u8;
+
         let new_identity = Identity {
             owner,
-            name_id,
-            infos,
-            bump: identity_management.profiles.len() as u8,
-            //bump: 0u8
+            name_id: name_id.clone(),
+            infos: infos.clone(),
+            bump,
         };
 
         identity_management.profiles.push(new_identity);
+
+        identity.owner = owner;
+        identity.name_id = name_id;
+        identity.infos = infos;
+        identity.bump = bump;
         Ok(())
     }
 
     pub fn update_identity(
         ctx: Context<UpdateIdentity>,
         name_id: String,
-        secret_info: Vec<(String, String)>,
+        store_ids: Vec<String>,
+        secret_names: Vec<String>,
     ) -> Result<()> {
         if ctx.accounts.identity.name_id == name_id {
             return err!(ErrCode::IdWrong);
         }
         let identity = &mut ctx.accounts.identity;
-        for (store_id, secret_name) in secret_info.into_iter() {
+        for (store_id, secret_name) in store_ids.iter().zip(secret_names.iter()) {
             let type_info = get_type(secret_name.clone())?;
             
-            let existing_info = identity.infos.iter_mut().find(|info| info.store_id == store_id);
+            let existing_info = identity.infos.iter_mut().find(|info| &info.store_id == store_id);
     
             match existing_info {
                 Some(info) => {
@@ -97,7 +99,7 @@ pub struct Initialize<'info> {
 
     #[account(
         init,
-        seeds = [b"identity_management"], // optional seeds for pda
+        seeds = [b"identity_management".as_ref()], // optional seeds for pda
         bump,                 // bump seed for pda
         payer = signer,
         space = 8 + 3000
@@ -113,7 +115,7 @@ pub struct UpdateIdentity<'info> {
 
     #[account(
         mut,
-        seeds = [b"identity"],
+        seeds = [b"identity".as_ref()],
         bump = identity.bump
     )]
     pub identity: Box<Account<'info, Identity>>,
