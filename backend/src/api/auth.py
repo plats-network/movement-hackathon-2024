@@ -24,7 +24,7 @@ async def get_nonce(public_key: str):
     nonce = base64.b64encode(nacl.utils.random(16)).decode("utf-8")
     
     # store the nonce in redis
-    redis_client.setex(public_key, timedelta(seconds=60), nonce)
+    await redis_client.setex(public_key, timedelta(seconds=60), nonce)
     
     return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
 
