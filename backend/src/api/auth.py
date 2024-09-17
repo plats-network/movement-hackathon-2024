@@ -13,18 +13,33 @@ from src.config import settings
 from src.dtos import TokenData
 from src.config.db import redis_client
 from src.services import UserService
+import hashlib
 
 router = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def base64_to_a_z(base64_str):
+    # Decode the base64 string to bytes
+    decoded_bytes = base64.b64decode(base64_str)
+    # Hash the bytes using SHA-256
+    sha256_hash = hashlib.sha256(decoded_bytes).digest()
+    # Encode the hash in base64
+    base64_hash = base64.b64encode(sha256_hash).decode('utf-8')
+    # Map the base64 characters to a-z
+    a_z_str = ''.join(chr((ord(c) % 26) + ord('a')) for c in base64_hash)
+    return a_z_str
+
 @router.get("/nonce")
 async def get_nonce(public_key: str):
     nonce = base64.b64encode(nacl.utils.random(16)).decode("utf-8")
     
+    # generate a string from public_key unique
+    unique_key = base64_to_a_z(public_key)
+    print("Nonce", nonce)
     # store the nonce in redis
-    await redis_client.setex(public_key, timedelta(seconds=60), nonce)
+    redis_client.setex(unique_key, timedelta(seconds=60), nonce)
     
     return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
 
@@ -36,12 +51,17 @@ async def verify_signature(request: VerifyRequestDTO):
     print("publicKey", public_key)
     print("signature", signature)
     # Retrieve the nonce from Redis
-    nonce = await redis_client.get(public_key)
+    unique_key = base64_to_a_z(public_key)
+    nonce_bytes = redis_client.get(unique_key)
+    nonce = nonce_bytes.decode("utf-8") if nonce_bytes else None
+    
+    
     if nonce is None:
         return ResponseMsg.INVALID.to_json(msg="Nonce not found")
     
+
     # Delete the nonce from Redis
-    redis_client.delete(public_key)
+    redis_client.delete(unique_key)
     
     # ! Uncomment to verify signature
     try:
@@ -51,7 +71,8 @@ async def verify_signature(request: VerifyRequestDTO):
         
         # Verify the signature against the message
         verify_key.verify(nonce.encode("utf-8"), decoded_signature)
-    except:
+    except Exception as e:
+        logger.error(f"Error verifying signature: {e}")
         return ResponseMsg.INVALID.to_json(msg="Verification failed")
     
     
