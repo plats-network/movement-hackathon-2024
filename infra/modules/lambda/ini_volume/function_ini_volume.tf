@@ -12,11 +12,11 @@ resource "aws_lambda_function" "ini_volume" {
   description                    = "To Initialize Volume"
   filename                       = data.archive_file.func_zip.output_path
   handler                        = "main.main"
-  memory_size                    = 128
+  memory_size                    = 512
   package_type                   = "Zip"
   publish                        = false
   reserved_concurrent_executions = -1
-  runtime                        = "python3.8"
+  runtime                        = "python3.11"
   skip_destroy                   = false
   source_code_hash               = data.archive_file.break_trades_zip.output_base64sha256
   timeout                        = 300
@@ -24,7 +24,7 @@ resource "aws_lambda_function" "ini_volume" {
 
   environment {
     variables = {
-      FOO = "bar"
+      BACKEND_URL = "http://172.31.21.6"
     }
   }
 }
