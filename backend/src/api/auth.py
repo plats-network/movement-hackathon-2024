@@ -44,6 +44,10 @@ async def get_nonce(public_key: str):
     return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
 
 
+@router.options("/verify")
+async def verify_signature_options():
+    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+
 @router.post("/verify")
 async def verify_signature(request: VerifyRequestDTO):
     public_key = request.public_key
