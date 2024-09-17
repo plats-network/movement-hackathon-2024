@@ -45,8 +45,12 @@ async def verify_signature(request: VerifyRequestDTO):
     
     # ! Uncomment to verify signature
     try:
+        # Decode the base64 public key and signature
         verify_key = VerifyKey(public_key, encoder=Base64Encoder)
-        verify_key.verify(nonce.encode("utf-8"), signature.encode("utf-8"))
+        decoded_signature = Base64Encoder.decode(signature)
+        
+        # Verify the signature against the message
+        verify_key.verify(nonce.encode("utf-8"), decoded_signature)
     except:
         return ResponseMsg.INVALID.to_json(msg="Verification failed")
     
