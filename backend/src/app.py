@@ -22,13 +22,12 @@ def create_app(config=None, app_name=None):
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
     
     # Add middleware
-    app.add_middleware(CustomHeadersMiddleware)
+    # app.add_middleware(CustomHeadersMiddleware)
     app.add_middleware(SessionMiddleware, secret_key="!secret")
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
