@@ -51,6 +51,15 @@ def check_register(address: str):
     except Exception as e:
         return ResponseMsg.ERROR.to_json(msg=str(e))
 
+@router.post('/user')
+def update_user(plat_id: str, is_new_user: bool):
+    try:
+        UserService.update_user_info(plat_id, {"is_new_user": is_new_user})
+        return ResponseMsg.SUCCESS.to_json(data={})
+    except Exception as e:
+        return ResponseMsg.ERROR.to_json(msg=str(e))
+    
+
 @router.post('/rank')
 async def rank():
     try:

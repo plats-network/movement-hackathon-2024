@@ -65,6 +65,10 @@ class Settings():
     TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
     TWITTER_API_URL = os.getenv("TWITTER_API_URL")
     
+    # Solana
+    SOLANA_RPC_URL = os.getenv("SOLANA_RPC_URL")
+    SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
+    
 settings = Settings()
 
 

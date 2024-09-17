@@ -18,3 +18,6 @@ tweepy
 starlette
 httpx
 itsdangerous
+solana
+solders
+anchorpy

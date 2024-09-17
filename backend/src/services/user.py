@@ -30,7 +30,8 @@ class UserService(object):
         user = mUser.insert({
             "plat_id": plat_id,
             "address": [eoa],
-            "public_key": public_key
+            "public_key": public_key,
+            "is_new_user": True
         })
         return user
         
