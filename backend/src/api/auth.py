@@ -36,7 +36,7 @@ async def verify_signature(request: VerifyRequestDTO):
     print("publicKey", public_key)
     print("signature", signature)
     # Retrieve the nonce from Redis
-    nonce = redis_client.get(public_key)
+    nonce = await redis_client.get(public_key)
     if nonce is None:
         return ResponseMsg.INVALID.to_json(msg="Nonce not found")
     
