@@ -67,7 +67,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "CONTRACT_SERVICE_DNS",
-          "value" : var.contract_service_dns
+          "value" : "http://${var.contract_service_dns}"
         }
       ]
       environmentFiles = []
