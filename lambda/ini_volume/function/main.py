@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 
 import requests
 
@@ -160,16 +161,21 @@ def main(event, context):
     print("Context: ", event)
     payload = json.loads(event.get("Records")[0].get("body"))
     plat_id = payload.get("plat_id")
-    wallet_addr = payload.get("wallet_addr")
-    from_block = payload.get("from_block")
-    to_block = payload.get("to_block")
-    usd_price = payload.get("usd_price")
-    usd_price = float(usd_price)
-    # get volume
-    volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
-    volumne_usd = usd_price * volume
-    # add volume
-    add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
     # call set is_new_user to False
     set_is_new_user(plat_id=plat_id, is_new_user=False)
+    try:
+        wallet_addr = payload.get("wallet_addr")
+        from_block = payload.get("from_block")
+        to_block = payload.get("to_block")
+        usd_price = payload.get("usd_price")
+        usd_price = float(usd_price)
+        # get volume
+        volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
+        volumne_usd = usd_price * volume
+        # add volume
+        add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
+
+    except Exception:
+        traceback.print_exc()
+        set_is_new_user(plat_id=plat_id, is_new_user=True)
     return
