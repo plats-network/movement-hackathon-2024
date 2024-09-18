@@ -32,8 +32,8 @@ export default function Home() {
             objectFit="contain"
           />
         </div>
-
-        <div className="flex flex-col gap-8 text-center">
+{/* 
+        <div className="flex flex-col gap-8 text-center z-50">
             <p className="text-[32px] text-white">
               Your gateway <br />
               to personalized web3 experience
@@ -45,14 +45,14 @@ export default function Home() {
               <WalletIcon />
               <p> Connect your account</p>
             </Link>
-          </div>
-        {/* {publicKey ? (
-          <div className="flex flex-col gap-3 text-center ">
+          </div> */}
+        {publicKey ? (
+          <div className="flex flex-col gap-3 text-center z-50 text-white">
             <p className="text-2xl font-bold">{`You are relized as: <result>`}</p>
             <p className="text-2xl font-bold">{`Your score is: <score>`}</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-8 text-center">
+          <div className="flex flex-col gap-8 text-center z-50">
             <p className="text-[32px] text-white">
               Your gateway <br />
               to personalized web3 experience
@@ -65,7 +65,7 @@ export default function Home() {
               <p> Connect your account</p>
             </Link>
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,8 @@ class UserService(object):
         if user:
             return {
                 "plat_id": user['plat_id'],
-                "address": user['address']
+                "address": user['address'],
+                "is_new_user": user['is_new_user']
             }
         return None
         
