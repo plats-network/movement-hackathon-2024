@@ -1,5 +1,5 @@
 resource "aws_lb" "load_balancer" {
-  name               = "plat-fellowship-${var.environment_name}-contract-service"
+  name               = "plat-fellowship-${var.environment_name}-contract-svc"
   internal           = true
   load_balancer_type = "application"
   security_groups    = [var.aws_security_group_load_balancer_id]
@@ -15,7 +15,7 @@ resource "aws_lb" "load_balancer" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
-    Service     = "contract-service"
+    Service     = "contract-svc"
   }
 }
 

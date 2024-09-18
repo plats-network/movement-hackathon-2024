@@ -1,5 +1,5 @@
 resource "aws_security_group" "ecs" {
-  name        = "plat-fellowship-${var.environment_name}-contract-service-ecs"
+  name        = "plat-fellowship-${var.environment_name}-contract-svc-ecs"
   description = "ECS Service security group"
   vpc_id      = var.vpc_id
 
@@ -22,12 +22,12 @@ resource "aws_security_group" "ecs" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
-    Service     = "contract-service"
+    Service     = "contract-svc"
   }
 }
 
 resource "aws_security_group" "elb_sg" {
-  name        = "plat-fellowship-${var.environment_name}-contract-service-elb"
+  name        = "plat-fellowship-${var.environment_name}-contract-svc-elb"
   description = "ELB security group"
   vpc_id      = var.vpc_id
 
@@ -49,6 +49,6 @@ resource "aws_security_group" "elb_sg" {
     Environment = var.environment_name
     SystemName  = "plat"
     ProductName = "plat-fellowship"
-    Service     = "contract-service"
+    Service     = "contract-svc"
   }
 }

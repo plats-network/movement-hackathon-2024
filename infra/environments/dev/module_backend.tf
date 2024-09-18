@@ -42,6 +42,7 @@ module "backend_ecs" {
   security_group_ecs_task_service = module.backend_network.ecs_sg_id
   public_subnet_id                = var.public_subnet_a_id
   target_group_arn                = module.backend_load_balancer.load_balancer_target_group_arn
+  contract_service_dns            = module.contract_service_load_balancer.lb_dns_name
 }
 
 

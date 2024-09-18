@@ -46,3 +46,8 @@ variable "target_group_arn" {
   type        = string
   description = "target_group_arn"
 }
+variable "contract_service_dns" {
+  type        = string
+  description = "contract_service_dns"
+}
+
