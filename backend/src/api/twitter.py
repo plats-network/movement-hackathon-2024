@@ -38,7 +38,7 @@ async def login(request: Request, plat_id: str):
         
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
-        print(e)
+        print("Error getting authorization URL: ", str(e))
         raise HTTPException(status_code=500, detail="Error getting authorization URL")
 
 
