@@ -1,0 +1,82 @@
+name: deployment-contract-service
+run-name: ${{ github.workflow }} (${{ inputs.branch }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Environment to deploy'
+        options: 
+        - dev
+        # - prod
+      branch:
+        description: 'Branch name to deploy'
+        required: true
+        default: 'dev'
+
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment }}
+  AWS_REGION: ap-southeast-1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Print branch name
+        run: echo "Checked out branch ${{ github.event.inputs.branch }}"
+
+      - name: Specify Deployment Role
+        run: |
+          echo "AWS_ROLE_ARN=${{ secrets.AWS_ROLE_ARN_PLAT }}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: GitHubActionsWorkflow
+          role-duration-seconds: 900
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set Environments
+        run: |
+          REPOSITORY_NAME="plat-fellowship-${{ env.ENVIRONMENT }}-contract-service"
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry }}/${REPOSITORY_NAME}" >> $GITHUB_ENV
+          echo "ECS_TASK_SERVICE_NAME=plat-fellowship-${{ env.ENVIRONMENT }}-contract-service" >> $GITHUB_ENV
+          echo "ECS_CLUSTER_NAME=plat-fellowship-${{ env.ENVIRONMENT }}-contract-service" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: |
+          cd contract-service && docker build -t ${{ env.ECR_REPOSITORY }}:${{ github.sha }} . -f Dockerfile
+
+      - name: Tag image, and push image to ECR Repository
+        run: |
+          aws ecr put-image-tag-mutability --repository-name ${{ env.REPOSITORY_NAME }} --image-tag-mutability MUTABLE
+          docker tag ${{ env.ECR_REPOSITORY }}:${{ github.sha }} ${{ env.ECR_REPOSITORY }}:latest
+          docker push -a ${{ env.ECR_REPOSITORY }}
+          aws ecr put-image-tag-mutability --repository-name ${{ env.REPOSITORY_NAME }} --image-tag-mutability IMMUTABLE
+
+      - name: Update Amazon ECS Service
+        run: |
+          aws ecs update-service --service ${{ env.ECS_TASK_SERVICE_NAME }} --cluster ${{ env.ECS_CLUSTER_NAME }} --force-new-deployment
+
