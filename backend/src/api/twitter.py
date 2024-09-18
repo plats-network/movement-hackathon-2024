@@ -25,6 +25,10 @@ class Token(BaseModel):
 async def get_session(request: Request):
     return request.session
 
+@router.options("/login")
+async def login_options():
+    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+
 @router.get("/login")
 async def login(request: Request, plat_id: str):
     try:
