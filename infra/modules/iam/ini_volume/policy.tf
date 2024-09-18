@@ -75,3 +75,28 @@ resource "aws_iam_policy" "secret_manager_readonly" {
     ]
   })
 }
+# policy: secret manager readonly
+resource "aws_iam_policy" "network_connect" {
+  name = "plat-fellowship-${var.environment_name}-ini-volume-network"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeSubnets",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}

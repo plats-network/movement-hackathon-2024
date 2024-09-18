@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("8QHxbx26WeD96Z6idcKH8X6aiEXoB5Ek42GWAsLFXcRG");
+declare_id!("D2CPWAujr7jvku9AtNwb1jaDudhDU7TNYUTcJY8trTFd");
 
 #[program]
 pub mod plats_id {
@@ -8,25 +8,17 @@ pub mod plats_id {
 
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        let management = &mut ctx.accounts.identity_management;
-        management.bump = ctx.bumps.identity_management;
-        management.owner = ctx.accounts.signer.key();
-        management.profiles = Vec::default();
-
-        Ok(())
-    }
 
     pub fn register_identity(
         ctx: Context<RegisterIdentity>,
-        owner: Pubkey,
         name_id: String,
         store_ids: Vec<String>,
         secret_names: Vec<String>,
         bump: u8
     ) -> Result<()> {
+        let owner_account = &ctx.accounts.owner;
         let identity = &mut ctx.accounts.identity;
-        let identity_management = &mut ctx.accounts.identity_management;
+
         let mut infos = Vec::new();
         for (store_id, secret_name) in store_ids.iter().zip(secret_names.iter()) {
             let type_info = get_type(secret_name.clone())?;
@@ -37,21 +29,10 @@ pub mod plats_id {
             };
             infos.push(privacy_info);
         }
-
-
-        let new_identity = Identity {
-            owner,
-            name_id: name_id.clone(),
-            infos: infos.clone(),
-            bump,
-        };
-
-        identity_management.profiles.push(new_identity);
-
-        identity.owner = owner;
         identity.name_id = name_id;
         identity.infos = infos;
         identity.bump = bump;
+        identity.owner = owner_account.key();
         Ok(())
     }
 
@@ -61,52 +42,32 @@ pub mod plats_id {
         store_ids: Vec<String>,
         secret_names: Vec<String>,
     ) -> Result<()> {
-        if ctx.accounts.identity.name_id == name_id {
+        if ctx.accounts.identity.name_id != name_id {
             return err!(ErrCode::IdWrong);
         }
         let identity = &mut ctx.accounts.identity;
+
+        let mut new_infos = Vec::new();
+
+
         for (store_id, secret_name) in store_ids.iter().zip(secret_names.iter()) {
             let type_info = get_type(secret_name.clone())?;
-            
-            let existing_info = identity.infos.iter_mut().find(|info| &info.store_id == store_id);
-    
-            match existing_info {
-                Some(info) => {
-                    info.secret_name = secret_name.clone();
-                    info.type_info = type_info.clone();
-                }
-                None => {
-                    return err!(ErrCode::IdentityIsExisted);
-                }
-            }
+            let privacy_info = PrivacyInfo {
+                store_id: store_id.clone(),
+                secret_name: secret_name.clone(),
+                type_info
+            };
+            new_infos.push(privacy_info);
+
         }
+
+        identity.infos = new_infos;
 
         Ok(())
     }
 }
 
-#[account]
-pub struct IdentityManagement {
-    pub owner: Pubkey,
-    pub profiles: Vec<Identity>,
-    pub bump: u8,
-}
 
-#[derive(Accounts)]
-pub struct Initialize<'info> {
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    #[account(
-        init,
-        seeds = [b"identity_management".as_ref()], // optional seeds for pda
-        bump,                 // bump seed for pda
-        payer = signer,
-        space = 8 + 3000
-    )]
-    pub identity_management: Account<'info, IdentityManagement>,
-    pub system_program: Program<'info, System>,
-}
 
 #[derive(Accounts)]
 pub struct UpdateIdentity<'info> {
@@ -115,10 +76,15 @@ pub struct UpdateIdentity<'info> {
 
     #[account(
         mut,
-        seeds = [b"identity".as_ref()],
-        bump = identity.bump
+        seeds = [b"identity".as_ref(), owner.key().as_ref()],
+        bump
     )]
     pub identity: Box<Account<'info, Identity>>,
+
+    /// CHECK:
+    pub owner: AccountInfo<'info>,
+
+
     pub system_program: Program<'info, System>,
 }
 
@@ -127,11 +93,12 @@ pub struct RegisterIdentity<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(init, payer = signer, space = 8 + 3000, seeds = [b"identity"], bump)]
+    #[account(init, payer = signer, space = 8 + 3000, seeds = [b"identity", owner.key().as_ref()], bump)]
     pub identity: Box<Account<'info, Identity>>,
 
-    #[account(mut)]
-    pub identity_management: Account<'info, IdentityManagement>,
+    /// CHECK:
+    pub owner: AccountInfo<'info>,
+
 
     pub system_program: Program<'info, System>,
 }

@@ -6,5 +6,6 @@ resource "aws_iam_role" "lambda_execution_role" {
     aws_iam_policy.sqs_io.arn,
     aws_iam_policy.lambda_io.arn,
     aws_iam_policy.secret_manager_readonly.arn,
+    aws_iam_policy.network_connect.arn
   ]
 }
