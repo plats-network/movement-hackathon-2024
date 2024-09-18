@@ -64,6 +64,10 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "TWITTER_API_URL",
           "value" : "https://api.discover.getmoni.io/api/v1/twitters"
+        },
+        {
+          "name" : "CONTRACT_SERVICE_DNS",
+          "value" : var.contract_service_dns
         }
       ]
       environmentFiles = []

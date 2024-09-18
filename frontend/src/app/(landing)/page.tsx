@@ -1,13 +1,13 @@
-"use client";
-
-import { useWallet } from "@solana/wallet-adapter-react";
 
 import Link from "next/link";
 import Image from "next/image";
 import WalletIcon from "@/assets/WalletIcom";
+import { clientAccessToken } from "@/lib/utils";
+import { cookies } from "next/headers";
 
 export default function Home() {
-  const { publicKey } = useWallet();
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("accessToken");
   return (
     <div className="relative h-[100vh] flex items-center justify-center ">
 
@@ -32,21 +32,7 @@ export default function Home() {
             objectFit="contain"
           />
         </div>
-{/* 
-        <div className="flex flex-col gap-8 text-center z-50">
-            <p className="text-[32px] text-white">
-              Your gateway <br />
-              to personalized web3 experience
-            </p>
-            <Link
-              href={"/login"}
-              className="w-full py-4 text-base font-bold  flex items-center justify-center gap-2 text-white rounded-xl  cursor-pointer bg-gradient-to-r from-[#8737E9] to-[#3AE7E7]  "
-            >
-              <WalletIcon />
-              <p> Connect your account</p>
-            </Link>
-          </div> */}
-        {publicKey ? (
+        {accessToken ? (
           <div className="flex flex-col gap-3 text-center z-50 text-white">
             <p className="text-2xl font-bold">{`You are relized as: <result>`}</p>
             <p className="text-2xl font-bold">{`Your score is: <score>`}</p>

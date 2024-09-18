@@ -10,12 +10,6 @@ variable "logs_region" {
   description = "Region where CloudWatch Logs resides"
 }
 
-# secret
-variable "secret_arn" {
-  type        = string
-  description = "ARN for getting value by key in secret manager"
-}
-
 # erc
 variable "ecr_uri" {
   type        = string
@@ -46,8 +40,3 @@ variable "target_group_arn" {
   type        = string
   description = "target_group_arn"
 }
-variable "contract_service_dns" {
-  type        = string
-  description = "contract_service_dns"
-}
-
