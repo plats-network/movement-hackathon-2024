@@ -25,6 +25,10 @@ class Token(BaseModel):
 async def get_session(request: Request):
     return request.session
 
+@router.options("/login")
+async def login_options():
+    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+
 @router.get("/login")
 async def login(request: Request, plat_id: str):
     try:
@@ -34,7 +38,7 @@ async def login(request: Request, plat_id: str):
         
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
-        print(e)
+        print("Error getting authorization URL: ", str(e))
         raise HTTPException(status_code=500, detail="Error getting authorization URL")
 
 
