@@ -17,6 +17,10 @@ variable "public_subnet_a_id" {
   type        = string
   description = "public_subnet_a_id"
 }
+variable "private_subnet_a_id" {
+  type        = string
+  description = "private_subnet_a_id"
+}
 variable "public_subnet_b_id" {
   type        = string
   description = "public_subnet_b_id"
