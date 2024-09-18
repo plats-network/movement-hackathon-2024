@@ -48,6 +48,12 @@ resource "aws_iam_policy" "ecs_task_container_policy" {
         Effect   = "Allow"
         Resource = "*"
         Sid      = "SecretManager"
+      },
+      {
+        Action   = ["sqs:sendmessage"]
+        Effect   = "Allow"
+        Resource = "*"
+        Sid      = "SQS"
       }
     ]
   })
