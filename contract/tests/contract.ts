@@ -13,42 +13,36 @@ describe("Plats Id", () => {
   const signer = provider.wallet as NodeWallet;
   const users = Array.from({ length: 10 }, () => anchor.web3.Keypair.generate());
   const owner = users[0].publicKey;
-  let [identityManagementPDA, _] = PublicKey.findProgramAddressSync(
-    [
-      anchor.utils.bytes.utf8.encode('identity_management'),
-    ],
-    program.programId
-  );
-  console.log("identityManagementPDA:", identityManagementPDA);
+
+  const owner1 = users[1].publicKey;
+  const owner2 = users[2].publicKey;
+  console.log("Owner:",owner2);
+  const owner3 = users[3].publicKey;
+  const owner4 = users[4].publicKey;
+  // let [identityManagementPDA, _] = PublicKey.findProgramAddressSync(
+  //   [
+  //     anchor.utils.bytes.utf8.encode('identity_management'),
+  //     owner4.toBuffer()
+  //   ],
+  //   program.programId
+  // );
+  // console.log("identityManagementPDA:", identityManagementPDA);
     let [identityPDA, bump] = PublicKey.findProgramAddressSync(
       [
-        anchor.utils.bytes.utf8.encode('identity'), Buffer.from('1')
+        anchor.utils.bytes.utf8.encode('identity'),
+        owner2.toBuffer()
       ],
       program.programId
     );
     console.log("identityPDA:", identityPDA);
-  // it("Is initialized!", async () => {
-  //   try {
-  //     const txSig = await program.methods
-  //       .initialize()
-  //       .accounts({
-  //         identityManagement: identityManagementPDA,
-  //       })
-  //       .rpc();
- 
-  //     console.log(`Transaction Signature: ${txSig}`);
-  //   } catch (error) {
-  //     // If PDA Account already created, then we expect an error
-  //     console.log(error);
-  //   }
-  // });
+
 
 
   it("Register Identity", async () => {
 
 
 
-    let nameId = "Alice.ID";
+    let nameId = "BOB.ID";
     let storeIdBalance = "c999d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -59,48 +53,48 @@ describe("Plats Id", () => {
     let secretNameTwitter = "secret_twitter";
 
     const transactionSignature = await program.methods
-      .registerIdentity(owner, nameId, [storeIdBalance, storeIdVolume,storeIdTwitter ], [secretNameBalance, secretNameVolume, secretNameTwitter], 0)
+      .registerIdentity(nameId, [storeIdBalance, storeIdVolume,storeIdTwitter ], [secretNameBalance, secretNameVolume, secretNameTwitter], 1)
     .accounts({
-      identityManagement: identityManagementPDA,
-      identity: identityPDA
+      identity: identityPDA,
+      owner: owner2
     })
     .rpc();
   });
-
-
-  // it("Update  Identity", async () => {
-
-
-
-  //   let nameId = "Alice.ID";
-  //   let storeIdBalance = "c888d3e9-a6c1-438b-a121-295115728f01";
-  //   let secretNameBalance = "secret_balance";
-
-  //   let storeIdVolume = "c888d3e9-a6c1-438b-a121-295115728f01";
-  //   let secretNameVolume = "secret_volume";
-
-  //   let storeIdTwitter = "c888d3e9-a6c1-438b-a121-295115728f01";
-  //   let secretNameTwitter = "secret_twitter";
-
-  //   const transactionSignature = await program.methods
-  //     .updateIdentity(nameId, [storeIdBalance, storeIdVolume,storeIdTwitter ], [secretNameBalance, secretNameVolume, secretNameTwitter])
-  //   .accounts({
-  //     identity: identityPDA
-  //   })
-  //   .rpc();
-  // });
-
 
   it("Get Identity", async () => {
 
 
 
-    const accountData = await program.account.identityManagement.fetch(identityManagementPDA);
+    const accountData = await program.account.identity.fetch(identityPDA);
 
-    console.log(`Owner of identity Management: ${accountData.owner}`);
-    console.log(`Profiles: ${JSON.stringify(accountData.profiles)}`);
-    console.log(`Bumps: ${JSON.stringify(accountData.bump)}`);
+    console.log(`Name : ${accountData.nameId}`);
+    console.log(`Profiles: ${JSON.stringify(accountData.infos)}`);
+    console.log(`Owners: ${JSON.stringify(accountData.owner)}`);
   });
+
+
+  it("Update  Identity", async () => {
+
+
+    let nameId = "BOB.ID";
+    let storeIdBalance = "c888d3e9-a6c1-438b-a121-295115728f01";
+    let secretNameBalance = "secret_balance";
+
+    let storeIdVolume = "c888d3e9-a6c1-438b-a121-295115728f01";
+    let secretNameVolume = "secret_volume";
+
+    let storeIdTwitter = "c888d3e9-a6c1-438b-a121-295115728f01";
+    let secretNameTwitter = "secret_twitter";
+
+    const transactionSignature = await program.methods
+      .updateIdentity(nameId, [storeIdBalance, storeIdVolume,storeIdTwitter ], [secretNameBalance, secretNameVolume, secretNameTwitter])
+    .accounts({
+      identity: identityPDA,
+      owner: owner2
+    })
+    .rpc();
+  });
+
 
 
 
