@@ -24,3 +24,18 @@ variable "source_arn" {
   type        = string
   description = "source_arn"
 }
+
+variable "subnet_1a_load_balancer_id" {
+  type        = string
+  description = "subnet_1a_load_balancer_id"
+}
+
+variable "subnet_1c_load_balancer_id" {
+  type        = string
+  description = "subnet_1c_load_balancer_id"
+}
+
+variable "aws_security_group_id" {
+  type        = string
+  description = "aws_security_group_id"
+}

@@ -18,10 +18,15 @@ resource "aws_lambda_function" "ini_volume" {
   reserved_concurrent_executions = -1
   runtime                        = "python3.11"
   skip_destroy                   = false
-  source_code_hash               = data.archive_file.break_trades_zip.output_base64sha256
+  source_code_hash               = data.archive_file.func_zip.output_base64sha256
   timeout                        = 300
-  layers                         = [aws_lambda_layer_version.nodejs20_break_trades_all_layer.arn]
+  layers                         = [aws_lambda_layer_version.ini_volume_all_layer.arn]
 
+  vpc_config {
+    # Every subnet should be able to reach an EFS mount target in the same Availability Zone. Cross-AZ mounts are not permitted.
+    subnet_ids         = [var.subnet_1a_load_balancer_id, var.subnet_1c_load_balancer_id]
+    security_group_ids = [var.aws_security_group_id]
+  }
   environment {
     variables = {
       BACKEND_URL = "http://172.31.21.6"
@@ -29,7 +34,7 @@ resource "aws_lambda_function" "ini_volume" {
   }
 }
 # trigger
-resource "aws_lambda_permission" "lambda_break_trade_trigger_with_sqs" {
+resource "aws_lambda_permission" "lambda_ini_volume_trigger_with_sqs" {
   statement_id  = "AllowExecutionFromSQS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ini_volume.function_name

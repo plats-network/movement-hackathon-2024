@@ -77,13 +77,15 @@ def sync(wallet_addr: str, from_block: int, to_block: int):
 
             tx_hash = tx_hash_obj.get("tx_hash")
             volume = get_tx_volume(tx_hash)
-            # TODO: sol to usd
+            # TODO: sol to usd by timestamp
             total_volume += volume
 
         if is_end:
             break
 
         latest_tx_hash = tx_hashes[-1].get("tx_hash")
+
+    # NOTE: we currently convert total volume to USD by using the latest price
 
     return total_volume
 
@@ -130,16 +132,30 @@ def add_volume(plat_id: str, asset_symbol: str, volume: int) -> None:
     return
 
 
-def main():
-    plat_id = "odinhoang"
-    my_addr = "H3xebErnGPc5JsFyjaDGYh4MN3rH1VBEzxsWu1bf5ryz"
-    from_block = 325635587
-    to_block = 325684254
+# def main():
+#     plat_id = "odinhoang"
+#     my_addr = "H3xebErnGPc5JsFyjaDGYh4MN3rH1VBEzxsWu1bf5ryz"
+#     from_block = 325635587
+#     to_block = 325684254
+#     # get volume
+#     volume = sync(wallet_addr=my_addr, from_block=from_block, to_block=to_block)
+#     # add volume
+#     add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volume)
+#     return
+
+
+# main()
+
+def main(event, context):
+    print("Event: ", event)
+    print("Context: ", event)
+    plat_id = event.get("plat_id")
+    wallet_addr = event.get("wallet_addr")
+    from_block = event.get("from_block")
+    to_block = event.get("to_block")
     # get volume
-    volume = sync(wallet_addr=my_addr, from_block=from_block, to_block=to_block)
+    volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
     # add volume
     add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volume)
+    # TODO: call set is_new_user to False
     return
-
-
-main()
