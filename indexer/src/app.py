@@ -1,7 +1,9 @@
 import logging
 import traceback
 import time
+import json
 
+import boto3
 import requests
 from solana.rpc.api import Client
 from jsonrpcclient import request, parse, Ok
@@ -13,6 +15,7 @@ from src.extensions import redis_client
 
 class TransactionIndexer(object):
     def __init__(self) -> None:
+        self.sqs = boto3.client('sqs')
         self.latest_sync_block_key = "plat_fellowship:indexer:latest_sync_block"
         self.chain_base_asset_symbol = "SOL"
         self.chain_base_asset_decimals = 9
@@ -69,6 +72,20 @@ class TransactionIndexer(object):
                     plat_id = self._get_plat_id(signer_addr)
                     if not plat_id:
                         continue
+
+                    # check if is new user
+                    is_new_user = self._check_is_new_user(signer_addr)
+                    if is_new_user:
+                        print("New User: ", plat_id, signer_addr)
+                        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol)
+                        queue_msg = {
+                            "plat_id": plat_id,
+                            "wallet_addr": signer_addr,
+                            "from_block": block_num - 1_500_000,
+                            "to_block": block_num,
+                            "usd_price": f"{price_in_usd}"
+                        }
+                        self._send_msg_to_queue(queue_msg)
 
                     print("signatures: ", signatures)
                     print("signer_addr: ", signer_addr)
@@ -161,6 +178,22 @@ class TransactionIndexer(object):
         plat_id = response_json.get('data').get('plat_id') or ""
         return plat_id
 
+    def _check_is_new_user(self, wallet_addr: str) -> bool:
+        url = f"{Conf.BACKEND_URL}/api/v1/internal/nillion/user"
+        params = {"address": wallet_addr}
+        headers = {"accept": "application/json"}
+
+        response = requests.get(url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            # Print error message
+            print(f"Not Plat User: {response.status_code}, {response.text}")
+            return ""
+        # Print the response content
+        response_json = response.json()
+        is_new_user = response_json.get('data').get('is_new_user') or False
+        return is_new_user
+
     def _add_volume(self, plat_id: str, asset_symbol: str, volume: int) -> None:
         key = f"volume_{asset_symbol}_in_usd"
 
@@ -205,4 +238,14 @@ class TransactionIndexer(object):
             }
         )
         print(f"added volume {plat_id}: ", response.json())
+        return
+
+    def _send_msg_to_queue(self, msg: dict) -> None:
+        response = self.sqs.send_message(
+            QueueUrl=Conf.SQS_QUEUE_URL,
+            DelaySeconds=10,
+            MessageAttributes={},
+            MessageBody=json.dumps(msg)
+        )
+        print("send_msg_to_queue: ", response)
         return
