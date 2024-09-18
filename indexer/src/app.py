@@ -241,11 +241,12 @@ class TransactionIndexer(object):
         return
 
     def _send_msg_to_queue(self, msg: dict) -> None:
+        print("send_msg_to_queue: ", msg)
         response = self.sqs.send_message(
             QueueUrl=Conf.SQS_QUEUE_URL,
             DelaySeconds=10,
             MessageAttributes={},
             MessageBody=json.dumps(msg)
         )
-        print("send_msg_to_queue: ", msg, response)
+        print("sended: ", response)
         return
