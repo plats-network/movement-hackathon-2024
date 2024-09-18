@@ -63,7 +63,7 @@ class TransactionIndexer(object):
                     for account_key in message.account_keys:
                         if not account_key.signer:
                             continue
-                        signer_addr = account_key.pubkey
+                        signer_addr = str(account_key.pubkey)
                         break
                     if not signer_addr:
                         continue
