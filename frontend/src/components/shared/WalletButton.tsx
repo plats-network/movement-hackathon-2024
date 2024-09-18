@@ -21,8 +21,10 @@ import { decodeUTF8 } from "tweetnacl-util";
 import { toast } from "@/hooks/use-toast";
 
 export default function WalletButton({
+  isLoading,
   handleGetNonce,
 }: {
+  isLoading: boolean;
   handleGetNonce: () => void;
 }) {
   const { setVisible: setModalVisible } = useWalletModal();
@@ -50,14 +52,15 @@ export default function WalletButton({
     <>
       
 
-<button
+<Button
+disabled={isLoading}
           onClick={handleLogin}
-          className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7]  rounded-xl w-full py-4 text-base font-bold flex items-center justify-center gap-2 text-white cursor-pointer"
+          className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7]  rounded-xl w-full h-[56px] text-base font-bold flex items-center justify-center gap-2 text-white cursor-pointer"
         >
           <WalletIcon />
           {publicKey ? "Connect your wallet" + " " + sliceAddressWallet(publicKey) : <p>Connect your wallet</p>}
           
-        </button>
+        </Button>
     </>
   );""
 }
