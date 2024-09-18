@@ -59,7 +59,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "FRONTEND_URL",
-          "value" : "https://plat-frontend.vercel.app"
+          "value" : "https://fellowship.plats.network"
         },
         {
           "name" : "TWITTER_API_URL",
