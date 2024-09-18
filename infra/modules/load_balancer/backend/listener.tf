@@ -68,8 +68,9 @@ resource "aws_lb_listener_rule" "internal_api_allow" {
     source_ip {
       values = [
         var.vpc_cidr_block,
-        "171.252.188.6/32", # Aiden Sepiol home IP
-        "222.253.79.150/32" # Odin Hoang home IP
+        "171.252.188.6/32",  # Aiden Sepiol home IP
+        "222.253.79.150/32", # Odin Hoang home IP
+        "118.155.249.8/32"   # Aiden Sepiol c IP
       ]
     }
   }
