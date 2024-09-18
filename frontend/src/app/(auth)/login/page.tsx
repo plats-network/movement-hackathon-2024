@@ -39,11 +39,6 @@ const LoginPage = () => {
       const responseNonce = await authApiRequest.nonce(
         publicKeyWallet
       );
-      console.log(
-        "🚀 ~ handleGetNonce ~ responseNonce:",
-        responseNonce?.data?.data.nonce
-      );
-
       // cho 5 s
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -52,10 +47,14 @@ const LoginPage = () => {
         handleGetSignature(responseNonce?.data?.data.nonce);
       }
     } catch (error) {
-     
-    } finally {
       setIsLoading(false);
-    }
+      console.log("🚀 ~ handleGetNonce ~ error:", error)
+      toast({
+        variant: "destructive",
+        className:"z-50 text-white",
+        description: "Connect wallet failed",
+      });
+    } 
   };
 
   const handleGetSignature = async (nonce: string) => {
@@ -72,8 +71,13 @@ const LoginPage = () => {
         handleVerifySignature(signedMessage.signature);
       }
     } catch (error) {
+      setIsLoading(false);
     console.log("🚀 ~ handleGetSignature ~ error:", error)
-   
+    toast({
+      variant: "destructive",
+      className:"z-50 text-white",
+      description: "Connect wallet failed",
+    });
     }
   };
 
@@ -101,7 +105,6 @@ const LoginPage = () => {
             className:"z-50 text-white",
             description: responseLogin.data.msg,
           });
-          console.log("🚀 ~ handleRegister ~ responseLogin:", responseLogin)
           await authApiRequest.auth({accessToken: responseLogin.data.data.access_token})
           router.push("/id-management")
         }
@@ -109,14 +112,20 @@ const LoginPage = () => {
           setAuthenToken(responseVerify.data.data.authen_token)
         }
    
-
       }
-     
-     
     } catch (error) {
       console.log("🚀 ~ handleVerifySignature ~ error:", error)
-      
+      setIsLoading(false);
+
+      toast({
+        variant: "destructive",
+        className:"z-50 text-white",
+        description: "Connect wallet failed",
+      });
     } 
+    finally {
+      setIsLoading(false);
+    }
   };
 
  
@@ -165,7 +174,7 @@ const LoginPage = () => {
             </div>
 
             <div className=" ">
-                <WalletButton handleGetNonce={handleGetNonce} />
+                <WalletButton isLoading={isLoading} handleGetNonce={handleGetNonce} />
 
 
               <div className="w-full flex flex-col gap-5">
