@@ -41,3 +41,7 @@ variable "public_subnet_id" {
   type        = string
   description = "ecs task container role arn"
 }
+variable "sqs_queue_url" {
+  type        = string
+  description = "sqs_queue_url"
+}

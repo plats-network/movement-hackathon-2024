@@ -31,4 +31,5 @@ module "indexer_ecs" {
   ecs_task_container_role_arn     = module.indexer_iam.ecs_task_container_role_arn
   security_group_ecs_task_service = module.indexer_network.ecs_sg_id
   public_subnet_id                = var.public_subnet_a_id
+  sqs_queue_url                   = module.ini_volume_sqs.aws_sqs_queue_url
 }
