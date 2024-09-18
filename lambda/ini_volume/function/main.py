@@ -158,11 +158,12 @@ def set_is_new_user(plat_id: str, is_new_user: bool) -> None:
 def main(event, context):
     print("Event: ", event)
     print("Context: ", event)
-    plat_id = event.get("plat_id")
-    wallet_addr = event.get("wallet_addr")
-    from_block = event.get("from_block")
-    to_block = event.get("to_block")
-    usd_price = event.get("usd_price")
+    payload = json.loads(event.get("Records")[0].get("body"))
+    plat_id = payload.get("plat_id")
+    wallet_addr = payload.get("wallet_addr")
+    from_block = payload.get("from_block")
+    to_block = payload.get("to_block")
+    usd_price = payload.get("usd_price")
     usd_price = float(usd_price)
     # get volume
     volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
