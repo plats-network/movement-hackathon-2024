@@ -4,60 +4,91 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import authApiRequest from "@/apiRequest/auth";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  userId: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  platId: z.string().min(2, {
+    message: "platId must be at least 2 characters.",
   }),
 });
 
-const RegisterIdForm = () => {
+const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
   const router = useRouter();
+
+  const { publicKey } = useWallet();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userId: "",
+      platId: "",
     },
   });
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
-    // setIsOpen(false); // Close the modal after successful form submission.
-    router.push("/id-management"); // Redirect to dashboard page after successful form submission.
+    handleRegister(values.platId);
   }
+
+  const handleRegister = async (platId: string) => {
+    try {
+      if (!authenToken) return;
+      if (!publicKey) return;
+
+      const data = {
+        eoa: publicKey?.toBase58(),
+        plat_id: platId,
+        public_key: Buffer.from(publicKey.toBytes()).toString("base64"),
+      };
+
+      const response = await authApiRequest.register(data, authenToken);
+
+      toast({
+        className: "z-50 text-white",
+        description: response.data.msg,
+      });
+      if (response) {
+        const responseLogin = await authApiRequest.login(authenToken);
+        toast({
+          className: "z-50 text-white",
+          description: responseLogin.data.msg,
+        });
+
+        await authApiRequest.auth({
+          accessToken: responseLogin.data.data.access_token,
+        });
+        router.push("/id-management");
+      }
+    } catch (error) {}
+  };
+
   return (
     <div className="w-full h-full text-center flex flex-col gap-[120px] items-center justify-center ">
-       <p className="text-[28px] font-semibold">
-                  Register your ID <br />
-                  to start your journey
-                </p>
+      <p className="text-[28px] font-semibold">
+        Register your ID <br />
+        to start your journey
+      </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
-       
-               
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 w-full"
+        >
           <FormField
             control={form.control}
-            name="userId"
+            name="platId"
             render={({ field }) => (
               <FormItem className="text-start">
-                
                 <FormControl>
                   <div className="relative">
                     <input
@@ -75,8 +106,11 @@ const RegisterIdForm = () => {
               </FormItem>
             )}
           />
-          <button type="submit"  className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7] rounded-xl w-full py-4 text-base font-bold text-center text-white cursor-pointer">
-          CLAM ID
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7] rounded-xl w-full py-4 text-base font-bold text-center text-white cursor-pointer"
+          >
+            CLAM ID
           </button>
         </form>
       </Form>
