@@ -11,6 +11,20 @@ export function cn(...inputs: ClassValue[]) {
 
 
 
+export class HttpError extends Error {
+  status: number;
+  payload: {
+    message: string;
+    [key: string]: any;
+  };
+
+  constructor({ status, payload }: { status: number; payload?: any }) {
+    super("Http Error");
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
 
 
 

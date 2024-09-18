@@ -2,7 +2,6 @@
 import axios from 'axios'
 
 export const apiClient =  axios.create({
-  withCredentials: true,
   baseURL: process.env.NEXT_PUBLIC_API,
   
   headers: {
@@ -16,7 +15,6 @@ export const apiClient =  axios.create({
 
 export const apiClientAuth =  axios.create({
   baseURL: "",
-  
   headers: {
     "Content-Type": "application/json",
   },
