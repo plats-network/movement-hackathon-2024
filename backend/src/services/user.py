@@ -39,14 +39,16 @@ class UserService(object):
     async def get_user(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
         # except ObjectId
-        except_list = ['_id', 'public_key', 'plat_id', 'address', 'date_created', 'date_updated']
+        except_list = ['_id', 'public_key', 'plat_id', 'address', 'date_created', 'date_updated', 'is_new_user']
+        temp_user = py_.clone(user)
         if user:
             for key in except_list:
-                user.pop(key, None)
+                temp_user.pop(key, None)
             
-            for key in user:
+            for key in temp_user:
                 value = await Nillion.retrieve(plat_id, key)
                 user[key] = value
+            user.pop("_id", None)
             return user
         return None
     
