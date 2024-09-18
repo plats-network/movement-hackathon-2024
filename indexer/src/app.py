@@ -77,7 +77,7 @@ class TransactionIndexer(object):
                     is_new_user = self._check_is_new_user(signer_addr)
                     if is_new_user:
                         print("New User: ", plat_id, signer_addr)
-                        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol)
+                        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol) or self.symbol_to_latest_price[self.chain_base_asset_symbol]
                         queue_msg = {
                             "plat_id": plat_id,
                             "wallet_addr": signer_addr,
@@ -247,5 +247,5 @@ class TransactionIndexer(object):
             MessageAttributes={},
             MessageBody=json.dumps(msg)
         )
-        print("send_msg_to_queue: ", response)
+        print("send_msg_to_queue: ", msg, response)
         return
