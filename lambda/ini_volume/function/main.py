@@ -132,6 +132,15 @@ def add_volume(plat_id: str, asset_symbol: str, volume: int) -> None:
     return
 
 
+def set_is_new_user(plat_id: str, is_new_user: bool) -> None:
+    is_new_user_str = "true" if is_new_user else "false"
+    url = f"{BACKEND_URL}/api/v1/internal/nillion/user?plat_id={plat_id}&is_new_user={is_new_user_str}"
+    payload = {}
+    headers = {'accept': 'application/json'}
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print("Set is_new_user: ", response.json())
+    return
+
 # def main():
 #     plat_id = "odinhoang"
 #     my_addr = "H3xebErnGPc5JsFyjaDGYh4MN3rH1VBEzxsWu1bf5ryz"
@@ -153,9 +162,13 @@ def main(event, context):
     wallet_addr = event.get("wallet_addr")
     from_block = event.get("from_block")
     to_block = event.get("to_block")
+    usd_price = event.get("usd_price")
+    usd_price = float(usd_price)
     # get volume
     volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
+    volumne_usd = usd_price * volume
     # add volume
-    add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volume)
-    # TODO: call set is_new_user to False
+    add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
+    # call set is_new_user to False
+    set_is_new_user(plat_id=plat_id, is_new_user=False)
     return

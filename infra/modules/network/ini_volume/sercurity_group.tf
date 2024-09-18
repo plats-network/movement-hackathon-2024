@@ -7,7 +7,7 @@ resource "aws_security_group" "lambda" {
     description = "HTTP from VPC"
     from_port   = 0
     to_port     = 0
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = [var.vpc_cidr_block]
   }
 
