@@ -12,9 +12,6 @@ import {
 
 import { getIdentityPDA, Identity, simulateSendAndConfirmTX } from "./utils";
 import * as fs from "fs";
-import axios from "axios";
-import nacl from "tweetnacl";
-import { decodeUTF8 } from "tweetnacl-util";
 import * as bip39 from "bip39";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import dotenv from "dotenv";
