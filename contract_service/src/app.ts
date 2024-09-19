@@ -11,6 +11,9 @@ import { router as solanaRoute } from "./routes/solanaClient.route";
 // Create Express server
 export const app = express();
 
+// Express body parser
+app.use(express.json());
+
 // Express configuration
 app.set("port", process.env.PORT || 3000);
 app.set("views", path.join(__dirname, "../views"));
