@@ -6,23 +6,30 @@ import TwitterIcon from '@/assets/TwitterIcon'
 import WalletIcon from '@/assets/WalletIcom'
 import ConnectAccountModal from '@/components/ConnectAccountModal'
 
+
 import React from 'react'
 
-const ConnectedAccount = () => {
+const ConnectedAccount = ({user}:{user: any}) => {
+  console.log("🚀 ~ ConnectedAccount ~ user:", user.plat_id)
+  
   return (
 
-    <div className="relative w-full">
-    <div className="absolute inset-0 rounded-xl  from-[#190532] opacity-15"
+    <div className="relative w-full z-10  lg:max-w-[455px]">
+    <div className="absolute inset-0 rounded-xl  from-[#190532] opacity-10"
     style={{
       background: "linear-gradient(90deg, rgba(25,5,50,1),rgba(102,255,255,1) 0%)"
     }}
     ></div>
-    <div className="relative z-10  flex flex-col gap-8 p-5 ">
+    <div className="relative z-10 h-full flex flex-col justify-between gap-8 p-5 ">
    
     <p className="text-xl text-[#3AE7E7] font-semibold">
       Connected Account
     </p>
-    <div className="flex flex-col gap-3">
+    <div className='flex flex-col items-center justify-center text-center gap-3'>
+      <p className='text-[40px] font-bold'>- -</p>
+      <p className='text-[17px] text-[#B172FF]'>You haven't connected to any accounts yet</p>
+    </div>
+    {/* <div className="flex flex-col gap-3">
       <div className="bg-[#1E2536] flex items-center py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
         <div className="flex items-center gap-2">
           <WalletIcon/>
@@ -81,8 +88,8 @@ const ConnectedAccount = () => {
       </div>
 
 
-    </div>
-    <ConnectAccountModal/>
+    </div> */}
+    <ConnectAccountModal platId={user.plat_id}/>
 
   </div>
     </div>

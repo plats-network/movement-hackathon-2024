@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Image from 'next/image'
 import React from 'react'
 
-const Banner = () => {
+const Banner = ({platId}: {platId: string}) => {
   const { publicKey } = useWallet();
 
   return (
@@ -19,7 +19,7 @@ const Banner = () => {
             />
           </div>
           <p className="text-[28px] font-semibold mt-20">
-            {publicKey?.toString()}
+           {platId ?? "- -"}
           </p>
         
         </div>
