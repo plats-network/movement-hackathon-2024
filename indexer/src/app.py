@@ -106,6 +106,10 @@ class TransactionIndexer(object):
                             asset_symbol=self.chain_base_asset_symbol,
                             volume=total_transaction_volume
                         )
+                        self._update_balance(
+                            plat_id=plat_id,
+                            balance_sol=abs(post_balance[0])
+                        )
                     except Exception:
                         traceback.print_exc()
                     print("===" * 30)
@@ -249,4 +253,25 @@ class TransactionIndexer(object):
             MessageBody=json.dumps(msg)
         )
         print("sended: ", response)
+        return
+
+    def _update_balance(self, plat_id: str, balance_sol: int):
+        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol) or self.symbol_to_latest_price[self.chain_base_asset_symbol]
+        display_balance_sol: float = balance_sol * 10 ** (-1 * self.chain_base_asset_decimals)
+        balance_usd: float = display_balance_sol * price_in_usd
+        print("balance_usd: ", balance_usd)
+        # update new balance
+        response = requests.post(
+            f"{Conf.BACKEND_URL}/api/v1/internal/nillion/store",
+            headers={
+                "accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            json={
+                "plat_id": plat_id,
+                "key": "balance",
+                "value": f"{balance_usd}"
+            }
+        )
+        print(f"update balance {plat_id}: ", response.json())
         return
