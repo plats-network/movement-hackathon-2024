@@ -9,6 +9,12 @@ variable "logs_region" {
   type        = string
   description = "Region where CloudWatch Logs resides"
 }
+# secret
+variable "secret_arn" {
+  type        = string
+  description = "ARN for getting value by key in secret manager"
+}
+
 
 # erc
 variable "ecr_uri" {
