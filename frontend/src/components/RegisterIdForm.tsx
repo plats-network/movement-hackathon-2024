@@ -45,10 +45,10 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
     try {
       if (!authenToken) return;
       if (!publicKey) return;
-
+      
       const data = {
         eoa: publicKey?.toBase58(),
-        plat_id: platId,
+        plat_id: platId+".ID",
         public_key: Buffer.from(publicKey.toBytes()).toString("base64"),
       };
 
