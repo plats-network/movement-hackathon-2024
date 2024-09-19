@@ -1,5 +1,6 @@
 from src.libs.nillion_helpers import NillionHelpers
 from src.models import mUser
+from src.services.solana_client import Solana
 class Nillion(object):
     
     
@@ -14,12 +15,22 @@ class Nillion(object):
         else:
             store_id = await nillion.store_integer(key=key, value=value)
         
-        # TODO: Store store_id and key(secret_name) to smart contract using plat_id
+        # TODO: Store store_id and key(secret_name) to smart contract 
         print("store_id", store_id)
         
+        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        if key == 'balance':
+            store_balance = store_id
+        elif key == 'volume_SOL_in_usd':
+            store_volume = store_id
+        elif key == 'twitter':
+            store_twitter = store_id
+            
+        Solana.update(plat_id, user.get('public_key'), store_balance, store_volume, store_twitter)
+            
         
         # Temporary save to database
-        mUser.update(user['_id'], {key: store_id})
+        # mUser.update(user['_id'], {key: store_id})
         
         # return store_id 
         
@@ -32,12 +43,13 @@ class Nillion(object):
             raise Exception("User not found")
         
         # TODO: Retrieve store_id from smart contract using plat_id & key (secret_name)
-        # Output is a list of store_id & keys
-        # volume_id = ...
-        # twitter_id = ...
-        # balance_id = ...
-        # return
-        store_id = mUser.get_item_with({"plat_id": plat_id})[key]
+        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        if key == 'balance':
+            store_id = store_balance
+        elif key == 'volume_SOL_in_usd':
+            store_id = store_volume
+        elif key == 'twitter':
+            store_id = store_twitter
 
         
         if not store_id:
@@ -45,6 +57,26 @@ class Nillion(object):
         value = await nillion.retrieve(store_id, key)
         return value
         
+    @staticmethod
+    async def get_info(plat_id: str, store_balance: str, store_volume: str, store_twitter: str, balance_key = 'balance', volume_key = 'volume_SOL_in_usd', twitter_key = 'twitter'):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if user is None:
+            raise Exception("User not found")
+        nillion = NillionHelpers()
+        try:
+            balance = await nillion.retrieve(store_balance, balance_key)
+            volume = await nillion.retrieve(store_volume, volume_key)
+            twitter = await nillion.retrieve(store_twitter, twitter_key)
+            rank = await nillion.rank(secret_balance=balance, secret_volumn=volume, secret_twitter=twitter)
+        except Exception as e:
+            raise Exception(e)
+        
+        return {
+            "balance": balance,
+            "volume": volume,
+            "twitter": twitter,
+            "rank": rank
+        }
     
     @staticmethod
     async def rank():

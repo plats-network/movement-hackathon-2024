@@ -2,6 +2,7 @@ from src.models import mUser
 import pydash as py_
 from .twitter import TwitterService
 from src.services import Nillion
+from src.services.solana_client import Solana
 class UserService(object):
     
     @staticmethod
@@ -42,16 +43,34 @@ class UserService(object):
         # except ObjectId
         except_list = ['_id', 'public_key', 'plat_id', 'address', 'date_created', 'date_updated', 'is_new_user']
         temp_user = py_.clone(user)
-        if user:
-            for key in except_list:
-                temp_user.pop(key, None)
+        
+        if not user:
+            return None
+        
+        # get store_id from solana
+        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        
+        # Log all variables
+        print(f"store_balance: {store_balance}")
+        print(f"store_volume: {store_volume}")
+        print(f"store_twitter: {store_twitter}")
+        if not store_balance or not store_volume or not store_twitter:
+            return {}
+        # get data from nillion
+        user_info = await Nillion.get_info(plat_id, store_balance, store_volume, store_twitter)
+        
+        if user_info:
+            return user_info
+        # if user:
+        #     for key in except_list:
+        #         temp_user.pop(key, None)
             
-            for key in temp_user:
-                value = await Nillion.retrieve(plat_id, key)
-                user[key] = value
-            user.pop("_id", None)
-            return user
-        return None
+        #     for key in temp_user:
+        #         value = await Nillion.retrieve(plat_id, key)
+        #         user[key] = value
+        #     user.pop("_id", None)
+        #     return user
+        return {}
     
     @staticmethod
     def get_user_by_public_key(public_key: str):

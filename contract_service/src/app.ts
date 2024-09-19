@@ -3,14 +3,14 @@ dotenv.config();
 import express from "express";
 import logger from "morgan";
 import * as path from "path";
-
+import cors from "cors";
 import { errorHandler, errorNotFoundHandler } from "./middlewares/errorHandler";
 
 // Routes
 import { router as solanaRoute } from "./routes/solanaClient.route";
 // Create Express server
 export const app = express();
-
+app.use(cors());
 // Express body parser
 app.use(express.json());
 

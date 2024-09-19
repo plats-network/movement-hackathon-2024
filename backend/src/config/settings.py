@@ -70,6 +70,7 @@ class Settings():
     # Solana
     SOLANA_RPC_URL = os.getenv("SOLANA_RPC_URL")
     SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
+    CONTRACT_SERVICE_DNS = os.getenv("CONTRACT_SERVICE_DNS")
     
 settings = Settings()
 
