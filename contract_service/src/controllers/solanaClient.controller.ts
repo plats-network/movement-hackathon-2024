@@ -16,7 +16,7 @@ export const retriveAccount = async (
     try {
         initializeProgram();
 
-        const { publicKey } = req.query;
+        const { publicKey } = req.body;
         if (typeof publicKey !== "string") {
             res.status(400).json({ msg: "Invalid publicKey", code: 400 });
             return;

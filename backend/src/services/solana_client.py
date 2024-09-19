@@ -13,8 +13,11 @@ class Solana(object):
     
     @staticmethod
     def get(public_key):
-        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account?publicKey={public_key}"
-        response = requests.get(contract_dns)
+        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/info"
+        json = {
+            "publicKey": public_key
+        }
+        response = requests.post(contract_dns, json=json)
         if response.status_code == 200:
             data = response.json()
             store_balance = data.get('secret_balance')
