@@ -51,3 +51,8 @@ variable "contract_service_dns" {
   description = "contract_service_dns"
 }
 
+
+variable "sqs_queue_url" {
+  type        = string
+  description = "sqs_queue_url"
+}

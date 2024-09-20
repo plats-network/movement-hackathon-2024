@@ -43,6 +43,7 @@ module "backend_ecs" {
   public_subnet_id                = var.public_subnet_a_id
   target_group_arn                = module.backend_load_balancer.load_balancer_target_group_arn
   contract_service_dns            = module.contract_service_load_balancer.lb_dns_name
+  sqs_queue_url                   = module.ini_volume_sqs.aws_sqs_queue_url
 }
 
 

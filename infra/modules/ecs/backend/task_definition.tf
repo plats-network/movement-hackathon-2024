@@ -68,6 +68,14 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "CONTRACT_SERVICE_DNS",
           "value" : "http://${var.contract_service_dns}"
+        },
+        {
+          "name" : "SQS_QUEUE_URL",
+          "value" : var.sqs_queue_url
+        },
+        {
+          "name" : "RPC_URL",
+          "value" : "https://api.devnet.solana.com"
         }
       ]
       environmentFiles = []
