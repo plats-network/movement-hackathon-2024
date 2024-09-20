@@ -73,6 +73,7 @@ class Nillion(object):
         if user is None:
             raise Exception("User not found")
         nillion = NillionHelpers()
+        print(f"FE::GET::INFO::{plat_id}", store_balance, store_volume, store_twitter)
         
         balance = await nillion.retrieve(store_balance, balance_key)
         volume = await nillion.retrieve(store_volume, volume_key)
