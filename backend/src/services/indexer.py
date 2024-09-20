@@ -13,7 +13,7 @@ class Indexer():
         payload = json.dumps({
             "jsonrpc": "2.0",
             "id": 1,
-            "method": "getBlockHeight"
+            "method": "getSlot"
         })
         headers = {'Content-Type': 'application/json'}
 
@@ -78,4 +78,4 @@ class Indexer():
 
 if __name__ == "__main__":
     indexer = Indexer()
-    indexer.send_message("khaihoang.ID", "2kce2oj6D5mg5GpqXAAKP8wGLZ5BAJ7UydisMhmD3Wqx")
+    indexer.send_message("odin.dev.ID", "BBt9L8MfbuytDBaqcP7rUTjheiBBXUTRwdYjuwx8xNUC")

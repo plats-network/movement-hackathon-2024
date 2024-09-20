@@ -36,13 +36,13 @@ async def login_options():
 async def login(request: Request, plat_id: str):
     try:
         auth_url = oauth1_user_handler.get_authorization_url()
-        request.session['request_token'] = oauth1_user_handler.request_token
+        # request.session['request_token'] = oauth1_user_handler.request_token
         request.session['plat_id'] = plat_id
         
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
         print("Error getting authorization URL: ", str(e))
-        raise HTTPException(status_code=500, detail="Error getting authorization URL")
+        raise HTTPException(status_code=500, detail=f"Error getting authorization URL::{str(e)}")
 
 @router.options("/callback")
 async def callback_option():
