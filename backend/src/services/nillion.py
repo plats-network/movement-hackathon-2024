@@ -63,13 +63,19 @@ class Nillion(object):
         if user is None:
             raise Exception("User not found")
         nillion = NillionHelpers()
+        nan = -1
+        balance = volume = twitter = rank = None
         try:
             balance = await nillion.retrieve(store_balance, balance_key)
             volume = await nillion.retrieve(store_volume, volume_key)
             twitter = await nillion.retrieve(store_twitter, twitter_key)
             rank = await nillion.rank(secret_balance=balance, secret_volumn=volume, secret_twitter=twitter)
         except Exception as e:
-            raise Exception(e)
+            print(f"Error occurred: {e}")
+            balance = balance if balance is not None else nan
+            volume = volume if volume is not None else nan
+            twitter = twitter if twitter is not None else nan
+            rank = rank if rank is not None else nan
         
         return {
             "balance": balance,

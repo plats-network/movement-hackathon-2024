@@ -54,8 +54,6 @@ class UserService(object):
         print(f"store_balance: {store_balance}")
         print(f"store_volume: {store_volume}")
         print(f"store_twitter: {store_twitter}")
-        if not store_balance or not store_volume or not store_twitter:
-            return {}
         # get data from nillion
         user_info = await Nillion.get_info(plat_id, store_balance, store_volume, store_twitter)
         
