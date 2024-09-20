@@ -48,7 +48,7 @@ class Nillion(object):
             store_id = store_balance
         elif key == 'volume_SOL_in_usd':
             store_id = store_volume
-        elif key == 'twitter':
+        elif key == 'twitter_score':
             store_id = store_twitter
 
         
