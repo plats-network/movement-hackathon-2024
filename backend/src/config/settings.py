@@ -72,6 +72,9 @@ class Settings():
     SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
     CONTRACT_SERVICE_DNS = os.getenv("CONTRACT_SERVICE_DNS")
     
+    SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
+    RPC_URL = os.getenv("RPC_URL")
+    
 settings = Settings()
 
 

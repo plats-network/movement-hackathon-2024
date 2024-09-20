@@ -21,3 +21,4 @@ itsdangerous
 solana
 solders
 anchorpy
+boto3
