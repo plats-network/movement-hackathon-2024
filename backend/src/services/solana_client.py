@@ -17,7 +17,9 @@ class Solana(object):
         json = {
             "publicKey": public_key
         }
+        print(f"FE::GET::INFO::{public_key}", json)
         response = requests.post(contract_dns, json=json)
+        print(f"FE::GET::INFO::{public_key}", response.text)
         if response.status_code == 200:
             data = response.json()
             store_balance = data.get('secret_balance')
