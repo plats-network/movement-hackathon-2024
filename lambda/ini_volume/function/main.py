@@ -205,7 +205,9 @@ def main(event, context):
         usd_price = float(usd_price)
         # get volume
         volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
+        print("volume sol: ", volume)
         volumne_usd = usd_price * volume
+        print("volume usd: ", volumne_usd)
         # add volume
         add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
         # update_balance
