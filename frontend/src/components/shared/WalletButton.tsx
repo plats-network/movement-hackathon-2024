@@ -4,21 +4,8 @@ import { useWalletMultiButton } from "@solana/wallet-adapter-base-ui";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { sliceAddressWallet } from "@/lib/helper";
 import * as React from "react";
-
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
 import WalletIcon from "@/assets/WalletIcom";
-import { useRouter } from "next/navigation";
-import getProviderPhantom from "@/hooks/getProviderPhantom";
-import authApiRequest from "@/apiRequest/auth";
-import { decodeUTF8 } from "tweetnacl-util";
-import { toast } from "@/hooks/use-toast";
 
 export default function WalletButton({
   isLoading,
@@ -33,11 +20,6 @@ export default function WalletButton({
       setModalVisible(true);
     },
   });
-  const [copied, setCopied] = React.useState(false);
-
-  const router = useRouter();
-
-
   const handleLogin = () => {
     try {
       if (!publicKey) {

@@ -13,7 +13,10 @@ router = APIRouter()
 
 # Tweepy OAuth1UserHandler
 oauth1_user_handler = tweepy.OAuth1UserHandler(
-    settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET,
+    consumer_key=settings.TWITTER_CONSUMER_KEY,
+    consumer_secret=settings.TWITTER_CONSUMER_SECRET,
+    access_token=settings.TWITTER_ACCESS_TOKEN,
+    access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
     callback=settings.TWITTER_REDIRECT_URI
 )
 
@@ -25,6 +28,10 @@ class Token(BaseModel):
 async def get_session(request: Request):
     return request.session
 
+@router.options("/login")
+async def login_options():
+    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+
 @router.get("/login")
 async def login(request: Request, plat_id: str):
     try:
@@ -34,7 +41,7 @@ async def login(request: Request, plat_id: str):
         
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
-        print(e)
+        print("Error getting authorization URL: ", str(e))
         raise HTTPException(status_code=500, detail="Error getting authorization URL")
 
 

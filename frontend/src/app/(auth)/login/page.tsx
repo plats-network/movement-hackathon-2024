@@ -106,7 +106,8 @@ const LoginPage = () => {
             description: responseLogin.data.msg,
           });
           await authApiRequest.auth({accessToken: responseLogin.data.data.access_token})
-          router.push("/id-management")
+          router.push("/")
+          router.refresh();
         }
         else {
           setAuthenToken(responseVerify.data.data.authen_token)
@@ -131,7 +132,7 @@ const LoginPage = () => {
  
 
   return (
-    <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white">
+    <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white px-10">
       <div className="relative  h-full">
         <div
           className="absolute inset-0  opacity-5 shadow w-full max-w-6xl m-auto rounded-2xl"
@@ -143,7 +144,7 @@ const LoginPage = () => {
         <div className="relative z-10  flex h-full  shadow w-full max-w-6xl m-auto rounded-2xl  ">
           {/* <div className="flex h-full shadow w-full max-w-6xl m-auto rounded-2xl bg-[#08082C]"> */}
           {/* left */}
-          <div className="w-full h-full flex flex-col items-center justify-between text-center bg-[url('/LoginBackground.png')] bg-no-repeat bg-cover bg-center py-[27px]">
+          <div className="w-full h-full lg:flex hidden flex-col items-center justify-between text-center bg-[url('/LoginBackground.png')] bg-no-repeat bg-cover bg-center py-[27px]">
             <div className="relative max-w-[505px] w-full h-[437px]">
               <Image
                 alt="img-login"

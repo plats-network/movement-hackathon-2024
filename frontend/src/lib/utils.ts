@@ -39,8 +39,6 @@ class AccessToken {
   set value(token: string) {
     // neu goi method nay o server thi se bi loi
     if (typeof window === "undefined") {
-      console.log("🚀 ~ sessionToken ~ setvalue ~ window:", window);
-
       throw new Error("Can not set token on sever side");
     }
 
