@@ -72,8 +72,8 @@ class Settings():
     SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
     CONTRACT_SERVICE_DNS = os.getenv("CONTRACT_SERVICE_DNS")
     
-    SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
-    RPC_URL = os.getenv("RPC_URL")
+    SQS_QUEUE_URL = "https://sqs.ap-southeast-1.amazonaws.com/905418230863/plat-fellowship-dev-ini-volume"
+    RPC_URL = os.getenv("RPC_URL") or "https://api.devnet.solana.com"
     
 settings = Settings()
 

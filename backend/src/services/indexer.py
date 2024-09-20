@@ -3,14 +3,13 @@ import json
 from src.config import settings
 import boto3
 import requests
-
 class Indexer():
     def __init__(self) -> None:
         self.symbol_to_latest_price = {}
         self.sqs = boto3.client('sqs')
 
     
-    def __get_current_block() -> int:
+    def __get_current_block(self) -> int:
         payload = json.dumps({
             "jsonrpc": "2.0",
             "id": 1,
@@ -55,8 +54,11 @@ class Indexer():
 
 
     def send_message(self, plat_id, wallet_addr):
+        print("Sending message to SQS")
         current_block = self.__get_current_block()
+        print("Current block: ", current_block)
         sol_price = self.__get_price_by_asset("SOL")
+        print("SOL price: ", sol_price)
         msg = {
             "plat_id": plat_id,
             "wallet_addr": wallet_addr,
@@ -64,11 +66,16 @@ class Indexer():
             "to_block": current_block,
             "usd_price": f"{sol_price}"
         }
-        
         response = self.sqs.send_message(
             QueueUrl=settings.SQS_QUEUE_URL,
             DelaySeconds=10,
             MessageAttributes={},
             MessageBody=json.dumps(msg)
         )
+        
         print("sended: ", response)
+
+
+if __name__ == "__main__":
+    indexer = Indexer()
+    indexer.send_message("khaihoang.ID", "2kce2oj6D5mg5GpqXAAKP8wGLZ5BAJ7UydisMhmD3Wqx")
