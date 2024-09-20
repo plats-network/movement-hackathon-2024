@@ -11,6 +11,7 @@ export default async function ProfileView ()  {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken");
   const response = await accountApiRequest.user(accessToken?.value ?? "");
+  console.log("🚀 ~ ProfileView ~ response:", response?.data.data.user)
 
   return (
     <div className="min-h-[100vh] w-full flex flex-col items-center  gap-10 text-white  ">
@@ -24,7 +25,7 @@ export default async function ProfileView ()  {
         <ConnectedAccount user={response?.data?.data?.user} />
 
         <div className="flex flex-col gap-8 lg:max-w-[706px] w-full">
-          <YourUnifiedIdProfile />
+          <YourUnifiedIdProfile data={response?.data.data.user}/>
 
           <ConnectedPlatsApp />
         </div>

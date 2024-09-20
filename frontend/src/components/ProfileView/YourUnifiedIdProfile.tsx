@@ -1,7 +1,7 @@
 import EthereumIcon from "@/assets/EthereumIcon";
 import React from "react";
 
-const YourUnifiedIdProfile = () => {
+const YourUnifiedIdProfile = ({data}: {data: any}) => {
   return (
     <div className="relative w-full ">
       <div
@@ -22,7 +22,7 @@ const YourUnifiedIdProfile = () => {
         <div className="flex gap-2  max-w-[667px] w-full">
           <div className="group gradient-border-mask  max-w-[251px] w-full  flex flex-col gap-2 text-center py-3 px-8 bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
             <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-            - -
+            {data?.balance >= 0 ? data?.twitter : "- -"}
             </p>
             <p className="text-[17px] text-[#B7B4BB] group-hover:text-white">
               Your balance
@@ -30,18 +30,20 @@ const YourUnifiedIdProfile = () => {
           </div>
           <div className="group gradient-border-mask max-w-[251px] w-full flex flex-col gap-2 text-center py-3 px-8 bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
             <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-              - -
+            {data?.volume >= 0 ? data?.twitter : "- -"}
+
             </p>
             <p className="text-[17px] text-[#B7B4BB] group-hover:text-white">
-              Your balance
+            One month volume
             </p>
           </div>
           <div className="group gradient-border-mask  max-w-[251px] w-full  flex flex-col gap-2 text-center py-3 px-8 bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
             <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-               - -
+            {data?.twitter >= 0 ? data?.twitter : "- -"}
+
             </p>
             <p className="text-[17px] text-[#B7B4BB] group-hover:text-white">
-              Your balance
+            Twitter Scores
             </p>
           </div>
         </div>
