@@ -16,7 +16,9 @@ import authApiRequest from "@/apiRequest/auth";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
+
+
 
 const formSchema = z.object({
   platId: z.string().min(2, {
@@ -84,9 +86,7 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
         description: "Connect wallet failed",
       });
       
-    } finally {
-      setIsLoading(true)
-    }
+    } 
   };
 
   return (
@@ -122,13 +122,14 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
               </FormItem>
             )}
           />
-          <Button
+          <LoadingButton
+          loading={isLoading}
           disabled={isLoading}
             type="submit"
             className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7] rounded-xl w-full h-[56px] py-4 text-base font-bold text-center text-white cursor-pointer"
           >
             CLAM ID
-          </Button>
+          </LoadingButton>
         </form>
       </Form>
     </div>

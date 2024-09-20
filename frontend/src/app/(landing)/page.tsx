@@ -46,12 +46,7 @@ export default function Home() {
                 objectFit="contain"
               />
             </div>
-            {/* {accessToken ? (
-    <div className="flex flex-col gap-3 text-center z-50 text-white">
-      <p className="text-2xl font-bold">{`You are relized as: <result>`}</p>
-      <p className="text-2xl font-bold">{`Your score is: <score>`}</p>
-    </div>
-  ) : ( */}
+     
             <div className="flex flex-col gap-8 text-center z-50">
               <p className="text-[32px] text-white">
                 Your gateway <br />
