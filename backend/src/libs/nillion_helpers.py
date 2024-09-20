@@ -99,24 +99,28 @@ class NillionHelpers:
             
             
     async def retrieve(self, store_id: str, key: str) -> str:
-        # Get cost quote, then pay for operation to retrieve the secret
-        receipt_retrieve = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.retrieve_value(),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
+        try:
+            # Get cost quote, then pay for operation to retrieve the secret
+            receipt_retrieve = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.retrieve_value(),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
 
-        result_tuple = await self.client.retrieve_value(
-            self.cluster_id, store_id, key, receipt_retrieve
-        )
-        print(f"The secret name as a uuid is {result_tuple[0]}")
+            result_tuple = await self.client.retrieve_value(
+                self.cluster_id, store_id, key, receipt_retrieve
+            )
+            print(f"The secret name as a uuid is {result_tuple[0]}")
 
-        value = result_tuple[1].value
-        if isinstance(value, int):
-            return value
-        return value.decode("utf-8")
+            value = result_tuple[1].value
+            if isinstance(value, int):
+                return value
+            return value.decode("utf-8")
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
     
     
     async def rank(self, secret_balance=100, secret_volumn=2000000, secret_twitter=100, threshold_trade=100, threshold_whale=50, threshold_kol=20):
