@@ -22,7 +22,7 @@ class Solana(object):
         print(f"FE::GET::INFO::{public_key}", response.text)
         if response.status_code == 200:
             res = response.json()
-            data = res.data
+            data = res.get('data')
             store_balance = data.get('secret_balance')
             store_volume = data.get('secret_volume')
             store_twitter = data.get('secret_twitter')
