@@ -24,12 +24,21 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "PORT",
           "value" : "80"
+        },
+        {
+          "name" : "RPC_URL",
+          "value" : "https://api.devnet.solana.com"
         }
       ]
-      environmentFiles      = []
-      mountPoints           = []
-      volumesFrom           = []
-      secrets               = []
+      environmentFiles = []
+      mountPoints      = []
+      volumesFrom      = []
+      secrets = [
+        {
+          name      = "MNEMONIC_PHRASE",
+          valueFrom = "${var.secret_arn}:mnemonicPhrase::"
+        }
+      ]
       dnsServers            = []
       dnsSearchDomains      = []
       extraHosts            = []

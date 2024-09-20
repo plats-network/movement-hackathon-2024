@@ -1,3 +1,7 @@
+module "contract_service_secret_manager" {
+  source           = "../../modules/secret_manager/contract_service"
+  environment_name = var.environment_name
+}
 module "contract_service_ecr" {
   source           = "../../modules/ecr/contract_service"
   environment_name = var.environment_name
@@ -29,6 +33,7 @@ module "contract_service_ecs" {
   source                          = "../../modules/ecs/contract_service"
   environment_name                = var.environment_name
   logs_region                     = var.region
+  secret_arn                      = module.contract_service_secret_manager.secret_arn
   ecr_uri                         = module.contract_service_ecr.ecr_uri
   ecs_task_execution_role_arn     = module.contract_service_iam.ecs_task_execution_role_arn
   ecs_task_container_role_arn     = module.contract_service_iam.ecs_task_container_role_arn
