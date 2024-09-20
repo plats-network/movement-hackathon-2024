@@ -56,7 +56,12 @@ class UserService(object):
         print(f"store_twitter: {store_twitter}")
         # get data from nillion
         user_info = await Nillion.get_info(plat_id, store_balance, store_volume, store_twitter)
-        
+        try:
+            twitter_name = await Nillion.retrieve(plat_id, 'twitter_name')
+        except:
+            twitter_name = ""
+        user_info['twitter_name'] = twitter_name
+        user_info['plat_id'] = plat_id
         if user_info:
             return user_info
         # if user:

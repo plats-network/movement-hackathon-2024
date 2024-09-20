@@ -72,7 +72,7 @@ async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_ve
         plat_id = session.get('plat_id')
         
         # Store to nillion
-        background_tasks.add_task(Nillion.store, plat_id, 'twitter', user.screen_name)
+        background_tasks.add_task(Nillion.store, plat_id, 'twitter_name', user.screen_name)
         
         # Save twitter score 
         score = TwitterService.get_score(user.screen_name)

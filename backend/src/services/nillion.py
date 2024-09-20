@@ -25,13 +25,12 @@ class Nillion(object):
             store_volume = store_id
         elif key == 'twitter_score':
             store_twitter = store_id
+        else:
+            # Temporary save to database
+            mUser.update(user['_id'], {key: store_id})
             
         Solana.update(plat_id, user.get('public_key'), store_balance, store_volume, store_twitter)
-            
-        
-        # Temporary save to database
-        # mUser.update(user['_id'], {key: store_id})
-        
+
         # return store_id 
         
     
@@ -50,8 +49,10 @@ class Nillion(object):
             store_id = store_volume
         elif key == 'twitter_score':
             store_id = store_twitter
-
-        
+        else:
+            # Temporary get from database
+            store_id = user.get(key, "")
+            
         if not store_id:
             raise Exception("Store ID not found")
         value = await nillion.retrieve(store_id, key)
