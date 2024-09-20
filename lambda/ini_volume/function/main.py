@@ -142,6 +142,40 @@ def set_is_new_user(plat_id: str, is_new_user: bool) -> None:
     print("Set is_new_user: ", response.json())
     return
 
+
+def update_balance(plat_id: str, wallet_addr: str, price_in_usd: float):
+    url = "https://api.devnet.solana.com"
+    payload = json.dumps({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getBalance",
+        "params": [wallet_addr]
+    })
+    headers = {'Content-Type': 'application/json'}
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    balance_sol = response.json().get("result").get("value")
+    print("balance_sol: ", balance_sol)
+    display_balance_sol: float = balance_sol * 10 ** (-1 * SOL_DECIMALS)
+    print("display_balance_sol: ", display_balance_sol)
+    balance_usd: float = display_balance_sol * price_in_usd
+    print("balance_usd: ", balance_usd)
+    # update new balance
+    response = requests.post(
+        f"{BACKEND_URL}/api/v1/internal/nillion/store",
+        headers={
+            "accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        json={
+            "plat_id": plat_id,
+            "key": "balance",
+            "value": f"{balance_usd}"
+        }
+    )
+    print(f"update balance {plat_id}: ", response.json())
+    return
+
 # def main():
 #     plat_id = "odinhoang"
 #     my_addr = "H3xebErnGPc5JsFyjaDGYh4MN3rH1VBEzxsWu1bf5ryz"
@@ -174,6 +208,8 @@ def main(event, context):
         volumne_usd = usd_price * volume
         # add volume
         add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
+        # update_balance
+        update_balance(plat_id=plat_id, wallet_addr=wallet_addr, price_in_usd=usd_price)
 
     except Exception:
         traceback.print_exc()
