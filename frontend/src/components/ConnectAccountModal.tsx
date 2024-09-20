@@ -6,12 +6,9 @@ import GoogleIcon from "@/assets/GoogleIcon";
 import TelegramIcon from "@/assets/TelegramIcon";
 import TwitterIcon from "@/assets/TwitterIcon";
 import WalletIcon from "@/assets/WalletIcom";
-import RegisterIdForm from "@/components/RegisterIdForm";
-import WalletButton from "@/components/shared/WalletButton";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useWallet } from "@solana/wallet-adapter-react";
-import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, {useRef, useState } from "react";
 
 const ConnectAccountModal = ({ platId }: { platId: string }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -23,17 +20,8 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
     try {
       if (!platId) return;
       const response = await accountApiRequest.addTwitter(platId);
-      console.log("🚀 ~ handleAddTwitterAccount ~ response:", response);
     } catch (error) {}
   };
-
-  // useEffect(() => {
-
-  //   if(publicKey) {
-  //     setIsOpen(false)
-  //   }
-
-  // },[publicKey]);
 
   return (
     <>

@@ -1,16 +1,9 @@
-import AddIcon from '@/assets/AddIcon'
-import DeleteIcon from '@/assets/DeleteIcon'
-import GoogleIcon from '@/assets/GoogleIcon'
-import TelegramIcon from '@/assets/TelegramIcon'
-import TwitterIcon from '@/assets/TwitterIcon'
-import WalletIcon from '@/assets/WalletIcom'
 import ConnectAccountModal from '@/components/ConnectAccountModal'
 
 
 import React from 'react'
 
 const ConnectedAccount = ({user}:{user: any}) => {
-  console.log("🚀 ~ ConnectedAccount ~ user:", user.plat_id)
   
   return (
 

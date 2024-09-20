@@ -3,10 +3,7 @@ import authApiRequest from "@/apiRequest/auth";
 
 export async function POST(request: Request) {
     try {
-      const res = await request.json();
-      console.log("🚀 ~ POST ~ res:", res);
-
-      
+      const res = await request.json();      
       const resVerify = await authApiRequest.verify(res)
       return new Response(JSON.stringify({ message: resVerify.data.msg, data: resVerify.data.data }), {
         status: 200,

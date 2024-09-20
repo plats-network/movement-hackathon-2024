@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import authApiRequest from "@/apiRequest/auth";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   platId: z.string().min(2, {
@@ -26,6 +28,7 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
   const router = useRouter();
 
   const { publicKey } = useWallet();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,6 +46,7 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
 
   const handleRegister = async (platId: string) => {
     try {
+      setIsLoading(true)
       if (!authenToken) return;
       if (!publicKey) return;
       
@@ -68,9 +72,21 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
         await authApiRequest.auth({
           accessToken: responseLogin.data.data.access_token,
         });
-        router.push("/id-management");
+        router.push("/");
+        router.refresh();
       }
-    } catch (error) {}
+    } catch (error) {
+      setIsLoading(false)
+      console.log("🚀 ~ handleRegister ~ error:", error)
+      toast({
+        variant: "destructive",
+        className:"z-50 text-white",
+        description: "Connect wallet failed",
+      });
+      
+    } finally {
+      setIsLoading(true)
+    }
   };
 
   return (
@@ -106,12 +122,13 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
               </FormItem>
             )}
           />
-          <button
+          <Button
+          disabled={isLoading}
             type="submit"
-            className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7] rounded-xl w-full py-4 text-base font-bold text-center text-white cursor-pointer"
+            className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7] rounded-xl w-full h-[56px] py-4 text-base font-bold text-center text-white cursor-pointer"
           >
             CLAM ID
-          </button>
+          </Button>
         </form>
       </Form>
     </div>
