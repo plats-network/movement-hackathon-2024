@@ -19,6 +19,12 @@ class Nillion(object):
         print("store_id", store_id)
         
         store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        # Logger
+        print("GET from solana::", store_balance, store_volume, store_twitter)
+        print(f"store_balance: {store_balance}")
+        print(f"store_volume: {store_volume}")
+        print(f"store_twitter: {store_twitter}")
+        
         if key == 'balance':
             store_balance = store_id
         elif key == 'volume_SOL_in_usd':
@@ -28,7 +34,8 @@ class Nillion(object):
         else:
             # Temporary save to database
             mUser.update(user['_id'], {key: store_id})
-            
+        
+        print("Update to solana::", store_balance, store_volume, store_twitter)
         Solana.update(plat_id, user.get('public_key'), store_balance, store_volume, store_twitter)
 
         # return store_id 
@@ -43,6 +50,8 @@ class Nillion(object):
         
         # TODO: Retrieve store_id from smart contract using plat_id & key (secret_name)
         store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        
+        print("GET from solana::", store_balance, store_volume, store_twitter)
         if key == 'balance':
             store_id = store_balance
         elif key == 'volume_SOL_in_usd':
