@@ -126,7 +126,7 @@ class TransactionIndexer(object):
         # get current block
         response = requests.post(
             Conf.RPC_URL,
-            json=request("getBlockHeight")
+            json=request("getSlot")
         )
         parsed = parse(response.json())
         if isinstance(parsed, Ok):
