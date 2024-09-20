@@ -37,11 +37,12 @@ class Solana(object):
             "secretNameBalance": "secret_balance",
             "secretNameVolume": "secret_volume",
             "secretNameTwitter": "secret_twitter",
-            "storeIdBalance": store_balance,
-            "storeIdVolume": store_volume,
-            "storeIdTwitter": store_twitter
+            "storeIdBalance": store_balance if store_balance is not None else "",
+            "storeIdVolume": store_volume if store_volume is not None  else "",
+            "storeIdTwitter": store_twitter if store_twitter is not None  else ""
         }
         response = requests.put(contract_dns, json=json)
+        print(f"CONTRACT::UPDATE::{plat_id}::{public_key}::{store_balance}::{store_volume}::{store_twitter}::", response.json())
         if response.status_code == 200:
             return response.json()
         else:
