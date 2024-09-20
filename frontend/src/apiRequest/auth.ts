@@ -1,4 +1,4 @@
-import { apiClient, apiClientAuth } from "@/apiRequest/apiClient";
+import  apiClient  from "@/apiRequest/apiClient";
 import axios from "axios";
 
 const authApiRequest = {
@@ -12,7 +12,7 @@ const authApiRequest = {
       withCredentials: false, // Không gửi credentials
     }),
   verifyFromClientToServer: (body: any) =>
-    apiClientAuth.post("/api/auth/verify", body),
+    axios.post("/api/auth/verify", body),
   register: (body: any, authenToken: string) =>
     apiClient.post("/auth/register", JSON.stringify(body), {
       withCredentials: false,
@@ -29,9 +29,23 @@ const authApiRequest = {
         },
       }),
   auth: (body: { accessToken: string }) =>
-    apiClientAuth.post("/api/auth", body, {
+    axios.post("/api/auth", body, {
       withCredentials: false, // Không gửi credentials
     }),
+    logoutFromNextClientToNextServer: (
+      force?: boolean | undefined,
+      signal?: AbortSignal | undefined
+    ) =>
+      axios.post(
+        "/api/auth/logout",
+        {
+          force,
+        },
+        {
+          signal,
+        }
+      ),
+  
 };
 
 export default authApiRequest;

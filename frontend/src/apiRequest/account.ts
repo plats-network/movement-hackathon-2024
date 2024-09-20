@@ -1,4 +1,4 @@
-import { apiClient } from "@/apiRequest/apiClient";
+import apiClient from "@/apiRequest/apiClient";
 import { clientAccessToken } from "@/lib/utils";
 
 const accountApiRequest = {
