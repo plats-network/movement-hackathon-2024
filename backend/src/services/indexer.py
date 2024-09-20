@@ -77,5 +77,12 @@ class Indexer():
 
 
 if __name__ == "__main__":
+    # import from sys.args 
+    import sys
+    plat_id = sys.argv[1]
+    wallet_addr = sys.argv[2]
+    print("plat_id: ", plat_id)
+    print("wallet_addr: ", wallet_addr)
+    
     indexer = Indexer()
-    indexer.send_message("odin.dev.ID", "BBt9L8MfbuytDBaqcP7rUTjheiBBXUTRwdYjuwx8xNUC")
+    indexer.send_message(plat_id, wallet_addr)
