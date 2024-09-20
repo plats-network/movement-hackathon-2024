@@ -51,7 +51,7 @@ class Nillion(object):
         # TODO: Retrieve store_id from smart contract using plat_id & key (secret_name)
         store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
         
-        print(f"RETRIEVE::GET from solana::{plat_id}::{key}::{value}::", store_balance, store_volume, store_twitter)
+        print(f"RETRIEVE::GET from solana::{plat_id}::{key}::", store_balance, store_volume, store_twitter)
         if key == 'balance':
             store_id = store_balance
         elif key == 'volume_SOL_in_usd':
