@@ -54,7 +54,7 @@ class Nillion(object):
             store_id = user.get(key, "")
             
         if not store_id:
-            raise Exception("Store ID not found")
+            return 0
         value = await nillion.retrieve(store_id, key)
         return value
         
