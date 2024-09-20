@@ -6,7 +6,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import AppProvider from "@/providers/AppProvider";
 import { cookies } from "next/headers";
-import accountApiRequest from "@/apiRequest/account";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,21 +23,7 @@ export default async function RootLayout({
 
   const cookieStore = cookies()
   const accessToken = cookieStore.get('accessToken')
-
-
-
   let user:  any | null = null;
-
- try {
-  if(accessToken) {
-    const response = await accountApiRequest.user(accessToken?.value ?? "")
-    user = response?.data?.data?.user
-  
-    }
- } catch (error) {
-  console.log("🚀 ~ error:", error)
-  
- }
 
   return (
     <html lang="en">
