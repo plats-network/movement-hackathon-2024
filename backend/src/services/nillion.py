@@ -23,7 +23,7 @@ class Nillion(object):
             store_balance = store_id
         elif key == 'volume_SOL_in_usd':
             store_volume = store_id
-        elif key == 'twitter':
+        elif key == 'twitter_score':
             store_twitter = store_id
             
         Solana.update(plat_id, user.get('public_key'), store_balance, store_volume, store_twitter)
@@ -58,7 +58,7 @@ class Nillion(object):
         return value
         
     @staticmethod
-    async def get_info(plat_id: str, store_balance: str, store_volume: str, store_twitter: str, balance_key = 'balance', volume_key = 'volume_SOL_in_usd', twitter_key = 'twitter'):
+    async def get_info(plat_id: str, store_balance: str, store_volume: str, store_twitter: str, balance_key = 'balance', volume_key = 'volume_SOL_in_usd', twitter_key = 'twitter_score'):
         user = mUser.get_item_with({"plat_id": plat_id})
         if user is None:
             raise Exception("User not found")
