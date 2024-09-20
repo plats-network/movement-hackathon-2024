@@ -119,7 +119,7 @@ class NillionHelpers:
                 return value
             return value.decode("utf-8")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error::{store_id}::{key}:: {e}")
             return -1
     
     
@@ -212,6 +212,7 @@ class NillionHelpers:
                     print(f"🖥️  The result is {compute_event.result.value}")
                     return compute_event.result.value
             
-        except:
+        except Exception as e:
+            print(f"Error:: {e}")
             return -1
     
