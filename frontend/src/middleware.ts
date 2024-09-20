@@ -11,9 +11,6 @@ export function middleware(request: NextRequest) {
 
     const sessionToken = request.cookies.get('accessToken')?.value;
     const {pathname} = request.nextUrl
-    console.log("🚀 ~ middleware ~ pathname:", pathname)
-
-
 
     //chua dang nhap thi ko cho vao privatePaths
     if(privatePaths.some(path => pathname.startsWith(path)) && !sessionToken) {

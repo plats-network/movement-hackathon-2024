@@ -39,8 +39,7 @@ const LoginPage = () => {
       const responseNonce = await authApiRequest.nonce(
         publicKeyWallet
       );
-      // cho 5 s
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+
 
       // Sign message
       if (responseNonce) {
@@ -101,17 +100,20 @@ const LoginPage = () => {
         const responseLogin = await authApiRequest.login(responseVerify.data.data.authen_token)
       
         if(responseLogin && responseLogin?.data.code !== 400) {
+        
+          await authApiRequest.auth({accessToken: responseLogin.data.data.access_token})
           toast({
             className:"z-50 text-white",
             description: responseLogin.data.msg,
           });
-          await authApiRequest.auth({accessToken: responseLogin.data.data.access_token})
-          router.push("/id-management")
+          router.push("/")
+          router.refresh();
+
         }
         else {
           setAuthenToken(responseVerify.data.data.authen_token)
         }
-   
+
       }
     } catch (error) {
       console.log("🚀 ~ handleVerifySignature ~ error:", error)
@@ -123,15 +125,13 @@ const LoginPage = () => {
         description: "Connect wallet failed",
       });
     } 
-    finally {
-      setIsLoading(false);
-    }
+
   };
 
  
 
   return (
-    <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white">
+    <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white px-10">
       <div className="relative  h-full">
         <div
           className="absolute inset-0  opacity-5 shadow w-full max-w-6xl m-auto rounded-2xl"
@@ -141,9 +141,8 @@ const LoginPage = () => {
           }}
         ></div>
         <div className="relative z-10  flex h-full  shadow w-full max-w-6xl m-auto rounded-2xl  ">
-          {/* <div className="flex h-full shadow w-full max-w-6xl m-auto rounded-2xl bg-[#08082C]"> */}
-          {/* left */}
-          <div className="w-full h-full flex flex-col items-center justify-between text-center bg-[url('/LoginBackground.png')] bg-no-repeat bg-cover bg-center py-[27px]">
+       
+          <div className="w-full h-full md:flex hidden flex-col items-center justify-between text-center bg-[url('/LoginBackground.png')] bg-no-repeat bg-cover bg-center py-[27px]">
             <div className="relative max-w-[505px] w-full h-[437px]">
               <Image
                 alt="img-login"
@@ -166,8 +165,6 @@ const LoginPage = () => {
               <button
                 onClick={() => router.push("/")}
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                data-modal-hide="default-modal"
               >
                 <CloseIcon />
               </button>
@@ -209,8 +206,8 @@ const LoginPage = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col justify-between p-6">
-        
+          <div className="w-full h-full flex flex-col justify-between p-6 bg-">
+            
 
             <RegisterIdForm authenToken={authenToken}/>
           </div>

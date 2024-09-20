@@ -2,7 +2,6 @@
 
 export async function POST(request: Request) {
     const res = await request.json();
-    console.log("🚀 ~ POST ~ res:", res);
     const accessToken = res.accessToken as string;
     if (!accessToken) {
       return Response.json(

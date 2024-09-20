@@ -29,11 +29,16 @@ export default async function RootLayout({
 
   let user:  any | null = null;
 
+ try {
   if(accessToken) {
-  const response = await accountApiRequest.user(accessToken?.value ?? "")
-  user = response?.data?.data?.user
-
-  }
+    const response = await accountApiRequest.user(accessToken?.value ?? "")
+    user = response?.data?.data?.user
+  
+    }
+ } catch (error) {
+  console.log("🚀 ~ error:", error)
+  
+ }
 
   return (
     <html lang="en">
