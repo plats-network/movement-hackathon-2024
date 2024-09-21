@@ -14,6 +14,9 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@router.options("")
+async def options():
+    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.get('')
 async def get_user(token: TokenData = Depends(Auth.verify_token)):
@@ -25,10 +28,14 @@ async def get_user(token: TokenData = Depends(Auth.verify_token)):
         if user is None:
             return ResponseMsg.INVALID.to_json(msg="Unauthorized or User not found")
         
+        if not user:
+            return ResponseMsg.SUCCESS.to_json(msg="No data", data={})    
+        
         response = {
             "user": user
         }
+        
         return ResponseMsg.SUCCESS.to_json(data=response)
     except Exception as e:
-        logger.error(f"Error logging in: {e}")
-        return ResponseMsg.ERROR.to_json(msg="Error logging in")
+        logger.error(f"Retrive failed::{e}")
+        return ResponseMsg.ERROR.to_json(msg=f"Retrive failed::{e}")

@@ -99,113 +99,159 @@ class NillionHelpers:
             
             
     async def retrieve(self, store_id: str, key: str) -> str:
-        # Get cost quote, then pay for operation to retrieve the secret
-        receipt_retrieve = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.retrieve_value(),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
+        try:
+            # Get cost quote, then pay for operation to retrieve the secret
+            receipt_retrieve = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.retrieve_value(),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
 
-        result_tuple = await self.client.retrieve_value(
-            self.cluster_id, store_id, key, receipt_retrieve
-        )
-        print(f"The secret name as a uuid is {result_tuple[0]}")
+            result_tuple = await self.client.retrieve_value(
+                self.cluster_id, store_id, key, receipt_retrieve
+            )
+            print(f"The secret name as a uuid is {result_tuple[0]}")
 
-        value = result_tuple[1].value
-        if isinstance(value, int):
-            return value
-        return value.decode("utf-8")
+            value = result_tuple[1].value
+            if isinstance(value, int):
+                return value
+            return value.decode("utf-8")
+        except Exception as e:
+            print(f"Error::{store_id}::{key}:: {e}")
+            return -1
     
     
-    async def rank(self, secret_balance=100, secret_volumn=2000000, secret_twitter=100, threshold_trade=100, threshold_whale=50, threshold_kol=20):
-        party_name = "Plats"
-        program_name = "platscall"
-        bin_dir = os.path.join("..", "nillion", "nada_quickstart_programs", "target")
-        
-        program_mir_path = os.path.join(bin_dir, f"{program_name}.nada.bin")
-        print(f"program_mir_path: {program_mir_path}")
-        
-        # Pay to store the program and obtain a receipt of the payment
-        receipt_store_program = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.store_program(program_mir_path),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
-        # Store the program
-        action_id = await self.client.store_program(
-            self.cluster_id, program_name, program_mir_path, receipt_store_program
-        )
-        # Create a variable for the program_id, which is the {user_id}/{program_name}. We will need this later
-        program_id = f"{self.client.user_id}/{program_name}"
-        print("Stored program. action_id:", action_id)
-        print("Stored program_id:", program_id)
-        
-        # Set permissions for the client to compute on the program
-        self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
-        
-        # Create a secret
-        stored_secret = nillion.NadaValues(
-            {
-                "threshold_trade": nillion.Integer(threshold_trade),
-                "threshold_whale": nillion.Integer(threshold_whale),
-                "threshold_kol": nillion.Integer(threshold_kol),
-            }
-        )
-        receipt_store = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.store_values(stored_secret, ttl_days=5),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
-        # Store a secret
-        store_id = await self.client.store_values(
-            self.cluster_id, stored_secret, self.permissions, receipt_store
-        )
-        # Bind the parties in the computation to the client to set input and output parties
-        compute_bindings = nillion.ProgramBindings(program_id)
-        compute_bindings.add_input_party(party_name, self.client.party_id)
-        compute_bindings.add_output_party(party_name, self.client.party_id)
-        
-        print(f"Computing using program {program_id}")
-        print(f"Use secret store_id: {store_id}")
-
-        computation_time_secrets = nillion.NadaValues(
-            {
-                "secret_twitter": nillion.SecretInteger(secret_twitter),
-                "secret_balance": nillion.SecretInteger(secret_balance),
-                "secret_volumn": nillion.SecretInteger(secret_volumn),
-            }
-        )
-        # Pay for the compute
-        receipt_compute = await get_quote_and_pay(
-            self.client,
-            nillion.Operation.compute(program_id, computation_time_secrets),
-            self.payments_wallet,
-            self.payments_client,
-            self.cluster_id,
-        )
-
-        # Compute on the secrets
-        compute_id = await self.client.compute(
-            self.cluster_id,
-            compute_bindings,
-            [store_id],
-            computation_time_secrets,
-            receipt_compute,
-        )
-            # Print compute result
-        print(f"The computation was sent to the network. compute_id: {compute_id}")
-        while True:
-            compute_event = await self.client.next_compute_event()
-            if isinstance(compute_event, nillion.ComputeFinishedEvent):
-                print(f"✅  Compute complete for compute_id {compute_event.uuid}")
-                print(f"🖥️  The result is {compute_event.result.value}")
-                return compute_event.result.value
-        
+    async def rank(self, secret_balance: int, secret_volume: int, secret_twitter: int, threshold_whale: int, threshold_trade: int, threshold_kol: int):
+        try:
+            print("PARAMS::", secret_balance, secret_volume, secret_twitter, threshold_whale, threshold_trade, threshold_kol)
+            party_name = "Plats"
+            program_name = "platscall"
+            program_mir_path = os.path.join(os.path.dirname(__file__), f"{program_name}.nada.bin")
+            print(f"program_mir_path: {program_mir_path}")
             
+            # Pay to store the program and obtain a receipt of the payment
+            receipt_store_program = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.store_program(program_mir_path),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
+            # Store the program
+            action_id = await self.client.store_program(
+                self.cluster_id, program_name, program_mir_path, receipt_store_program
+            )
+            # Create a variable for the program_id, which is the {user_id}/{program_name}. We will need this later
+            program_id = f"{self.client.user_id}/{program_name}"
+            print("Stored program. action_id:", action_id)
+            print("Stored program_id:", program_id)
+            
+            # Set permissions for the client to compute on the program
+            self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
+            
+            # Create a secret
+            stored_secret = nillion.NadaValues(
+                {
+                    "threshold_trade": nillion.Integer(threshold_trade),
+                    "threshold_whale": nillion.Integer(threshold_whale),
+                    "threshold_kol": nillion.Integer(threshold_kol),
+                }
+            )
+            receipt_store = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.store_values(stored_secret, ttl_days=5),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
+            # Store a secret
+            store_id = await self.client.store_values(
+                self.cluster_id, stored_secret, self.permissions, receipt_store
+            )
+            
+            # Bind the parties in the computation to the client to set input and output parties
+            compute_bindings = nillion.ProgramBindings(program_id)
+            compute_bindings.add_input_party(party_name, self.client.party_id)
+            compute_bindings.add_output_party(party_name, self.client.party_id)
+            
+            print(f"Computing using program {program_id}")
+            print(f"Use secret store_id: {store_id}")
+
+            computation_time_secrets = nillion.NadaValues(
+                {
+                    "secret_volumn": nillion.SecretInteger(secret_volume),
+                    "secret_balance": nillion.SecretInteger(secret_balance),
+                    "secret_twitter": nillion.SecretInteger(secret_twitter),
+                }
+            )
+            # Pay for the compute
+            receipt_compute = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.compute(program_id, computation_time_secrets),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
+
+            # Compute on the secrets
+            compute_id = await self.client.compute(
+                self.cluster_id,
+                compute_bindings,
+                [store_id],
+                computation_time_secrets,
+                receipt_compute,
+            )
+                # Print compute result
+            print(f"The computation was sent to the network. compute_id: {compute_id}")
+            while True:
+                compute_event = await self.client.next_compute_event()
+                if isinstance(compute_event, nillion.ComputeFinishedEvent):
+                    print(f"✅  Compute complete for compute_id {compute_event.uuid}")
+                    print(f"🖥️  The result is {compute_event.result.value}")
+                    return compute_event.result.value
+            
+        except Exception as e:
+            print(f"RANKING::ERROR:: {e}")
+            return {
+                "result_whale": -1,
+                "result_trade": -1,
+                "result_twitter": -1
+            }
     
+    def safe_float_conversion(self, value, default=0.0):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+            
+    def format_compute(self, balance, volume, twitter):
+        threshold_whale = int(500)
+        threshold_trade = int(1000)
+        threshold_kol = int(200)
+        
+        # convert to int
+        balance_int = int(self.safe_float_conversion(balance))
+        volume_int = int(self.safe_float_conversion(volume))
+        twitter_int = int(self.safe_float_conversion(twitter))
+        
+        print(f"FORMAT::BALANCE::{balance_int}::VOLUME::{volume_int}::TWITTER::{twitter_int}")
+        print(f"FORMAT::THRESHOLD::WHALE::{threshold_whale}::TRADE::{threshold_trade}::KOL:{threshold_kol}")
+        print(f"FORMAT::EXPECTED::{balance_int > threshold_whale}::{volume_int > threshold_trade}:: {twitter_int > threshold_kol}")
+        
+        return balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol
+    
+if __name__ == "__main__":
+    nillion_helper = NillionHelpers()
+    balance = "123123.5"
+    volume = "500.56123"
+    twitter = "-1"
+    
+    balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol = nillion_helper.format_compute(balance, volume, twitter)
+
+    # whale =  asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_whale"))
+    # trade = asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_trade"))
+    # kol = asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_kol"))
+    # print(whale, trade, kol)
+    asyncio.run(nillion_helper.rank(secret_balance=balance_int, secret_volume=volume_int, secret_twitter=twitter_int, threshold_trade=threshold_trade, threshold_whale=threshold_whale, threshold_kol=threshold_kol))
