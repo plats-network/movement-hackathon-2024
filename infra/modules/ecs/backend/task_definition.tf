@@ -177,6 +177,14 @@ resource "aws_ecs_task_definition" "core" {
         {
           name      = "TWITTER_API_KEY",
           valueFrom = "${var.secret_arn}:twitterApiKey::"
+        },
+        {
+          name      = "TWITTER_ACCESS_TOKEN",
+          valueFrom = "${var.secret_arn}:twitterAccessToken::"
+        },
+        {
+          name      = "TWITTER_ACCESS_TOKEN_SECRET",
+          valueFrom = "${var.secret_arn}:twitterAccessTokenSecret::"
         }
       ]
       dnsServers            = []
