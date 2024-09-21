@@ -127,8 +127,7 @@ class NillionHelpers:
         try:
             party_name = "Plats"
             program_name = "platscall"
-            bin_dir = os.path.join("..", "nillion", "nada_quickstart_programs", "target")
-            
+            bin_dir = os.path.join(".")
             program_mir_path = os.path.join(bin_dir, f"{program_name}.nada.bin")
             print(f"program_mir_path: {program_mir_path}")
             
