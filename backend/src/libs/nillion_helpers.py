@@ -123,12 +123,12 @@ class NillionHelpers:
             return -1
     
     
-    async def rank(self, secret_balance=100, secret_volumn=2000000, secret_twitter=100, threshold_trade=100, threshold_whale=50, threshold_kol=20):
+    async def rank(self, secret_balance: int, secret_volume: int, secret_twitter: int, threshold_whale: int, threshold_trade: int, threshold_kol: int):
         try:
+            print("PARAMS::", secret_balance, secret_volume, secret_twitter, threshold_whale, threshold_trade, threshold_kol)
             party_name = "Plats"
             program_name = "platscall"
-            bin_dir = os.path.join(".")
-            program_mir_path = os.path.join(bin_dir, f"{program_name}.nada.bin")
+            program_mir_path = os.path.join(os.path.dirname(__file__), f"{program_name}.nada.bin")
             print(f"program_mir_path: {program_mir_path}")
             
             # Pay to store the program and obtain a receipt of the payment
@@ -170,6 +170,7 @@ class NillionHelpers:
             store_id = await self.client.store_values(
                 self.cluster_id, stored_secret, self.permissions, receipt_store
             )
+            
             # Bind the parties in the computation to the client to set input and output parties
             compute_bindings = nillion.ProgramBindings(program_id)
             compute_bindings.add_input_party(party_name, self.client.party_id)
@@ -180,9 +181,9 @@ class NillionHelpers:
 
             computation_time_secrets = nillion.NadaValues(
                 {
-                    "secret_twitter": nillion.SecretInteger(secret_twitter),
+                    "secret_volumn": nillion.SecretInteger(secret_volume),
                     "secret_balance": nillion.SecretInteger(secret_balance),
-                    "secret_volumn": nillion.SecretInteger(secret_volumn),
+                    "secret_twitter": nillion.SecretInteger(secret_twitter),
                 }
             )
             # Pay for the compute
@@ -219,3 +220,38 @@ class NillionHelpers:
                 "result_twitter": -1
             }
     
+    def safe_float_conversion(self, value, default=0.0):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+            
+    def format_compute(self, balance, volume, twitter):
+        threshold_whale = int(500)
+        threshold_trade = int(1000)
+        threshold_kol = int(200)
+        
+        # convert to int
+        balance_int = int(self.safe_float_conversion(balance))
+        volume_int = int(self.safe_float_conversion(volume))
+        twitter_int = int(self.safe_float_conversion(twitter))
+        
+        print(f"FORMAT::BALANCE::{balance_int}::VOLUME::{volume_int}::TWITTER::{twitter_int}")
+        print(f"FORMAT::THRESHOLD::WHALE::{threshold_whale}::TRADE::{threshold_trade}::KOL:{threshold_kol}")
+        print(f"FORMAT::EXPECTED::{balance_int > threshold_whale}::{volume_int > threshold_trade}:: {twitter_int > threshold_kol}")
+        
+        return balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol
+    
+if __name__ == "__main__":
+    nillion_helper = NillionHelpers()
+    balance = "123123.5"
+    volume = "500.56123"
+    twitter = "-1"
+    
+    balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol = nillion_helper.format_compute(balance, volume, twitter)
+
+    # whale =  asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_whale"))
+    # trade = asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_trade"))
+    # kol = asyncio.run(nillion_helper.retrieve("33761cb8-0e42-4641-a4d8-d7cd4f8c2bb9", "threshold_kol"))
+    # print(whale, trade, kol)
+    asyncio.run(nillion_helper.rank(secret_balance=balance_int, secret_volume=volume_int, secret_twitter=twitter_int, threshold_trade=threshold_trade, threshold_whale=threshold_whale, threshold_kol=threshold_kol))

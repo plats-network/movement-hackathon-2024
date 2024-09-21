@@ -79,7 +79,9 @@ class Nillion(object):
         volume = await nillion.retrieve(store_volume, volume_key)
         twitter = await nillion.retrieve(store_twitter, twitter_key)
         
-        rank = await nillion.rank(secret_balance=balance, secret_volumn=volume, secret_twitter=twitter)
+        balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol = nillion.format_compute(balance, volume, twitter)
+        
+        rank = await nillion.rank(balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol)
 
         return {
             "balance": balance,
