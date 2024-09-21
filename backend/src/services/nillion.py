@@ -78,7 +78,11 @@ class Nillion(object):
         balance = await nillion.retrieve(store_balance, balance_key)
         volume = await nillion.retrieve(store_volume, volume_key)
         twitter = await nillion.retrieve(store_twitter, twitter_key)
-        rank = await nillion.rank(secret_balance=balance, secret_volumn=volume, secret_twitter=twitter)
+        
+        balance_int = int(balance) if balance and balance.isdigit() else -1
+        volume_int = int(volume) if volume and volume.isdigit() else -1
+        twitter_int = int(twitter) if twitter and twitter.isdigit() else -1
+        rank = await nillion.rank(secret_balance=balance_int, secret_volumn=volume_int, secret_twitter=twitter_int)
 
         return {
             "balance": balance,

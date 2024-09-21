@@ -213,6 +213,10 @@ class NillionHelpers:
                     return compute_event.result.value
             
         except Exception as e:
-            print(f"Error:: {e}")
-            return -1
+            print(f"RANKING::ERROR:: {e}")
+            return {
+                "result_whale": -1,
+                "result_trade": -1,
+                "result_twitter": -1
+            }
     
