@@ -12,9 +12,9 @@ export default function Home() {
       {accessToken ? (
         <ProfileView />
       ) : (
-        <div className="relative h-[100vh] flex items-center justify-center ">
+        <div className="relative h-[100vh] flex items-center justify-center">
           <div className="absolute bottom-0 left-0">
-            <div className="relative w-[488px] h-[360px]">
+            <div className="relative md:w-[488px] w-[200px] md:h-[360px] h-[150px]">
               <Image
                 alt="left"
                 src={"/LeftImage.png"}
@@ -26,7 +26,7 @@ export default function Home() {
           </div>
 
           <div className="absolute top-10 right-0">
-            <div className="relative w-[283px] h-[243px]">
+            <div className="relative md:w-[283px] w-[180px]  md:h-[243px] h-[140px]">
               <Image
                 alt="left"
                 src={"/RightImage.png"}
@@ -47,7 +47,7 @@ export default function Home() {
               />
             </div>
      
-            <div className="flex flex-col gap-8 text-center z-50">
+            <div className="flex flex-col gap-8 text-center z-50 mx-5">
               <p className="text-[32px] text-white">
                 Your gateway <br />
                 to personalized web3 experience
