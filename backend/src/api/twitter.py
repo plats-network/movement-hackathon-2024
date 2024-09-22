@@ -15,8 +15,8 @@ router = APIRouter()
 oauth1_user_handler = tweepy.OAuth1UserHandler(
     consumer_key=settings.TWITTER_CONSUMER_KEY,
     consumer_secret=settings.TWITTER_CONSUMER_SECRET,
-    # access_token=settings.TWITTER_ACCESS_TOKEN,
-    # access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
+    access_token=settings.TWITTER_ACCESS_TOKEN,
+    access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
     callback=settings.TWITTER_REDIRECT_URI
 )
 
@@ -42,11 +42,11 @@ async def login(request: Request, plat_id: str):
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
         print("Error getting authorization URL: ", str(e))
-        raise HTTPException(status_code=500, detail="Error getting authorization URL")
+        raise HTTPException(status_code=500, detail=f"Error getting authorization URL::{str(e)}")
 
-@router.options("/callback")
-async def callback_option():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+# @router.options("/callback")
+# async def callback_option():
+#     return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.get("/callback")
 async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_verifier: str, request: Request, session: dict = Depends(get_session) ):
@@ -72,7 +72,7 @@ async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_ve
         plat_id = session.get('plat_id')
         
         # Store to nillion
-        background_tasks.add_task(Nillion.store, plat_id, 'twitter', user.screen_name)
+        background_tasks.add_task(Nillion.store, plat_id, 'twitter_name', user.screen_name)
         
         # Save twitter score 
         score = TwitterService.get_score(user.screen_name)

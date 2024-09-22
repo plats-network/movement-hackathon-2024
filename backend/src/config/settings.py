@@ -64,12 +64,16 @@ class Settings():
     # Twitter
     TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
     TWITTER_API_URL = os.getenv("TWITTER_API_URL")
-    TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-    TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+    TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN") or ""
+    TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET") or ""
     
     # Solana
     SOLANA_RPC_URL = os.getenv("SOLANA_RPC_URL")
     SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
+    CONTRACT_SERVICE_DNS = os.getenv("CONTRACT_SERVICE_DNS")
+    
+    SQS_QUEUE_URL = "https://sqs.ap-southeast-1.amazonaws.com/905418230863/plat-fellowship-dev-ini-volume"
+    RPC_URL = os.getenv("RPC_URL") or "https://api.devnet.solana.com"
     
 settings = Settings()
 

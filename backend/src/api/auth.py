@@ -14,6 +14,8 @@ from src.dtos import TokenData
 from src.config.db import redis_client
 from src.services import UserService
 import hashlib
+from src.services.solana_client import Solana
+from src.services.indexer import Indexer
 
 router = APIRouter()
 
@@ -103,6 +105,12 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
         if token.sub != public_key:
             return ResponseMsg.UNAUTHORIZED.to_json(msg="Unauthorized")
         
+        # TODO: Send transaction to SMC to register user with plat_id, eoa=new_user['address][0]
+        
+        response = Solana.register(plat_id, public_key)
+        
+        if response is None:
+            return ResponseMsg.ERROR.to_json(msg="Registration failed")
         
         # Create a new user with plat_id
         new_user = UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
@@ -110,8 +118,10 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
             return ResponseMsg.INVALID.to_json(msg="User exists")
         
         logger.info(f"User registered with plat_id: {plat_id}, address, {new_user['address']}, public_key: {public_key}")
-        # TODO: Send transaction to SMC to register user with plat_id, eoa=new_user['address][0]
         
+        logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
+        
+        Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
 
         
         return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")  

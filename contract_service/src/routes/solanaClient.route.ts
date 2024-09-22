@@ -3,6 +3,6 @@ import * as controller from "../controllers/solanaClient.controller";
 
 export const router = Router();
 
-router.get("/account", controller.retriveAccount);
+router.post("/account/info", controller.retriveAccount);
 router.post("/account", controller.createAccount);
 router.put("/account", controller.updateAccount);
