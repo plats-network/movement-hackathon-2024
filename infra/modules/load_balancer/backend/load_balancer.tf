@@ -7,6 +7,12 @@ resource "aws_lb" "load_balancer" {
     var.subnet_1a_load_balancer_id,
     var.subnet_1c_load_balancer_id
   ]
+  idle_timeout = 600
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
 
   enable_deletion_protection = false
 
