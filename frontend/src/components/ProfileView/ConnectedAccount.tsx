@@ -1,3 +1,8 @@
+import DeleteIcon from '@/assets/DeleteIcon'
+import GoogleIcon from '@/assets/GoogleIcon'
+import TelegramIcon from '@/assets/TelegramIcon'
+import TwitterIcon from '@/assets/TwitterIcon'
+import WalletIcon from '@/assets/WalletIcom'
 import ConnectAccountModal from '@/components/ConnectAccountModal'
 
 
@@ -22,8 +27,8 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
       <p className='text-[40px] font-bold'>- -</p>
       <p className='text-[17px] text-[#B172FF]'>You haven't connected to any accounts yet</p>
     </div>
-    {/* <div className="flex flex-col gap-3">
-      <div className="bg-[#1E2536] flex items-center py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
+    <div className="flex flex-col gap-3">
+      {/* <div className="bg-[#1E2536] flex items-center py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
         <div className="flex items-center gap-2">
           <WalletIcon/>
           <p>9SsNLjgGK1dUbdPKqrSyaZ5GhPY5355Jcdjk8f81SqiH</p>
@@ -36,8 +41,8 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
           </label>
           <DeleteIcon />
         </div>
-      </div>
-      <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
+      </div> */}
+      {/* <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
         <div className="flex items-center gap-2">
           <GoogleIcon />
           <p>@dustinhuynh</p>
@@ -50,8 +55,8 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
           </label>
           <DeleteIcon />
         </div>
-      </div>
-      <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
+      </div> */}
+      {/* <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
         <div className="flex items-center gap-2">
           <TelegramIcon />
           <p>@dustinhuynh</p>
@@ -64,8 +69,9 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
           </label>
           <DeleteIcon />
         </div>
-      </div>
-      <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
+      </div> */}
+   
+      {/* <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
         <div className="flex items-center gap-2">
           <TwitterIcon />
           <p>@dustinhuynh</p>
@@ -78,10 +84,10 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
           </label>
           <DeleteIcon />
         </div>
-      </div>
+      </div> */}
 
 
-    </div> */}
+    </div>
     <ConnectAccountModal platId={user?.plat_id}/>
 
   </div>

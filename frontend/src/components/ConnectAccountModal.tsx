@@ -6,32 +6,32 @@ import GoogleIcon from "@/assets/GoogleIcon";
 import TelegramIcon from "@/assets/TelegramIcon";
 import TwitterIcon from "@/assets/TwitterIcon";
 import WalletIcon from "@/assets/WalletIcom";
+import { LoadingButton } from "@/components/ui/loading-button";
 import useClickOutside from "@/hooks/useClickOutside";
-import { clientAccessToken } from "@/lib/utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import React, {useRef, useState } from "react";
 
 const ConnectAccountModal = ({ platId }: { platId: string }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { publicKey } = useWallet();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const modalRef = useRef(null);
   useClickOutside(modalRef, () => setIsOpen(!isOpen));
 
+  
+
   const handleAddTwitterAccount = async () => {
     try {
+      setIsLoading(true)
       if (!platId) return;
-      
-      // const response = await fetch(`${process.env.NEXT_PUBLIC_API}/twitter/login?plat_id=${platId}`, {
-      //   headers: {
-      //     "Authorization": `Bearer ${clientAccessToken?.value}`,
-      //   }
-      // })
-      // const result = await response.json()
-      // console.log("🚀 ~ handleAddTwitterAccount ~ result:", result)
-      const response = await accountApiRequest.addTwitterFromNextClientToNextServer(platId);
-      console.log("🚀 ~ handleAddTwitterAccount ~ response:", response)
-      console.log("🚀 ~ handleAddTwitterAccount ~ response:", response)
-    } catch (error) {}
+      const response = await accountApiRequest.addTwitter(platId);
+     
+    } catch (error) {
+      setIsLoading(false)
+    console.log("🚀 ~ handleAddTwitterAccount ~ error:", error)
+    } finally {
+      setIsLoading(false)
+    }
   };
 
   return (
@@ -60,23 +60,23 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
                 </button>
               </div>
               <div className="w-full h-full justify-center flex flex-col gap-4 text-center">
-                <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
+                {/* <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <WalletIcon />
                   <p> Connect your Wallet</p>
-                </button>
+                </button> */}
 
-                <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
+                {/* <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <GoogleIcon />
                   <p> Continue with Google</p>
                 </button>
                 <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white  text-base cursor-pointer rounded-xl">
                   <TelegramIcon />
                   <p> Continue with telegram</p>
-                </button>
-                <button onClick={handleAddTwitterAccount} className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
+                </button> */}
+                <LoadingButton loading={isLoading} onClick={handleAddTwitterAccount} className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <TwitterIcon />
                   <p> Continue with twitter</p>
-                </button>
+                </LoadingButton>
               </div>
             </div>
           </div>
