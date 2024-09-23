@@ -29,7 +29,6 @@ apiClient.interceptors.request.use(async (request) => {
 
   return request;
 });
-
 apiClient.interceptors.response.use(
   (response) => {
     const { method, url } = response.config;
@@ -54,7 +53,14 @@ apiClient.interceptors.response.use(
     );
 
     if (status === 400) {
-      redirect("/logout");
+      if (typeof window !== "undefined") {
+        // Redirect client-side
+        window.location.href = "/logout";
+      } else {
+        // Redirect server-side (nếu cần thiết)
+        // Ví dụ như: res.writeHead(302, { Location: '/logout' });
+        // res.end();
+      }
     }
 
     return Promise.reject(error);

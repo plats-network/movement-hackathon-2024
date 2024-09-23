@@ -3,7 +3,7 @@ import ConnectAccountModal from '@/components/ConnectAccountModal'
 
 import React from 'react'
 
-const ConnectedAccount = ({user}:{user: any}) => {
+const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) => {
   
   return (
 
@@ -82,7 +82,7 @@ const ConnectedAccount = ({user}:{user: any}) => {
 
 
     </div> */}
-    <ConnectAccountModal platId={user.plat_id}/>
+    <ConnectAccountModal platId={user?.plat_id}/>
 
   </div>
     </div>
