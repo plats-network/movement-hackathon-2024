@@ -17,7 +17,6 @@ export default  function ProfileView ()  {
   const handleGetProfile = async () => {
     try {
       const response = await accountApiRequest.user();
-      console.log("🚀 ~ ProfileView ~ response:", response?.data?.data?.user);
 
       if (response) {
         setUserData(response?.data?.data?.user);
