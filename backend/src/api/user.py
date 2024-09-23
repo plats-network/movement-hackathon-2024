@@ -14,9 +14,6 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@router.options("")
-async def options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.get('')
 async def get_user(token: TokenData = Depends(Auth.verify_token)):

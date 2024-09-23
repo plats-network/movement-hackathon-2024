@@ -46,10 +46,6 @@ async def get_nonce(public_key: str):
     return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
 
 
-@router.options("/verify")
-async def verify_signature_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
-
 @router.post("/verify")
 async def verify_signature(request: VerifyRequestDTO):
     public_key = request.public_key
@@ -90,9 +86,6 @@ async def verify_signature(request: VerifyRequestDTO):
     )
     return ResponseMsg.SUCCESS.to_json(data={"authen_token": authen_token}, msg="Verification successful")
 
-@router.options("/register")
-async def register_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.post("/register")
 async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(Auth.verify_token)):
@@ -129,9 +122,6 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
         logger.error(f"Error registering user: {e}")
         return ResponseMsg.ERROR.to_json(msg="Error registering user")
     
-@router.options("/login")
-async def login_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.post("/login")
 async def login(token: TokenData = Depends(Auth.verify_token)):
