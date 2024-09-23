@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     try {
       const res = await request.json();      
       const resVerify = await authApiRequest.verify(res)
-      return new Response(JSON.stringify({ message: resVerify.data.msg, data: resVerify.data.data }), {
+      return new Response(JSON.stringify({ message: resVerify.payload.data.msg, data: resVerify.payload.data.data }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });

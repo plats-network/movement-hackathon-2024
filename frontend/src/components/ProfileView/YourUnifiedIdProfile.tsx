@@ -23,10 +23,10 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
         <div className="flex sm:flex-row flex-col gap-2  max-w-[667px] w-full">
           <div className="group gradient-border-mask  md:w-[200px]  w-full  flex items-center justify-center flex-col gap-2 text-center py-3  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
                  {
-            isFirstLoad ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
+            !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
              {Number(data?.balance) >= 0
-                ? Number(data?.balance).toFixed(1)
+                ? '$' + Number(data?.balance).toFixed(1)
                 : "- -"}
             </p>
             )
@@ -37,10 +37,10 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
           </div>
           <div className="group gradient-border-mask md:w-[200px]  w-full flex items-center justify-center flex-col gap-2 text-center py-3  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
                 {
-            isFirstLoad ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
+            !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
              {Number(data?.volume) >= 0
-                ? Number(data?.volume).toFixed(1)
+                ? '$' + Number(data?.volume).toFixed(1)
                 : "- -"}
             </p>
             )
@@ -51,7 +51,7 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
           </div>
           <div className="group gradient-border-mask  md:w-[200px] w-full  flex items-center justify-center flex-col gap-2 text-center py-3  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
            {
-            isFirstLoad ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
+            !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
              {Number(data?.twitter) >= 0
                 ? Number(data?.twitter).toFixed(1)

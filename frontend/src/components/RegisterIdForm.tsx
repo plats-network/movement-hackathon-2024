@@ -62,17 +62,19 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
 
       toast({
         className: "z-50 text-white",
-        description: response.data.msg,
+        description: response.payload.msg,
       });
       if (response) {
         const responseLogin = await authApiRequest.login(authenToken);
-        toast({
-          className: "z-50 text-white",
-          description: responseLogin.data.msg,
-        });
+        console.log("🚀 ~ handleRegister ~ responseLogin:", responseLogin)
+     
 
         await authApiRequest.auth({
-          accessToken: responseLogin.data.data.access_token,
+          accessToken: responseLogin.payload.data.access_token,
+        });
+        toast({
+          className: "z-50 text-white",
+          description: "Login successful",
         });
         router.push("/");
         router.refresh();

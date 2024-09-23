@@ -1,6 +1,7 @@
 "use client";
 
-import { clientAccessToken } from "@/lib/utils";
+
+import { clientAccessToken } from "@/lib/http";
 import {
   createContext,
   ReactNode,
@@ -36,16 +37,12 @@ const AppProvider = ({
   user: any | null;
 }) => {
   const [user, setUser] = useState<any | null>(userProp);
-
-  useEffect(() => {
+  useState(() => {
     if (typeof window !== "undefined") {
       clientAccessToken.value = initialAccessToken;
-      console.log(
-        "🚀 ~ useState ~ clientAccessToken.value :",
-        clientAccessToken.value
-      );
     }
-  }, [initialAccessToken]);
+  });
+
   return (
     <AppContext.Provider value={{ user, setUser }}>
       {children}

@@ -20,7 +20,7 @@ const Banner = ({isFirstLoad, platId}: {isFirstLoad:boolean , platId: string}) =
             />
           </div>
 
-          {isFirstLoad ? (
+          {!platId ? (
 <Skeleton className="h-[35px] w-[210px] bg-slate-500 mt-20" />
 
     ) : (
