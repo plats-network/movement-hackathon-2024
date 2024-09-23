@@ -28,7 +28,7 @@ def create_app(config=None, app_name=None):
 
     # Add middleware
     app.add_middleware(OptionsMiddleware)
-    app.add_middleware(CustomHeadersMiddleware)
+    # app.add_middleware(CustomHeadersMiddleware)
     app.add_middleware(SessionMiddleware, secret_key="!secret")
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
