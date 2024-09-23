@@ -7,6 +7,7 @@ import TelegramIcon from "@/assets/TelegramIcon";
 import TwitterIcon from "@/assets/TwitterIcon";
 import WalletIcon from "@/assets/WalletIcom";
 import useClickOutside from "@/hooks/useClickOutside";
+import { clientAccessToken } from "@/lib/utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import React, {useRef, useState } from "react";
 
@@ -19,7 +20,17 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
   const handleAddTwitterAccount = async () => {
     try {
       if (!platId) return;
-      const response = await accountApiRequest.addTwitter(platId);
+      
+      // const response = await fetch(`${process.env.NEXT_PUBLIC_API}/twitter/login?plat_id=${platId}`, {
+      //   headers: {
+      //     "Authorization": `Bearer ${clientAccessToken?.value}`,
+      //   }
+      // })
+      // const result = await response.json()
+      // console.log("🚀 ~ handleAddTwitterAccount ~ result:", result)
+      const response = await accountApiRequest.addTwitterFromNextClientToNextServer(platId);
+      console.log("🚀 ~ handleAddTwitterAccount ~ response:", response)
+      console.log("🚀 ~ handleAddTwitterAccount ~ response:", response)
     } catch (error) {}
   };
 
