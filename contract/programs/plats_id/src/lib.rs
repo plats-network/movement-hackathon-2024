@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("B2z1t7U1D488QZGVMZxbxGiHPEMozLtdZFjqo91sEfdR");
+declare_id!("FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA");
 
 #[program]
 pub mod plats_id {
@@ -60,6 +60,7 @@ pub mod plats_id {
         identity.bump = bump;
         identity.master_owner = owner_account.key();
         identity.slave_accounts = Vec::new();
+        identity.permissions = Vec::new();
         Ok(())
     }
 
@@ -160,6 +161,50 @@ pub mod plats_id {
 
         Ok(())
     }
+
+    pub fn add_permissions(
+        ctx: Context<AddPermissions>,
+        name_id: String,
+        app_ids: Vec<String>
+    ) -> Result<()> {
+
+        if ctx.accounts.identity.name_id != name_id {
+            return err!(ErrCode::IdWrong);
+        }
+
+        let identity = &mut ctx.accounts.identity;
+        for app_id in app_ids.iter() {
+            identity.permissions.push(app_id.to_owned())
+
+        }
+
+        Ok(())
+    }
+
+    pub fn revoke_permissions(
+        ctx: Context<RevokePermissions>,
+        name_id: String,
+        app_ids: Vec<String>
+    ) -> Result<()> {
+
+        if ctx.accounts.identity.name_id != name_id {
+            return err!(ErrCode::IdWrong);
+        }
+        let identity = &mut ctx.accounts.identity;
+
+        for app_id in app_ids.iter() {
+            if let Some(pos) = identity.permissions.iter().position(|x| x == app_id) {
+                identity.permissions.remove(pos);
+            } else {
+                return err!(ErrCode::AppIdNotFound);
+            }
+        }
+
+        Ok(())
+    }
+
+
+
 }
 
 #[derive(Accounts)]
@@ -215,6 +260,42 @@ pub struct RegisterIdentity<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+#[instruction(name_id: String)]
+pub struct AddPermissions<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        mut,
+        constraint=identity.master_owner == signer.key() @ ErrCode::NotMasterOwner,
+        seeds = [b"identity".as_ref(), name_id.as_bytes().as_ref()],
+        bump
+    )]
+    pub identity: Box<Account<'info, Identity>>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(name_id: String)]
+pub struct RevokePermissions<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        mut,
+        constraint=identity.master_owner == signer.key() @ ErrCode::NotMasterOwner,
+        seeds = [b"identity".as_ref(), name_id.as_bytes().as_ref()],
+        bump
+    )]
+    pub identity: Box<Account<'info, Identity>>,
+
+    pub system_program: Program<'info, System>,
+}
+
+
+
 #[account]
 pub struct Identity {
     // Master account to create unique identity
@@ -225,6 +306,8 @@ pub struct Identity {
     pub balance_privacy: Vec<PrivacyBalanceInfo>,
     pub volumn_privacy: Vec<PrivacyVolumnInfo>,
     pub twitter_privacy: Vec<PrivacyTwitterInfo>,
+    // Permissions of app_id
+    pub permissions: Vec<String>,
     pub bump: u8,
 }
 
@@ -263,6 +346,10 @@ pub enum ErrCode {
     AccountIsNotRegister,
     #[msg("Account is existing")]
     AccountExisted,
+    #[msg("App Id not found")]
+    AppIdNotFound,
+    #[msg("Not master owner")]
+    NotMasterOwner,
 }
 
 // Helper Function

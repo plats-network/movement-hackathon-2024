@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { PlatsId } from "../target/types/plats_id";
-import { PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
 describe("Plats Id", () => {
@@ -17,10 +17,12 @@ describe("Plats Id", () => {
   const slave_owner1 = users[1].publicKey;
   const slave_owner2 = users[2].publicKey;
 
+  const nameId = "dung.ID";
+
     let [identityPDA, bump] = PublicKey.findProgramAddressSync(
       [
         anchor.utils.bytes.utf8.encode('identity'),
-        Buffer.from("Linh.ID")
+        Buffer.from(nameId)
       ],
       program.programId
     );
@@ -28,11 +30,19 @@ describe("Plats Id", () => {
 
 
 
+    it("Should airdrop sol for master account ", async () => {
+      await airdropSol(provider.connection, master_owner);
+  
+      const masterBalance = await provider.connection.getBalance(users[0].publicKey);
+  
+      expect(masterBalance).to.be.equal(1 * LAMPORTS_PER_SOL);
+    })
+
+
   it("Register Identity", async () => {
 
 
     // Master owner register unique id 
-    let nameId = "Linh.ID";
     let storeIdBalance = "c999d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -68,7 +78,6 @@ describe("Plats Id", () => {
   it("Update  Identity", async () => {
 
 
-    let nameId = "Linh.ID";
     let storeIdBalance = "c888d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -103,7 +112,6 @@ describe("Plats Id", () => {
   it("Add new slave account 1 to unique  Identity ", async () => {
 
 
-    let nameId = "Linh.ID";
     let storeIdBalance = "c777d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -139,7 +147,6 @@ describe("Plats Id", () => {
   it("Add new slave account 2 to unique  Identity ", async () => {
 
 
-    let nameId = "Linh.ID";
     let storeIdBalance = "c666d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -174,7 +181,6 @@ describe("Plats Id", () => {
   it("Update  Identity for slave account 1", async () => {
 
 
-    let nameId = "Linh.ID";
     let storeIdBalance = "c555d3e9-a6c1-438b-a121-295115728f01";
     let secretNameBalance = "secret_balance";
 
@@ -207,5 +213,35 @@ describe("Plats Id", () => {
   });
 
 
+  it("Grant Permissions to app id ", async () => {
+
+
+    const transactionSignature = await program.methods
+      .addPermissions(nameId, ["plats-app-id-1", "plats-app-id-2"])
+    .accounts({
+      identity: identityPDA,
+    }).signers([users[0]]) // master account 
+    .rpc();
+
+  });
+
+  it("Get Permissions after grant permissions", async () => {
+
+    const accountData = await program.account.identity.fetch(identityPDA);
+
+    console.log(`Name : ${accountData.nameId}`);
+    console.log(`Permissions: ${JSON.stringify(accountData.permissions)}`);
+  });
 
 });
+
+
+async function airdropSol(connection: any, publicKey: PublicKey) {
+  await connection.confirmTransaction(
+    await connection.requestAirdrop(
+      publicKey,
+      1 * LAMPORTS_PER_SOL
+    )
+  );
+}
+
