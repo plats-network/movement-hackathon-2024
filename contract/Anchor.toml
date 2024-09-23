@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-plats_id = "D2CPWAujr7jvku9AtNwb1jaDudhDU7TNYUTcJY8trTFd"
+plats_id = "FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA"
 
 [registry]
 url = "https://api.apr.dev"
