@@ -28,9 +28,6 @@ class Token(BaseModel):
 async def get_session(request: Request):
     return request.session
 
-@router.options("/login")
-async def login_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.get("/login")
 async def login(request: Request, plat_id: str):
@@ -44,9 +41,6 @@ async def login(request: Request, plat_id: str):
         print("Error getting authorization URL: ", str(e))
         raise HTTPException(status_code=500, detail=f"Error getting authorization URL::{str(e)}")
 
-# @router.options("/callback")
-# async def callback_option():
-#     return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.get("/callback")
 async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_verifier: str, request: Request, session: dict = Depends(get_session) ):
