@@ -17,7 +17,14 @@ class UserService(object):
                 "is_new_user": user['is_new_user']
             }
         return None
-        
+    
+    @staticmethod
+    def delete_user(plat_id: str):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if user:
+            mUser.delete(user['_id'], force=True)
+            return True
+        return False
         
     @staticmethod
     def register(plat_id: str, eoa: str, public_key: str):
@@ -111,12 +118,14 @@ class UserService(object):
         if public_key in user['public_key']:
             raise HTTPException(status_code=400, detail="Public key already exists")
         
+        # add to solana
+        Solana.add_address(plat_id, eoa, public_key)
+        
         mUser.update(user['_id'], {
             "address": user['address'] + [eoa],
             "public_key": user['public_key'] + [public_key]
         })
         
-        # add to solana
-        Solana.add_address(plat_id, eoa, public_key)
+
         
         

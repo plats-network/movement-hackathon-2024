@@ -114,25 +114,27 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
         # Create a new user with plat_id
         UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
 
-        
-        # Register the user on Solana
-        response = Solana.register(plat_id, public_key)
-        
-        if response is None:
-            raise HTTPException(status_code=500, detail="Error registering user on Solana")
-        
-        logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
-        
-        Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
+        try:
+            # Register the user on Solana
+            response = Solana.register(plat_id, public_key)
+            
+            if response is None:
+                raise HTTPException(status_code=500, detail="Failed to register on Solana::{}".format(e))
+            
+            logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
+            
+            Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
 
-        return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")
+            return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")
+        except Exception as e:
+            UserService.delete_user(plat_id=plat_id)
+            raise e
       
     except HTTPException as http_exc:
         raise http_exc
     
     except Exception as e:
-        logger.error(f"Error registering user: {e}")
-        return ResponseMsg.ERROR.to_json(msg="Error registering user")
+        raise HTTPException(status_code=500, detail="Internal Server Error::{}".format(e))
     
 
 @router.post("/login")
@@ -155,6 +157,10 @@ async def login(token: TokenData = Depends(Auth.verify_token)):
             "access_token": access_token
         }
         return ResponseMsg.SUCCESS.to_json(data=response)
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    
     except Exception as e:
         logger.error(f"Error logging in: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error::{e}")
