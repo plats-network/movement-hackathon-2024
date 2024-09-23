@@ -23,6 +23,7 @@ const LoginPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [authenToken, setAuthenToken] = useState<string>("");
+  const [isConnect, setIsConnect] = useState<boolean>(false);
   
 
   const phantomProvider = getProviderPhantom(); // see "Detecting the Provider"
@@ -158,7 +159,8 @@ const LoginPage = () => {
           </div>
          
           {!authenToken ? (
-          <div className="w-full h-full flex flex-col justify-between py-[74px] px-[27px]">
+          <div className="w-full h-full flex flex-col  py-[74px] px-[27px] gap-[120px]">
+            
             <div className="w-full flex items-center justify-between">
               <p className="text-[28px] font-semibold">Login</p>
 
@@ -171,12 +173,12 @@ const LoginPage = () => {
             </div>
 
             <div className=" ">
-                <WalletButton isLoading={isLoading} handleGetNonce={handleGetNonce} />
+                <WalletButton isConnect={isConnect} isLoading={isLoading} handleGetNonce={handleGetNonce} />
 
 
               <div className="w-full flex flex-col gap-5">
                 <div className="flex gap-[10px] pt-4">
-                  <Checkbox className="border-[#3AE7E7]  w-5 h-5 bg-[#303C50]" />
+                  <Checkbox onClick={() => setIsConnect(!isConnect)} checked={isConnect} className="border-[#3AE7E7]  w-5 h-5 bg-[#303C50]" />
 
                   <p className="text-base">
                     By continuing, you agree to the updated{" "}
@@ -184,13 +186,13 @@ const LoginPage = () => {
                     <strong>Privacy Policy.</strong>
                   </p>
                 </div>
-                <div className="flex items-center justify-center mt-10 mb-5 gap-2">
+                {/* <div className="flex items-center justify-center mt-10 mb-5 gap-2">
                   <div className="w-full h-[0.4px] bg-[#6E6E6E]" />
                   <p className="text-xl text-nowrap">Or login with</p>
                   <div className="w-full h-[0.4px] bg-[#6E6E6E]" />
-                </div>
+                </div> */}
 
-                <div className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
+                {/* <div className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <GoogleIcon />
                   <p> Continue with Google</p>
                 </div>
@@ -201,7 +203,7 @@ const LoginPage = () => {
                 <div className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <TwitterIcon />
                   <p> Continue with twitter</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
