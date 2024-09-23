@@ -3,12 +3,11 @@ from pydantic import BaseModel
 import pydash as py_
 from src.utils import ResponseMsg
 from src.services import UserService
-from src.dtos import TokenData
+from src.dtos import TokenData, UpdateAccountDTO
 from src.services import Auth
 from datetime import timedelta
 from src.config import settings
 import logging
-
 router = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
@@ -36,3 +35,20 @@ async def get_user(token: TokenData = Depends(Auth.verify_token)):
     except Exception as e:
         logger.error(f"Retrive failed::{e}")
         return ResponseMsg.ERROR.to_json(msg=f"Retrive failed::{e}")
+    
+
+@router.put('/address')
+async def add_address(body: UpdateAccountDTO, token: TokenData = Depends(Auth.verify_token)):
+    try:
+        if not body.address or not body.public_key:
+            return HTTPException(status_code=400, detail="Address is required")
+        # Get user from db with plat_id
+        UserService.add_address(token.sub, body.address, body.public_key)
+        return ResponseMsg.SUCCESS.to_json(msg="Address added successfully")
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    
+    except Exception as e:
+        logger.error("ADD ACCOUNT::ERROR::{}".format(e))
+        raise HTTPException(status_code=500, detail=str(e))

@@ -50,3 +50,20 @@ class Solana(object):
             return response.json()
         else:
             return None
+        
+        
+    @staticmethod
+    def add_address(plat_id, address, public_key):
+        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/address"
+        json = {
+            "platId": plat_id,
+            "address": address,
+            "publicKey": public_key
+        }
+        response = requests.put(contract_dns, json=json)
+        print(f"CONTRACT::ADD_ACCOUNT::{plat_id}::{address}::", response.json())
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print("ERROR::ADD_ACCOUNT::SOLANA_CLIENT::", response.text)
+            raise Exception(response.text)
