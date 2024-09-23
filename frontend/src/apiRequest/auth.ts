@@ -1,47 +1,48 @@
-import  apiClient  from "@/apiRequest/apiClient";
-import axios from "axios";
+import http from "@/lib/http";
+
 
 const authApiRequest = {
   nonce: (publicKey: string) =>
-    apiClient.get(`/auth/nonce`, {
-      params: { public_key: publicKey },
-      withCredentials: false, // Không gửi credentials
-    }),
+    http.get(`/auth/nonce?public_key=${publicKey}`),
   verify: (body: any) =>
-    apiClient.post(`/auth/verify`, JSON.stringify(body), {
-      withCredentials: false, // Không gửi credentials
-    }),
+    http.post(`/auth/verify`, body),
   verifyFromClientToServer: (body: any) =>
-    axios.post("/api/auth/verify", body),
-  register: (body: any, authenToken: string) =>
-    apiClient.post("/auth/register", JSON.stringify(body), {
-      withCredentials: false,
-      headers: {
-        Authorization: `Bearer ${authenToken}`,
-      },
+    http.post("/api/auth/verify", body, {
+      baseUrl:""
     }),
-
-    login: (authenToken: string) =>
-      apiClient.post("/auth/login", null, {
-        withCredentials: false,
+  register: (body: any, authenToken: string) =>
+    http.post("/auth/register", body,
+      {
         headers: {
           Authorization: `Bearer ${authenToken}`,
         },
-      }),
+      }
+
+    ),
+
+    login: (authenToken: string) =>
+      http.post("/auth/login", null,
+        {
+          headers: {
+            Authorization: `Bearer ${authenToken}`,
+          },
+        }
+
+      ),
   auth: (body: { accessToken: string }) =>
-    axios.post("/api/auth", body, {
-      withCredentials: false, // Không gửi credentials
+    http.post("/api/auth", body, {
+     baseUrl:""
     }),
     logoutFromNextClientToNextServer: (
       force?: boolean | undefined,
       signal?: AbortSignal | undefined
     ) =>
-      axios.post(
+      http.post(
         "/api/auth/logout",
         {
           force,
         },
-        {
+        { baseUrl: "",
           signal,
         }
       ),

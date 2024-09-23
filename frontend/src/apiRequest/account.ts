@@ -1,38 +1,17 @@
-import apiClient from "@/apiRequest/apiClient";
-import { clientAccessToken } from "@/lib/utils";
-import axios from "axios";
+
+import http from "@/lib/http";
+
 
 const accountApiRequest = {
-  user: () =>
-    apiClient.get("/user", {
-      withCredentials: false,
-      headers: {
-        Authorization: `Bearer ${clientAccessToken?.value}`,
-      }, // Không gửi credentials
-    }),
+  user: (url:string) =>
+    http.get(url, {
+      cache:'no-store'
+    }
+    ),
 
     addTwitter: (platId: string) =>
-      apiClient.get(`/twitter/login`, {
-        params: { plat_id: platId },
-        withCredentials: false,
-        headers: {
-          Authorization: `Bearer ${clientAccessToken?.value}`,
-        }, // Không gửi credentials
-      }),
-//   addTwitter: (platId: string, accessToken: string) =>
-//     apiClient.get(`/twitter/login`, {
-//       params: { plat_id: platId },
-//       withCredentials: false,
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       }, // Không gửi credentials
-//     }),
-//   addTwitterFromNextClientToNextServer: (platId: string) =>
-//     axios.post("/api/auth/twitter", 
-//       {
-//         platId: platId,
-//       }
-// ),
+      http.get(`/twitter/login?plat_id=${platId}`),
+
 };
 
 export default accountApiRequest;

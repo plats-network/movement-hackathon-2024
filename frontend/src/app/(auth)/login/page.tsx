@@ -38,17 +38,18 @@ const LoginPage = () => {
       );
       console.log("publickey get Nonce", publicKeyWallet);
       const responseNonce = await authApiRequest.nonce(
-        publicKeyWallet
+        encodeURIComponent(publicKeyWallet)
       );
+    
 
 
       // Sign message
       if (responseNonce) {
-        handleGetSignature(responseNonce?.data?.data.nonce);
+        handleGetSignature(responseNonce.payload.data.nonce);
       }
     } catch (error) {
       setIsLoading(false);
-      console.log("🚀 ~ handleGetNonce ~ error:", error)
+     
       toast({
         variant: "destructive",
         className:"z-50 text-white",
@@ -72,7 +73,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       setIsLoading(false);
-    console.log("🚀 ~ handleGetSignature ~ error:", error)
+  
     toast({
       variant: "destructive",
       className:"z-50 text-white",
@@ -90,29 +91,32 @@ const LoginPage = () => {
         signature: Buffer.from(signature).toString("base64"),
       };
 
-      const responseVerify = await authApiRequest.verifyFromClientToServer(
+      const responseVerify = await authApiRequest.verify(
         data
       );
+     
       toast({
         className:"z-50 text-white",
-        description: responseVerify.data.message,
+        description: responseVerify.payload.msg,
       });
       if(responseVerify) {
-        const responseLogin = await authApiRequest.login(responseVerify.data.data.authen_token)
+        const responseLogin = await authApiRequest.login(responseVerify.payload.data.authen_token)
+       
       
-        if(responseLogin && responseLogin?.data.code !== 400) {
+          
+        if(responseLogin && responseLogin?.payload.code !== 400) {
         
-          await authApiRequest.auth({accessToken: responseLogin.data.data.access_token})
+          await authApiRequest.auth({accessToken: responseLogin.payload.data.access_token})
           toast({
             className:"z-50 text-white",
-            description: responseLogin.data.msg,
+            description: "Login successful",
           });
           router.push("/")
           router.refresh();
 
         }
         else {
-          setAuthenToken(responseVerify.data.data.authen_token)
+          setAuthenToken(responseVerify.payload.data.authen_token)
         }
 
       }
@@ -208,7 +212,7 @@ const LoginPage = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col justify-between p-6 bg-">
+          <div className="w-full h-full flex flex-col justify-between p-6">
             
 
             <RegisterIdForm authenToken={authenToken}/>
