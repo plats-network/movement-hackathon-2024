@@ -26,9 +26,10 @@ class Solana(object):
             store_balance = data.get('secret_balance')
             store_volume = data.get('secret_volume')
             store_twitter = data.get('secret_twitter')
-            return store_balance, store_volume, store_twitter
+            permissions = data.get('permissions')
+            return store_balance, store_volume, store_twitter, permissions
         else:
-            return None, None, None
+            return None, None, None, []
         
     
     @staticmethod
@@ -66,4 +67,17 @@ class Solana(object):
             return response.json()
         else:
             print("ERROR::ADD_ACCOUNT::SOLANA_CLIENT::", response.text)
+            raise Exception(response.text)
+        
+    @staticmethod
+    def update_permission(plat_id, permissions):
+        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/permissions"
+        json = {
+            "platId": plat_id,
+            "permissions": permissions
+        }
+        response = requests.put(contract_dns, json=json)
+        if response.status_code == 200:
+            return response.json()
+        else:
             raise Exception(response.text)

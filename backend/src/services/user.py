@@ -128,4 +128,7 @@ class UserService(object):
         
 
         
-        
+    @staticmethod
+    def update_permission(plat_id: str, permissions: list):
+        # Update permissions on Solana
+        Solana.update_permission(plat_id, permissions)

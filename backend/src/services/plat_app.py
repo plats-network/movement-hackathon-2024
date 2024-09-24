@@ -1,6 +1,10 @@
 from src.models import mPlatApp
 from src.utils import generate_hash, tzware_datetime
 from fastapi import HTTPException
+from src.services.solana_client import Solana
+from src.models import mUser
+from src.models import mPlatApp
+from src.services.nillion import Nillion
 class PlatAppService(object):
     
     @staticmethod
@@ -62,3 +66,34 @@ class PlatAppService(object):
             mPlatApp.delete(app['_id'], force=True)
         else:
             raise HTTPException(status_code=404, detail="App not found")
+        
+        
+    @staticmethod
+    async def get_user(app_id: str, plat_id: str):
+        # 1. Get permission of app for plat_id on Solana
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        pub = user.get('public_key')[0]
+        store_balance, store_volume, store_twitter, permissions = Solana.get(pub)
+        
+        # 2. Verify permission
+        if app_id not in permissions:
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        
+        # 3. Compute rank and score
+        store_ids = [store_balance, store_volume, store_twitter]
+
+        rank, score = await Nillion.compute_rank_score(store_ids)
+        
+        return rank, score
+        
+        
+        
+        
+            
+            
+        
+    
+        
