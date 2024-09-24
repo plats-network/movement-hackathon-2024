@@ -13,12 +13,13 @@ class PlatAppService(object):
         return plat_apps
     
     @staticmethod
-    def register(app_name, app_url):
+    def register(app_name, app_url, app_icon):
         app_id = generate_hash(app_url)
         mPlatApp.insert({
             "app_id": app_id,
             "app_name": app_name,
-            "app_url": app_url
+            "app_url": app_url,
+            "app_icon": app_icon,
         })
         return app_id
     

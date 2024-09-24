@@ -38,14 +38,15 @@ async def register_plat_app(body: RegisterAppDTO):
         # Register plat app
         app_name = body.app_name
         app_url = body.app_url
+        app_icon = body.app_icon
         # check if app_name and app_url is not empty
-        if not app_name or not app_url:
+        if not app_name or not app_url or not app_icon:
             raise HTTPException(status_code=400, detail="App name and App URL is required")
         
         if PlatAppService.get_plat_app(app_url):
             raise HTTPException(status_code=400, detail="App URL already registered")
         
-        plat_app = PlatAppService.register(app_name=app_name, app_url=app_url)
+        plat_app = PlatAppService.register(app_name=app_name, app_url=app_url, app_icon=app_icon)
         return ResponseMsg.SUCCESS.to_json(data={"app_id": plat_app})
     
     except HTTPException as http_exc:
