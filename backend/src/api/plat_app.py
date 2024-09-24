@@ -75,7 +75,6 @@ async def get_plat_app(app_url: str):
 @router.put('')
 async def regenerate_app_id(body: UpdateAppDTO):
     try:
-        print("app_id", body.app_id)
         PlatAppService.regenerate_app_id(body.app_id)
         return ResponseMsg.SUCCESS.to_json(msg="App ID regenerated successfully")
     
