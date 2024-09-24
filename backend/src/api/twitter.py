@@ -35,7 +35,7 @@ async def login(request: Request, plat_id: str):
         print("Request token", oauth.request_token)
         request.session['request_token'] = oauth.request_token
         request.session['plat_id'] = plat_id   
-        return RedirectResponse(auth_url)
+        return ResponseMsg.SUCCESS.to_json(data={"auth_url": auth_url})
     except tweepy.TweepyException as e:
         # print traceback
         print(traceback.format_exc())
