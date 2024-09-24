@@ -146,7 +146,7 @@ async def login(token: TokenData = Depends(Auth.verify_token)):
         user = UserService.get_user_by_public_key(token.sub)
         
         if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
+            return ResponseMsg.INVALID.to_json(msg="User not registered")
         
         # Create accesstoken for get user info later.
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
