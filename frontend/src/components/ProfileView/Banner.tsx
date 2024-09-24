@@ -1,10 +1,11 @@
 'use client'
+import { Skeleton } from '@/components/ui/skeleton';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Image from 'next/image'
 import React from 'react'
 
-const Banner = ({platId}: {platId: string}) => {
-  const { publicKey } = useWallet();
+const Banner = ({isFirstLoad, platId}: {isFirstLoad:boolean , platId: string}) => {
+
 
   return (
     <div className="relative w-full h-[262px]  bg-[url('/BannerImage.png')] bg-no-repeat bg-cover bg-center">
@@ -18,10 +19,17 @@ const Banner = ({platId}: {platId: string}) => {
               objectFit="contain"
             />
           </div>
-          <p className="text-[28px] font-semibold mt-20">
-           {platId ?? "- -"}
-          </p>
-        
+
+          {!platId ? (
+<Skeleton className="h-[35px] w-[210px] bg-slate-500 mt-20" />
+
+    ) : (
+      <p className="text-[28px] font-semibold mt-20">
+      {platId ?? "- -"}
+     </p>
+    )
+         
+  }
         </div>
       </div>
   )

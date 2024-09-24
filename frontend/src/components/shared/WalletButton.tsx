@@ -11,9 +11,11 @@ import { LoadingButton } from "@/components/ui/loading-button";
 
 export default function WalletButton({
   isLoading,
+  isConnect,
   handleGetNonce,
 }: {
   isLoading: boolean;
+  isConnect: boolean;
   handleGetNonce: () => void;
 }) {
   const { setVisible: setModalVisible } = useWalletModal();
@@ -35,14 +37,14 @@ export default function WalletButton({
   return (
     <>
       <LoadingButton
-        loading={isLoading}
-        disabled={isLoading}
+        loading={isLoading }
+        disabled={isLoading || !isConnect}
         onClick={handleLogin}
         className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7]  rounded-xl w-full h-[56px] text-base font-bold flex items-center justify-center gap-2 text-white cursor-pointer"
       >
         {!isLoading && <WalletIcon />}
         {publicKey ? (
-          "Connect your wallet" + " " + sliceAddressWallet(publicKey)
+          "Verify your wallet" + " " + sliceAddressWallet(publicKey)
         ) : (
           <p>Connect your wallet</p>
         )}

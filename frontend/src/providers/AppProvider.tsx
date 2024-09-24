@@ -1,42 +1,53 @@
 "use client";
 
-import { clientAccessToken } from "@/lib/utils";
-import { createContext, ReactNode, useContext, useState } from "react";
 
+import { clientAccessToken } from "@/lib/http";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-
-
-const AppContext = createContext<{user: any | null, setUser: (user: any | null) => void}>({
-    user:null,
-    setUser: () => {},
+const AppContext = createContext<{
+  user: any | null;
+  setUser: (user: any | null) => void;
+}>({
+  user: null,
+  setUser: () => {},
 });
 
 export const useAppContext = () => {
-    const context = useContext(AppContext);
-    if(!context) {
-        throw new Error("useAppContext must be used within an AppProvider");
-    }
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
 
-    return context;
-}
+  return context;
+};
 
 const AppProvider = ({
   children,
   initialAccessToken = "",
-  user: userProp
+  user: userProp,
 }: {
   children: React.ReactNode;
   initialAccessToken?: string;
-  user: any | null
+  user: any | null;
 }) => {
-  const [user, setUser] = useState<any | null>(userProp)
-
+  const [user, setUser] = useState<any | null>(userProp);
   useState(() => {
     if (typeof window !== "undefined") {
       clientAccessToken.value = initialAccessToken;
     }
   });
-  return <AppContext.Provider value={{user, setUser}}>{children}</AppContext.Provider>;
+
+  return (
+    <AppContext.Provider value={{ user, setUser }}>
+      {children}
+    </AppContext.Provider>
+  );
 };
 
 export default AppProvider;

@@ -1,22 +1,17 @@
-import apiClient from "@/apiRequest/apiClient";
-import { clientAccessToken } from "@/lib/utils";
+
+import http from "@/lib/http";
+
 
 const accountApiRequest = {
-  user: (accessToken: string) =>
-    apiClient.get("/user", {
-      withCredentials: false,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }),
-  addTwitter: (platId: string) =>
-    apiClient.get(`/twitter/login`, {
-      params: { plat_id: platId },
-      withCredentials: false,
-      headers: {
-        Authorization: `Bearer ${clientAccessToken?.value}`,
-      }, // Không gửi credentials
-    }),
+  user: (url:string) =>
+    http.get(url, {
+      cache:'no-store'
+    }
+    ),
+
+    addTwitter: (platId: string) =>
+      http.get(`/twitter/login?plat_id=${platId}`),
+
 };
 
 export default accountApiRequest;
