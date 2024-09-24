@@ -57,7 +57,7 @@ class UserService(object):
             return None
         
         # get store_id from solana
-        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        store_balance, store_volume, store_twitter = Solana.get(plat_id)
         
         # Log all variables
         print(f"store_balance: {store_balance}")
@@ -130,5 +130,8 @@ class UserService(object):
         
     @staticmethod
     def update_permission(plat_id: str, permissions: list):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
         # Update permissions on Solana
-        Solana.update_permission(plat_id, permissions)
+        Solana.update_permission(plat_id, user['public_key'][0], permissions)

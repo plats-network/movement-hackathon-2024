@@ -61,6 +61,8 @@ async def update_permission(body: UpdatePermissionDTO, token: TokenData = Depend
         if not permissions:
             return HTTPException(status_code=400, detail="Permissions is required")
         
+        
+        
         UserService.update_permission(token.sub, permissions)
         
     

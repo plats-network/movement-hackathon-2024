@@ -12,12 +12,12 @@ import "dotenv/config";
 import bs58 from "bs58";
 
 export const programId = new PublicKey(
-    "D2CPWAujr7jvku9AtNwb1jaDudhDU7TNYUTcJY8trTFd",
+    "FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA",
 );
 
-export const getIdentityPDA = (user: PublicKey) => {
+export const getIdentityPDA = (nameId: string) => {
     const [pda] = PublicKey.findProgramAddressSync(
-        [utils.bytes.utf8.encode("identity"), user.toBuffer()],
+        [utils.bytes.utf8.encode("identity"), Buffer.from(nameId)],
         programId,
     );
     return pda;

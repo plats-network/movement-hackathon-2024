@@ -12,14 +12,14 @@ class Solana(object):
         
     
     @staticmethod
-    def get(public_key):
+    def get(plat_id):
         contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/info"
         json = {
-            "publicKey": public_key
+            "platId": plat_id
         }
-        print(f"FE::GET::INFO::{public_key}", json)
+        print(f"FE::GET::INFO::{plat_id}", json)
         response = requests.post(contract_dns, json=json)
-        print(f"FE::GET::INFO::{public_key}", response.text)
+        print(f"FE::GET::INFO::{plat_id}", response.text)
         if response.status_code == 200:
             res = response.json()
             data = res.get('data')
@@ -55,10 +55,9 @@ class Solana(object):
         
     @staticmethod
     def add_address(plat_id, address, public_key):
-        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/address"
+        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/identity"
         json = {
             "platId": plat_id,
-            "address": address,
             "publicKey": public_key
         }
         response = requests.put(contract_dns, json=json)
@@ -70,11 +69,12 @@ class Solana(object):
             raise Exception(response.text)
         
     @staticmethod
-    def update_permission(plat_id, permissions):
-        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/permissions"
+    def update_permission(plat_id, public_key, permissions):
+        contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/permission"
         json = {
             "platId": plat_id,
-            "permissions": permissions
+            "permissions": permissions,
+            "publicKey": public_key
         }
         response = requests.put(contract_dns, json=json)
         if response.status_code == 200:
