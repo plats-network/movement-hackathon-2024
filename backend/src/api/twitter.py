@@ -8,17 +8,10 @@ from src.config import settings
 from src.services import UserService
 from src.utils import ResponseMsg
 from src.services import Nillion, TwitterService
-
+import traceback
 router = APIRouter()
 
-# Tweepy OAuth1UserHandler
-oauth1_user_handler = tweepy.OAuth1UserHandler(
-    consumer_key=settings.TWITTER_CONSUMER_KEY,
-    consumer_secret=settings.TWITTER_CONSUMER_SECRET,
-    access_token=settings.TWITTER_ACCESS_TOKEN,
-    access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
-    callback=settings.TWITTER_REDIRECT_URI
-)
+
 
 class Token(BaseModel):
     oauth_token: str
@@ -27,29 +20,45 @@ class Token(BaseModel):
 
 async def get_session(request: Request):
     return request.session
-
+            
 
 @router.get("/login")
 async def login(request: Request, plat_id: str):
     try:
-        auth_url = oauth1_user_handler.get_authorization_url()
-        request.session['request_token'] = oauth1_user_handler.request_token
-        request.session['plat_id'] = plat_id
-        
+        oauth = tweepy.OAuth1UserHandler(
+            consumer_key=settings.TWITTER_CONSUMER_KEY,
+            consumer_secret=settings.TWITTER_CONSUMER_SECRET,
+            callback=settings.TWITTER_REDIRECT_URI
+        )
+
+        auth_url = oauth.get_authorization_url()
+        print("Request token", oauth.request_token)
+        request.session['request_token'] = oauth.request_token
+        request.session['plat_id'] = plat_id   
         return RedirectResponse(auth_url)
     except tweepy.TweepyException as e:
+        # print traceback
+        print(traceback.format_exc())
         print("Error getting authorization URL: ", str(e))
         raise HTTPException(status_code=500, detail=f"Error getting authorization URL::{str(e)}")
 
 
 @router.get("/callback")
 async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_verifier: str, request: Request, session: dict = Depends(get_session) ):
+    oauth = tweepy.OAuth1UserHandler(
+        consumer_key=settings.TWITTER_CONSUMER_KEY,
+        consumer_secret=settings.TWITTER_CONSUMER_SECRET,
+        callback=settings.TWITTER_REDIRECT_URI
+    )
     request_token = session.get('request_token')
+    oauth.request_token = request_token
+    
     if not request_token:
         raise HTTPException(status_code=400, detail="No request token")
 
     try:
-        access_token, access_token_secret = oauth1_user_handler.get_access_token(oauth_verifier)
+        print("OAuth verifier", oauth_verifier)
+        access_token, access_token_secret = oauth.get_access_token(oauth_verifier)
         session['access_token'] = access_token
         session['access_token_secret'] = access_token_secret
         
@@ -75,7 +84,8 @@ async def callback(oauth_token: str, background_tasks: BackgroundTasks, oauth_ve
         return RedirectResponse(url=settings.FRONTEND_URL)
         # return ResponseMsg.SUCCESS.to_json(data={}, msg="Authentication successful")
 
-    except tweepy.TweepError as e:
+    except Exception as e:
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error during authentication: {str(e)}")
 
 
