@@ -199,7 +199,8 @@ class TransactionIndexer(object):
         return is_new_user
 
     def _add_volume(self, plat_id: str, asset_symbol: str, volume: int) -> None:
-        key = f"volume_{asset_symbol}_in_usd"
+        # key = f"volume_{asset_symbol}_in_usd"
+        key = "secret_volume"
 
         # get current volume
         current_volume = 0
@@ -269,7 +270,7 @@ class TransactionIndexer(object):
             },
             json={
                 "plat_id": plat_id,
-                "key": "balance",
+                "key": "secret_balance",
                 "value": f"{balance_usd}"
             }
         )

@@ -92,7 +92,8 @@ def sync(wallet_addr: str, from_block: int, to_block: int):
 
 
 def add_volume(plat_id: str, asset_symbol: str, volume: int) -> None:
-    key = f"volume_{asset_symbol}_in_usd"
+    # key = f"volume_{asset_symbol}_in_usd"
+    key = "secret_volume"
 
     # get current volume
     current_volume = 0
@@ -169,7 +170,7 @@ def update_balance(plat_id: str, wallet_addr: str, price_in_usd: float):
         },
         json={
             "plat_id": plat_id,
-            "key": "balance",
+            "key": "secret_balance",
             "value": f"{balance_usd}"
         }
     )
