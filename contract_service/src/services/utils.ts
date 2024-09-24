@@ -12,7 +12,7 @@ import "dotenv/config";
 import bs58 from "bs58";
 
 export const programId = new PublicKey(
-    "FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA",
+    "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
 );
 
 export const getIdentityPDA = (nameId: string) => {
