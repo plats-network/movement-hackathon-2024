@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/plats_id.json`.
  */
 export type PlatsId = {
-  "address": "FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA",
+  "address": "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
   "metadata": {
     "name": "platsId",
     "version": "0.1.0",
@@ -438,11 +438,11 @@ export type PlatsId = {
             }
           },
           {
-            "name": "volumnPrivacy",
+            "name": "volumePrivacy",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "privacyVolumnInfo"
+                  "name": "privacyVolumeInfo"
                 }
               }
             }
@@ -511,7 +511,7 @@ export type PlatsId = {
       }
     },
     {
-      "name": "privacyVolumnInfo",
+      "name": "privacyVolumeInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -534,8 +534,9 @@ export type PlatsId = {
 };
 
 
+
 export const IDL: PlatsId = {
-  "address": "FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA",
+  "address": "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
   "metadata": {
     "name": "platsId",
     "version": "0.1.0",
@@ -968,11 +969,11 @@ export const IDL: PlatsId = {
             }
           },
           {
-            "name": "volumnPrivacy",
+            "name": "volumePrivacy",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "privacyVolumnInfo"
+                  "name": "privacyVolumeInfo"
                 }
               }
             }
@@ -1041,7 +1042,7 @@ export const IDL: PlatsId = {
       }
     },
     {
-      "name": "privacyVolumnInfo",
+      "name": "privacyVolumeInfo",
       "type": {
         "kind": "struct",
         "fields": [

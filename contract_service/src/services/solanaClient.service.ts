@@ -146,7 +146,7 @@ const fetchIdentity = async (plat_id: string) => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volume: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
     console.log(`Permissions: ${JSON.stringify(accountData.permissions)}`);
 };
