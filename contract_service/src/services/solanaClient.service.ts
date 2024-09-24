@@ -13,7 +13,7 @@ import {
 import { getIdentityPDA, Identity, simulateSendAndConfirmTX } from "./utils";
 import * as fs from "fs";
 import * as bip39 from "bip39";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import { base64, bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -27,6 +27,14 @@ let keypair: Keypair;
  */
 const convertPublicKeyToBase64 = (publicKey: PublicKey): string => {
     return publicKey.toBuffer().toString("base64");
+};
+const generateKeypair = () => {
+    const user = Keypair.generate();
+    return {
+        secretKey: user.secretKey.toString(),
+        pubBase64: convertPublicKeyToBase64(user.publicKey),
+        pubBase58: user.publicKey.toBase58(),
+    };
 };
 const initializeProgram = () => {
     const user = Keypair.generate();
@@ -149,6 +157,14 @@ const fetchIdentity = async (plat_id: string) => {
     console.log(`Volume: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
     console.log(`Permissions: ${JSON.stringify(accountData.permissions)}`);
+    const data = {
+        permissions: accountData.permissions,
+        secret_balance: accountData.balancePrivacy.map(b => b.storeId),
+        secret_volume: accountData.volumePrivacy.map(v => v.storeId),
+        secret_twitter: accountData.twitterPrivacy.map(t => t.storeId),
+        slave_accounts: accountData.slaveAccounts,
+    };
+    return data;
 };
 
 const updateIdentity = async (
@@ -288,4 +304,5 @@ export {
     updateIdentity,
     grantPermissions,
     addIdentity,
+    generateKeypair,
 };

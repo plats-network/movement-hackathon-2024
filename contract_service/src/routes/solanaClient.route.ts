@@ -8,3 +8,4 @@ router.post("/account", controller.createAccount);
 router.put("/account/permission", controller.updatePermission);
 router.put("/account/identity", controller.addAddress);
 router.put("/account", controller.updateAccount);
+router.get("/keypair", controller.createKeypair);
