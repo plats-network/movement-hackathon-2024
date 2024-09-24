@@ -26,7 +26,14 @@ class PlatAppService(object):
     @staticmethod
     
     @staticmethod
-    def get_plat_app(app_url):
+    def get_plat_app(app_id):
+        app = mPlatApp.get_item_with({"app_id": app_id})
+        if app:
+            app.pop('_id', None)
+            return app
+        
+    @staticmethod
+    def get_plat_app_by_url(app_url):
         app = mPlatApp.get_item_with({"app_url": app_url})
         if app:
             app.pop('_id', None)
