@@ -17,6 +17,7 @@ class Settings():
     MONGO_DB: str = os.getenv('MONGO_DB', '')
     MONGO_URI: str = os.getenv('MONGO_URI')
     MONGO_USER_COLLECTION: str = os.getenv('MONGO_USER_COLLECTION')
+    MONGO_PLAT_APP_COLLECTION: str = os.getenv('MONGO_PLAT_APP_COLLECTION') or "app"
 
     REDIS_HOST: str = os.getenv('REDIS_HOST', 'localhost')
     REDIS_PORT: int = int(os.getenv('REDIS_PORT', 6379))
