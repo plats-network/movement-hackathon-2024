@@ -248,6 +248,35 @@ class NillionHelpers:
         # Set permissions for the client to compute on the program
         self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
         return party_name, program_id
+    
+    
+    async def init_score_program(self):
+        party_name = "Plats"
+        program_name = "platscall"
+        program_mir_path = os.path.join(os.path.dirname(__file__), f"{program_name}.nada.bin")
+        print(f"program_mir_path: {program_mir_path}")
+        
+        # Pay to store the program and obtain a receipt of the payment
+        receipt_store_program = await get_quote_and_pay(
+            self.client,
+            nillion.Operation.store_program(program_mir_path),
+            self.payments_wallet,
+            self.payments_client,
+            self.cluster_id,
+        )
+        # Store the program
+        action_id = await self.client.store_program(
+            self.cluster_id, program_name, program_mir_path, receipt_store_program
+        )
+        # Create a variable for the program_id, which is the {user_id}/{program_name}. We will need this later
+        program_id = f"{self.client.user_id}/{program_name}"
+        print("Stored program. action_id:", action_id)
+        print("Stored program_id:", program_id)
+        
+        
+        # Set permissions for the client to compute on the program
+        self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
+        return party_name, program_id
         
     async def compute_rank(self, party_name, program_id, store_ids: list):
         try:
@@ -316,6 +345,51 @@ class NillionHelpers:
                 "result_trade": -1,
                 "result_twitter": -1
             }
+            
+            
+    async def compute_score(self, party_name, program_id, store_ids: list):
+        try:
+            # Bind the parties in the computation to the client to set input and output parties
+            compute_bindings = nillion.ProgramBindings(program_id)
+            compute_bindings.add_input_party(party_name, self.client.party_id)
+            compute_bindings.add_output_party(party_name, self.client.party_id)
+            
+            print(f"Computing using program {program_id}")
+            # print(f"Use secret store_id: {store_id}")
+
+            computation_time_secrets = nillion.NadaValues({})
+            # Pay for the compute
+            receipt_compute = await get_quote_and_pay(
+                self.client,
+                nillion.Operation.compute(program_id, computation_time_secrets),
+                self.payments_wallet,
+                self.payments_client,
+                self.cluster_id,
+            )
+
+            
+            # Compute on the secrets
+            compute_id = await self.client.compute(
+                self.cluster_id,
+                compute_bindings,
+                store_ids,
+                computation_time_secrets,
+                receipt_compute,
+            )
+            # Print compute result
+            print(f"The computation was sent to the network. compute_id: {compute_id}")
+            while True:
+                compute_event = await self.client.next_compute_event()
+                if isinstance(compute_event, nillion.ComputeFinishedEvent):
+                    print(f"✅  Compute complete for compute_id {compute_event.uuid}")
+                    print(f"🖥️  The result is {compute_event.result.value}")
+                    return compute_event.result.value
+            
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            print(f"RANKING::ERROR:: {e}")
+            return -1
         
         
     

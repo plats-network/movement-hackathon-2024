@@ -102,5 +102,7 @@ class Nillion(object):
         nillion = NillionHelpers()
         party_name, program_id = await nillion.init_rank_program()
         rank = await nillion.compute_rank(party_name, program_id, store_ids)
-        score = await nillion.compute_score(store_ids)
+        
+        party_name, program_id = await nillion.init_score_program()
+        score = await nillion.compute_score(party_name, program_id, store_ids)
         return rank, score

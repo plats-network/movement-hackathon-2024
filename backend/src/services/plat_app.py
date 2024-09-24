@@ -75,6 +75,7 @@ class PlatAppService(object):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
+        # NOTE: will handle this step later
         pub = user.get('public_key')[0]
         store_balance, store_volume, store_twitter, permissions = Solana.get(plat_id)
         
