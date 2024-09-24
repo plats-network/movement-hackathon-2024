@@ -117,3 +117,19 @@ async def delete_plat_app(app_id: str):
     except Exception as e:
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+@router.get('/{app_id}/account')
+async def get_user(app_id: str, plat_id: str):
+    try:
+        rank, score = await PlatAppService.get_user(app_id, plat_id)
+        return ResponseMsg.SUCCESS.to_json(data={
+            "rank": rank,
+            "score": score
+        })
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))

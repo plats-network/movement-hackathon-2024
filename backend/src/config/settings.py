@@ -76,6 +76,8 @@ class Settings():
     SQS_QUEUE_URL = "https://sqs.ap-southeast-1.amazonaws.com/905418230863/plat-fellowship-dev-ini-volume"
     RPC_URL = os.getenv("RPC_URL") or "https://api.devnet.solana.com"
     
+    NILLION_MULTIPLIER = int(os.getenv("NILLION_MULTIPLIER") or 1000)
+    
 settings = Settings()
 
 
