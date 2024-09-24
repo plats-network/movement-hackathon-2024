@@ -132,3 +132,20 @@ body {
 }
 
 
+
+
+.gradient-border-mask-box {
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.gradient-border-mask-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: linear-gradient(to right, #8737E9, #3AE7E7) border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
