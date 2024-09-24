@@ -4,6 +4,8 @@ import {
     fetchIdentity,
     registerIdentity,
     updateIdentity,
+    grantPermissions,
+    addIdentity,
 } from "../services/solanaClient.service";
 /**
  * GET /
@@ -16,12 +18,12 @@ export const retriveAccount = async (
     try {
         initializeProgram();
 
-        const { publicKey } = req.body;
-        if (typeof publicKey !== "string") {
-            res.status(400).json({ msg: "Invalid publicKey", code: 400 });
+        const { platId } = req.body;
+        if (typeof platId !== "string") {
+            res.status(400).json({ msg: "Invalid plat id", code: 400 });
             return;
         }
-        const data = await fetchIdentity(publicKey as string);
+        const data = await fetchIdentity(platId as string);
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);
@@ -55,11 +57,8 @@ export const updateAccount = async (
             publicKey,
             platId,
             secretNameBalance,
-            secretNameVolume,
-            secretNameTwitter,
             storeIdBalance,
             storeIdVolume,
-            storeIdTwitter,
         } = req.body;
         const data = await updateIdentity(
             publicKey,
@@ -67,10 +66,38 @@ export const updateAccount = async (
             storeIdBalance,
             secretNameBalance,
             storeIdVolume,
-            secretNameVolume,
-            storeIdTwitter,
-            secretNameTwitter,
         );
+        res.json({ msg: "success", code: 200, data });
+    } catch (error) {
+        console.log(error);
+        res.json({ msg: error, code: 500 }).status(500);
+    }
+};
+
+export const updatePermission = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        initializeProgram();
+        const { publicKey, platId, permissions } = req.body;
+        const data = await grantPermissions(platId, publicKey, permissions);
+
+        res.json({ msg: "success", code: 200, data });
+    } catch (error) {
+        console.log(error);
+        res.json({ msg: error, code: 500 }).status(500);
+    }
+};
+
+export const addAddress = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        initializeProgram();
+        const { publicKey, platId } = req.body;
+        const data = await addIdentity(platId, publicKey);
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);

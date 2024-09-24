@@ -56,7 +56,8 @@ const initializeProgram = () => {
     }
     return program;
 };
-const getNameID = (plat_id: string) => plat_id + ".ID";
+
+const EMPTY_VALUE = "";
 const registerIdentity = async (base64: string, plat_id: string) => {
     try {
         const userPublicKey = convertBase64toPublicKey(base64);
@@ -69,7 +70,6 @@ const registerIdentity = async (base64: string, plat_id: string) => {
             ComputeBudgetProgram.setComputeUnitLimit({
                 units: 120000,
             });
-        const EMPTY_VALUE = "";
         const storeIdBalance = EMPTY_VALUE;
         const secretNameBalance = "secret_balance";
 
@@ -79,19 +79,17 @@ const registerIdentity = async (base64: string, plat_id: string) => {
         const storeIdTwitter = EMPTY_VALUE;
         const secretNameTwitter = "secret_twitter";
 
-        const nameId = getNameID(plat_id);
-        console.log("NameID:", nameId);
         const instruction = await program.methods
             .registerIdentity(
-                nameId,
+                plat_id,
                 [storeIdBalance, storeIdVolume, storeIdTwitter],
                 [secretNameBalance, secretNameVolume, secretNameTwitter],
                 1,
             )
             .accounts({
                 // @ts-ignore
-                identity: getIdentityPDA(userPublicKey),
-                owner: userPublicKey,
+                identity: getIdentityPDA(plat_id),
+                masterOwner: userPublicKey,
             })
             .instruction();
 
@@ -111,10 +109,6 @@ const registerIdentity = async (base64: string, plat_id: string) => {
             "Confirmed! Your transaction signature",
             confirmation.signature,
         );
-        // const indentity = getIdentity(userPublicKey);
-        // console.log("Identity:", indentity);
-        // return indentity;
-        return { secretNameBalance, secretNameVolume, secretNameTwitter };
     } catch (err) {
         console.log(err);
     }
@@ -135,28 +129,34 @@ const convertBase64toPublicKey = (base64: string) => {
 //     return identity.toBase58();
 // };
 
-const fetchIdentity = async (base64: string) => {
-    const userPublicKey = convertBase64toPublicKey(base64);
-    const data = await program.account.identity.fetch(
-        getIdentityPDA(userPublicKey),
+const fetchIdentity = async (plat_id: string) => {
+    // const userPublicKey = convertBase64toPublicKey(base64);
+    // const data = await program.account.identity.fetch(
+    //     getIdentityPDA(userPublicKey),
+    // );
+    // console.log("ID:", data.nameId);
+    // console.log("Infos:", JSON.stringify(data.infos));
+    // return data.infos.reduce<{ [key: string]: any }>((acc, info) => {
+    //     acc[info.secretName] = info.storeId;
+    //     return acc;
+    // }, {});
+    const accountData = await program.account.identity.fetch(
+        getIdentityPDA(plat_id),
     );
-    console.log("ID:", data.nameId);
-    console.log("Infos:", JSON.stringify(data.infos));
-    return data.infos.reduce<{ [key: string]: any }>((acc, info) => {
-        acc[info.secretName] = info.storeId;
-        return acc;
-    }, {});
+    console.log(`Name : ${accountData.nameId}`);
+    console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
+    console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
+    console.log(`Volume: ${JSON.stringify(accountData.volumePrivacy)}`);
+    console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
+    console.log(`Permissions: ${JSON.stringify(accountData.permissions)}`);
 };
 
 const updateIdentity = async (
     base64: string,
     platId: string,
     storeIdBalance: string,
-    secretNameBalance: string = "secret_balance",
     storeIdVolume: string,
-    secretNameVolume: string = "secret_volume",
     storeIdTwitter: string,
-    secretNameTwitter: string = "secret_twitter",
 ) => {
     const userPublicKey = convertBase64toPublicKey(base64);
     const computeBudgetInstruction = ComputeBudgetProgram.setComputeUnitPrice({
@@ -167,19 +167,20 @@ const updateIdentity = async (
         ComputeBudgetProgram.setComputeUnitLimit({
             units: 120000,
         });
-
-    const nameId = getNameID(platId);
+    const secretNameBalance: string = "secret_balance";
+    const secretNameVolume: string = "secret_volume";
+    const secretNameTwitter: string = "secret_twitter";
 
     const instruction = await program.methods
         .updateIdentity(
-            nameId,
+            platId,
             [storeIdBalance, storeIdVolume, storeIdTwitter],
             [secretNameBalance, secretNameVolume, secretNameTwitter],
         )
         .accounts({
             // @ts-ignore
-            identity: getIdentityPDA(userPublicKey),
-            owner: userPublicKey,
+            identity: getIdentityPDA(platId),
+            account: userPublicKey,
         })
         .instruction();
 
@@ -194,4 +195,97 @@ const updateIdentity = async (
     console.log("Your transaction signature", confirmation.signature);
 };
 
-export { initializeProgram, registerIdentity, fetchIdentity, updateIdentity };
+const addIdentity = async (
+    platId: string,
+    base64: string,
+    storeIdBalance: string = EMPTY_VALUE,
+    storeIdVolume: string = EMPTY_VALUE,
+    storeIdTwitter: string = EMPTY_VALUE,
+) => {
+    const computeBudgetInstruction = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 100000,
+    });
+
+    const computeBudgetLimitInstruction =
+        ComputeBudgetProgram.setComputeUnitLimit({
+            units: 120000,
+        });
+
+    // convert string base58 to PublicKey
+    const userPublicKey = convertBase64toPublicKey(base64);
+
+    const secretNameBalance = "secret_balance";
+
+    const secretNameVolume = "secret_volume";
+
+    const secretNameTwitter = "secret_twitter";
+
+    const instruction = await program.methods
+        .addIdentity(
+            platId,
+            [storeIdBalance, storeIdVolume, storeIdTwitter],
+            [secretNameBalance, secretNameVolume, secretNameTwitter],
+        )
+        .accounts({
+            // @ts-ignore
+            identity: getIdentityPDA(platId),
+            account: userPublicKey,
+        })
+        .instruction();
+
+    const confirmation = await simulateSendAndConfirmTX(
+        [computeBudgetInstruction, computeBudgetLimitInstruction, instruction],
+        keypair,
+        connection,
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    console.log("Your transaction signature", confirmation.signature);
+};
+
+const grantPermissions = async (
+    plat_id: string,
+    base64: string,
+    permissions: string[],
+) => {
+    const computeBudgetInstruction = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 100000,
+    });
+
+    const computeBudgetLimitInstruction =
+        ComputeBudgetProgram.setComputeUnitLimit({
+            units: 120000,
+        });
+
+    // convert string base58 to PublicKey
+    const userPublicKey = convertBase64toPublicKey(base64);
+
+    const instruction = await program.methods
+        .addPermissions(plat_id, permissions)
+        .accounts({
+            // @ts-ignore
+            identity: getIdentityPDA(plat_id),
+            account: userPublicKey,
+        })
+        .instruction();
+
+    const confirmation = await simulateSendAndConfirmTX(
+        [computeBudgetInstruction, computeBudgetLimitInstruction, instruction],
+        keypair,
+        connection,
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    console.log("Your transaction signature", confirmation.signature);
+};
+
+export {
+    initializeProgram,
+    registerIdentity,
+    fetchIdentity,
+    updateIdentity,
+    grantPermissions,
+    addIdentity,
+};

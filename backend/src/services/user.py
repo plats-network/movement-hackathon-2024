@@ -3,6 +3,7 @@ import pydash as py_
 from .twitter import TwitterService
 from src.services import Nillion
 from src.services.solana_client import Solana
+from fastapi import HTTPException
 class UserService(object):
     
     @staticmethod
@@ -16,23 +17,31 @@ class UserService(object):
                 "is_new_user": user['is_new_user']
             }
         return None
-        
+    
+    @staticmethod
+    def delete_user(plat_id: str):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if user:
+            mUser.delete(user['_id'], force=True)
+            return True
+        return False
         
     @staticmethod
     def register(plat_id: str, eoa: str, public_key: str):
         # check exist public_key
-        exist_user = mUser.get_item_with({"public_key": public_key})
+        exist_user = mUser.get_item_with({"public_key": { "$elemMatch": {"$eq": public_key}}})
+        
         exist_plat_id = mUser.get_item_with({"plat_id": plat_id})
         if exist_user:
-            return None
+            raise HTTPException(status_code=400, detail="This address already associated with another user")
 
         if exist_plat_id:
-            return None
+            raise HTTPException(status_code=400, detail="Plat id already exists")
         
         user = mUser.insert({
             "plat_id": plat_id,
             "address": [eoa],
-            "public_key": public_key,
+            "public_key": [public_key],
             "is_new_user": True
         })
         return user
@@ -48,7 +57,7 @@ class UserService(object):
             return None
         
         # get store_id from solana
-        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        store_balance, store_volume, store_twitter = Solana.get(plat_id)
         
         # Log all variables
         print(f"store_balance: {store_balance}")
@@ -77,9 +86,8 @@ class UserService(object):
     
     @staticmethod
     def get_user_by_public_key(public_key: str):
-        user = mUser.get_item_with({"public_key": public_key})
+        user = mUser.get_item_with({"public_key": { "$elemMatch": {"$eq": public_key}}})
         return user
-    
     
     @staticmethod
     def update_user(plat_id: str, eoa: str):
@@ -95,3 +103,35 @@ class UserService(object):
         if not user:
             raise Exception("User not found")
         mUser.update(user['_id'], data)
+        
+    
+    @staticmethod
+    def add_address(plat_id: str, eoa: str, public_key: str):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check if exist eoa in address array
+        if eoa in user['address']:
+            raise HTTPException(status_code=400, detail="Address already exists")
+        # Check if exist public_key in public_key array
+        if public_key in user['public_key']:
+            raise HTTPException(status_code=400, detail="Public key already exists")
+        
+        # add to solana
+        Solana.add_address(plat_id, eoa, public_key)
+        
+        mUser.update(user['_id'], {
+            "address": user['address'] + [eoa],
+            "public_key": user['public_key'] + [public_key]
+        })
+        
+
+        
+    @staticmethod
+    def update_permission(plat_id: str, permissions: list):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        # Update permissions on Solana
+        Solana.update_permission(plat_id, user['public_key'][0], permissions)

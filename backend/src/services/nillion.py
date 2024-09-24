@@ -1,6 +1,7 @@
 from src.libs.nillion_helpers import NillionHelpers
 from src.models import mUser
 from src.services.solana_client import Solana
+from src.config import settings
 class Nillion(object):
     
     
@@ -11,14 +12,15 @@ class Nillion(object):
             raise Exception("User not found")
         nillion = NillionHelpers()
         if isinstance(value, str):
-            store_id = await nillion.store_blob(key=key, value=value)
+            value = int(nillion.safe_float_conversion(value) * settings.NILLION_MULTIPLIER)
+            store_id = await nillion.store_integer(key=key, value=value)
         else:
             store_id = await nillion.store_integer(key=key, value=value)
         
         # TODO: Store store_id and key(secret_name) to smart contract 
         print("store_id", store_id)
         
-        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        store_balance, store_volume, store_twitter = Solana.get(plat_id)
         # Logger
         print(f"STORE::GET from solana::{plat_id}::{key}::{value}::", store_balance, store_volume, store_twitter)
         print(f"store_balance: {store_balance}")
@@ -49,7 +51,7 @@ class Nillion(object):
             raise Exception("User not found")
         
         # TODO: Retrieve store_id from smart contract using plat_id & key (secret_name)
-        store_balance, store_volume, store_twitter = Solana.get(user.get('public_key'))
+        store_balance, store_volume, store_twitter = Solana.get(plat_id)
         
         print(f"RETRIEVE::GET from solana::{plat_id}::{key}::", store_balance, store_volume, store_twitter)
         if key == 'balance':
@@ -79,18 +81,28 @@ class Nillion(object):
         volume = await nillion.retrieve(store_volume, volume_key)
         twitter = await nillion.retrieve(store_twitter, twitter_key)
         
-        balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol = nillion.format_compute(balance, volume, twitter)
+        # balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol = nillion.format_compute(balance, volume, twitter)
         
-        rank = await nillion.rank(balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol)
+        # rank = await nillion.rank(balance_int, volume_int, twitter_int, threshold_whale, threshold_trade, threshold_kol)
 
         return {
             "balance": balance,
             "volume": volume,
             "twitter": twitter,
-            "rank": rank
         }
     
     @staticmethod
-    async def rank():
+    async def rank(store_ids: list):
         nillion = NillionHelpers()
         return await nillion.rank()
+    
+    
+    @staticmethod
+    async def compute_rank_score(store_ids: list):
+        nillion = NillionHelpers()
+        party_name, program_id = await nillion.init_rank_program()
+        rank = await nillion.compute_rank(party_name, program_id, store_ids)
+        
+        party_name, program_id = await nillion.init_score_program()
+        score = await nillion.compute_score(party_name, program_id, store_ids)
+        return rank, score

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from src.dtos import RegisterInputDTO, LoginInputDTO, VerifyRequestDTO
 from src.utils import ResponseMsg
 from src.services import Auth
@@ -35,20 +35,29 @@ def base64_to_a_z(base64_str):
 
 @router.get("/nonce")
 async def get_nonce(public_key: str):
-    nonce = base64.b64encode(nacl.utils.random(16)).decode("utf-8")
+    try:
+        nonce = base64.b64encode(nacl.utils.random(16)).decode("utf-8")
+        
+        # generate a string from public_key unique
+        try:
+            unique_key = base64_to_a_z(public_key)
+        
+        except Exception as e:
+            logger.error("ERROR:BASE64_TO_A_Z", e)
+            raise HTTPException(status_code=400, detail="{}".format(e))
+        
+        # store the nonce in redis
+        redis_client.setex(unique_key, timedelta(seconds=60), nonce)
+        
+        return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
     
-    # generate a string from public_key unique
-    unique_key = base64_to_a_z(public_key)
-    print("Nonce", nonce)
-    # store the nonce in redis
-    redis_client.setex(unique_key, timedelta(seconds=60), nonce)
+    except HTTPException as http_exc:
+        raise http_exc
     
-    return ResponseMsg.SUCCESS.to_json(data={"nonce": nonce}) 
+    except Exception as e:
+        logger.error("ERROR:GET_NONCE", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error::{}".format(e))
 
-
-@router.options("/verify")
-async def verify_signature_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.post("/verify")
 async def verify_signature(request: VerifyRequestDTO):
@@ -90,9 +99,6 @@ async def verify_signature(request: VerifyRequestDTO):
     )
     return ResponseMsg.SUCCESS.to_json(data={"authen_token": authen_token}, msg="Verification successful")
 
-@router.options("/register")
-async def register_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
 
 @router.post("/register")
 async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(Auth.verify_token)):
@@ -105,33 +111,31 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
         if token.sub != public_key:
             return ResponseMsg.UNAUTHORIZED.to_json(msg="Unauthorized")
         
-        # TODO: Send transaction to SMC to register user with plat_id, eoa=new_user['address][0]
-        
-        response = Solana.register(plat_id, public_key)
-        
-        if response is None:
-            return ResponseMsg.ERROR.to_json(msg="Registration failed")
-        
         # Create a new user with plat_id
-        new_user = UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
-        if new_user is None:
-            return ResponseMsg.INVALID.to_json(msg="User exists")
-        
-        logger.info(f"User registered with plat_id: {plat_id}, address, {new_user['address']}, public_key: {public_key}")
-        
-        logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
-        
-        Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
+        UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
 
-        
-        return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")  
-    except Exception as e:
-        logger.error(f"Error registering user: {e}")
-        return ResponseMsg.ERROR.to_json(msg="Error registering user")
+        try:
+            # Register the user on Solana
+            response = Solana.register(plat_id, public_key)
+            
+            if response is None:
+                raise HTTPException(status_code=500, detail="Failed to register on Solana::{}".format(e))
+            
+            logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
+            
+            Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
+
+            return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")
+        except Exception as e:
+            UserService.delete_user(plat_id=plat_id)
+            raise e
+      
+    except HTTPException as http_exc:
+        raise http_exc
     
-@router.options("/login")
-async def login_options():
-    return ResponseMsg.SUCCESS.to_json(msg="Options request successful")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error::{}".format(e))
+    
 
 @router.post("/login")
 async def login(token: TokenData = Depends(Auth.verify_token)):
@@ -140,6 +144,7 @@ async def login(token: TokenData = Depends(Auth.verify_token)):
     try:
         # get user from db
         user = UserService.get_user_by_public_key(token.sub)
+        
         if user is None:
             return ResponseMsg.INVALID.to_json(msg="User not registered")
         
@@ -152,6 +157,10 @@ async def login(token: TokenData = Depends(Auth.verify_token)):
             "access_token": access_token
         }
         return ResponseMsg.SUCCESS.to_json(data=response)
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    
     except Exception as e:
         logger.error(f"Error logging in: {e}")
-        return ResponseMsg.ERROR.to_json(msg="Error logging in")
+        raise HTTPException(status_code=500, detail=f"Internal server error::{e}")
