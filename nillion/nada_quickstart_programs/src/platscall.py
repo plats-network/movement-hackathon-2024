@@ -13,6 +13,14 @@ def nada_main():
 
     twitter = SecretInteger(Input(name="secret_twitter", party=party_plats))
 
+
+    # score formula
+    balance_multiplier = balance * Integer(2)
+    volume_multiplier = volume * Integer(3) 
+    score = (balance_multiplier + volume_multiplier + twitter) / Integer(6)
+
+    id.append(Output(score, "result_score", party_plats))
+
     threshold_trade = SecretInteger(Input(name="threshold_trade", party=party_plats))
     threshold_whale = SecretInteger(Input(name="threshold_whale", party=party_plats))
     threshold_kol = SecretInteger(Input(name="threshold_kol", party=party_plats))
