@@ -56,10 +56,28 @@ async def register_plat_app(body: RegisterAppDTO):
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.get('/{app_url}')
+@router.get('/{app_id}')
+async def get_plat_app(app_id: str):
+    try:
+        plat_app = PlatAppService.get_plat_app(app_id)
+        if not plat_app:
+            raise HTTPException(status_code=404, detail="Plat app not found")
+        
+        
+        return ResponseMsg.SUCCESS.to_json(data=plat_app)
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    
+    except Exception as e:
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    
+@router.post('/url')
 async def get_plat_app(app_url: str):
     try:
-        plat_app = PlatAppService.get_plat_app(app_url)
+        plat_app = PlatAppService.get_plat_app_by_url(app_url)
         if not plat_app:
             raise HTTPException(status_code=404, detail="Plat app not found")
         
