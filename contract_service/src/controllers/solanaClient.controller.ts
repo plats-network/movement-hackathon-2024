@@ -6,6 +6,7 @@ import {
     updateIdentity,
     grantPermissions,
     addIdentity,
+    generateKeypair,
 } from "../services/solanaClient.service";
 /**
  * GET /
@@ -25,6 +26,19 @@ export const retriveAccount = async (
         }
         const data = await fetchIdentity(platId as string);
         res.json({ msg: "success", code: 200, data });
+    } catch (error) {
+        console.log(error);
+        res.json({ msg: error, code: 500 }).status(500);
+    }
+};
+export const createKeypair = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        initializeProgram();
+        const keypair = generateKeypair();
+        res.json({ msg: "success", code: 200, data: keypair });
     } catch (error) {
         console.log(error);
         res.json({ msg: error, code: 500 }).status(500);
@@ -56,7 +70,7 @@ export const updateAccount = async (
         const {
             publicKey,
             platId,
-            secretNameBalance,
+            storeIdTwitter,
             storeIdBalance,
             storeIdVolume,
         } = req.body;
@@ -64,7 +78,7 @@ export const updateAccount = async (
             publicKey,
             platId,
             storeIdBalance,
-            secretNameBalance,
+            storeIdTwitter,
             storeIdVolume,
         );
         res.json({ msg: "success", code: 200, data });
