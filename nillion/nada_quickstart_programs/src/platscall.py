@@ -9,13 +9,13 @@ def nada_main():
 
     balance = SecretInteger(Input(name="secret_balance", party=party_plats))
 
-    volume = SecretInteger(Input(name="secret_volumn", party=party_plats))
+    volume = SecretInteger(Input(name="secret_volume", party=party_plats))
 
     twitter = SecretInteger(Input(name="secret_twitter", party=party_plats))
 
-    threshold_trade = PublicInteger(Input(name="threshold_trade", party=party_plats))
-    threshold_whale = PublicInteger(Input(name="threshold_whale", party=party_plats))
-    threshold_kol = PublicInteger(Input(name="threshold_kol", party=party_plats))
+    threshold_trade = SecretInteger(Input(name="threshold_trade", party=party_plats))
+    threshold_whale = SecretInteger(Input(name="threshold_whale", party=party_plats))
+    threshold_kol = SecretInteger(Input(name="threshold_kol", party=party_plats))
     
     # Check volumn 
     is_trade = volume > threshold_trade

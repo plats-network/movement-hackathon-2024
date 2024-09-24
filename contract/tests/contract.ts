@@ -3,6 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { PlatsId } from "../target/types/plats_id";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { expect } from "chai";
 
 describe("Plats Id", () => {
   // Configure the client to use the local cluster.
@@ -13,11 +14,11 @@ describe("Plats Id", () => {
   const signer = provider.wallet as NodeWallet;
   const users = Array.from({ length: 10 }, () => anchor.web3.Keypair.generate());
   const master_owner = users[0].publicKey;
-
+  console.log("Master Owner:",master_owner);
   const slave_owner1 = users[1].publicKey;
   const slave_owner2 = users[2].publicKey;
 
-  const nameId = "dung.ID";
+  const nameId = "du.ID";
 
     let [identityPDA, bump] = PublicKey.findProgramAddressSync(
       [
@@ -30,13 +31,13 @@ describe("Plats Id", () => {
 
 
 
-    it("Should airdrop sol for master account ", async () => {
+  it("Should airdrop sol for master account ", async () => {
       await airdropSol(provider.connection, master_owner);
   
       const masterBalance = await provider.connection.getBalance(users[0].publicKey);
   
       expect(masterBalance).to.be.equal(1 * LAMPORTS_PER_SOL);
-    })
+  })
 
 
   it("Register Identity", async () => {
@@ -47,7 +48,7 @@ describe("Plats Id", () => {
     let secretNameBalance = "secret_balance";
 
     let storeIdVolume = "c999d3e9-a6c1-438b-a121-295115728f01";
-    let secretNameVolume = "secret_volumn";
+    let secretNameVolume = "secret_volume";
 
     let storeIdTwitter = "c999d3e9-a6c1-438b-a121-295115728f01";
     let secretNameTwitter = "secret_twitter";
@@ -70,7 +71,7 @@ describe("Plats Id", () => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volumn: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
   });
 
@@ -82,7 +83,7 @@ describe("Plats Id", () => {
     let secretNameBalance = "secret_balance";
 
     let storeIdVolume = "c888d3e9-a6c1-438b-a121-295115728f01";
-    let secretNameVolume = "secret_volumn";
+    let secretNameVolume = "secret_volume";
 
     let storeIdTwitter = "c888d3e9-a6c1-438b-a121-295115728f01";
     let secretNameTwitter = "secret_twitter";
@@ -105,7 +106,7 @@ describe("Plats Id", () => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volumn: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
   });
 
@@ -116,7 +117,7 @@ describe("Plats Id", () => {
     let secretNameBalance = "secret_balance";
 
     let storeIdVolume = "c777d3e9-a6c1-438b-a121-295115728f01";
-    let secretNameVolume = "secret_volumn";
+    let secretNameVolume = "secret_volume";
 
     let storeIdTwitter = "c777d3e9-a6c1-438b-a121-295115728f01";
     let secretNameTwitter = "secret_twitter";
@@ -139,7 +140,7 @@ describe("Plats Id", () => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volumn: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
   });
 
@@ -151,7 +152,7 @@ describe("Plats Id", () => {
     let secretNameBalance = "secret_balance";
 
     let storeIdVolume = "c666d3e9-a6c1-438b-a121-295115728f01";
-    let secretNameVolume = "secret_volumn";
+    let secretNameVolume = "secret_volume";
 
     let storeIdTwitter = "c666d3e9-a6c1-438b-a121-295115728f01";
     let secretNameTwitter = "secret_twitter";
@@ -174,7 +175,7 @@ describe("Plats Id", () => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volumn: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
   });
 
@@ -185,7 +186,7 @@ describe("Plats Id", () => {
     let secretNameBalance = "secret_balance";
 
     let storeIdVolume = "c555d3e9-a6c1-438b-a121-295115728f01";
-    let secretNameVolume = "secret_volumn";
+    let secretNameVolume = "secret_volume";
 
     let storeIdTwitter = "c555d3e9-a6c1-438b-a121-295115728f01";
     let secretNameTwitter = "secret_twitter";
@@ -208,7 +209,7 @@ describe("Plats Id", () => {
     console.log(`Name : ${accountData.nameId}`);
     console.log(`Slave Accounts: ${JSON.stringify(accountData.slaveAccounts)}`);
     console.log(`Balance: ${JSON.stringify(accountData.balancePrivacy)}`);
-    console.log(`Volumn: ${JSON.stringify(accountData.volumnPrivacy)}`);
+    console.log(`Volumn: ${JSON.stringify(accountData.volumePrivacy)}`);
     console.log(`Twitter: ${JSON.stringify(accountData.twitterPrivacy)}`);
   });
 

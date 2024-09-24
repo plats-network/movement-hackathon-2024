@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("FhxviFcNXiGpfG8s3LziiPCRqJ5pPMEX5wupMLfa7PWA");
+declare_id!("3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk");
 
 #[program]
 pub mod plats_id {
@@ -32,8 +32,8 @@ pub mod plats_id {
                     };
                     balance_privacy.push(privacy_info);
                 }
-                "volumn" => {
-                    let privacy_info = PrivacyVolumnInfo {
+                "volume" => {
+                    let privacy_info = PrivacyVolumeInfo {
                         store_id: store_ids[i].clone(),
                         secret_name: secret_name.clone(),
                         type_info: type_info.clone(),
@@ -55,7 +55,7 @@ pub mod plats_id {
 
         identity.name_id = name_id;
         identity.balance_privacy = balance_privacy;
-        identity.volumn_privacy = volumn_privacy;
+        identity.volume_privacy = volumn_privacy;
         identity.twitter_privacy = twitter_privacy;
         identity.bump = bump;
         identity.master_owner = owner_account.key();
@@ -98,7 +98,7 @@ pub mod plats_id {
 
             match type_info.as_str() {
                 "balance" => identity.balance_privacy[idx].store_id = store_ids[i].clone(),
-                "volumn" => identity.volumn_privacy[idx].store_id = store_ids[i].clone(),
+                "volume" => identity.volume_privacy[idx].store_id = store_ids[i].clone(),
 
                 "twitter" => identity.twitter_privacy[idx].store_id = store_ids[i].clone(),
                 _ => return err!(ErrCode::PrivacyInfoNotSupport),
@@ -138,13 +138,13 @@ pub mod plats_id {
                     };
                     identity.balance_privacy.push(privacy_info);
                 }
-                "volumn" => {
-                    let privacy_info = PrivacyVolumnInfo {
+                "volume" => {
+                    let privacy_info = PrivacyVolumeInfo {
                         store_id: store_ids[i].clone(),
                         secret_name: secret_name.clone(),
                         type_info: type_info.clone(),
                     };
-                    identity.volumn_privacy.push(privacy_info);
+                    identity.volume_privacy.push(privacy_info);
                 }
 
                 "twitter" => {
@@ -304,7 +304,7 @@ pub struct Identity {
     //  associate multiple accounts with a master account
     pub slave_accounts: Vec<Pubkey>,
     pub balance_privacy: Vec<PrivacyBalanceInfo>,
-    pub volumn_privacy: Vec<PrivacyVolumnInfo>,
+    pub volume_privacy: Vec<PrivacyVolumeInfo>,
     pub twitter_privacy: Vec<PrivacyTwitterInfo>,
     // Permissions of app_id
     pub permissions: Vec<String>,
@@ -319,7 +319,7 @@ pub struct PrivacyBalanceInfo {
 }
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
-pub struct PrivacyVolumnInfo {
+pub struct PrivacyVolumeInfo {
     pub store_id: String,
     pub secret_name: String,
     pub type_info: String,
