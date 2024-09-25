@@ -61,11 +61,14 @@ class UserService(object):
         print(f"store_twitter: {store_twitter}")
         
         import asyncio
-        raw_data = await asyncio.gather(
-            *[Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i]) for i in range(len(store_balance))]
-        )
-    
-        raw_balance, raw_volume, raw_twitter = zip(*raw_data)
+        balances = []
+        volumes = []
+        twitters = []
+        for i in range(len(store_balance)):
+            balance, volume, twitter = await Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i])
+            balances.append(balance)
+            volumes.append(volume)
+            twitters.append(twitter)
             
         # Get twitter_name
         try:
@@ -81,9 +84,9 @@ class UserService(object):
         user.pop('_id', None)
         user['twitter_name'] = twitter_name
         user['twitter_score'] = twitter_score
-        user['balances'] = raw_balance
-        user['volumes'] = raw_volume
-        user['twitters'] = raw_twitter
+        user['balances'] = balances
+        user['volumes'] = volumes
+        user['twitters'] = twitters
         
         
         return user
