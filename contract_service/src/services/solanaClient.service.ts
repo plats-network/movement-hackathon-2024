@@ -39,6 +39,7 @@ const generateKeypair = () => {
 const initializeProgram = () => {
     const user = Keypair.generate();
     console.log("Seed User Base64:", convertPublicKeyToBase64(user.publicKey));
+    console.log("process.env.MNEMONIC_PHRASE", process.env.MNEMONIC_PHRASE);
     if (!program) {
         connection = new Connection(process.env.RPC_URL, {
             commitment: "confirmed",
@@ -46,7 +47,8 @@ const initializeProgram = () => {
         });
 
         const seed = bip39.mnemonicToSeedSync(
-            process.env.MNEMONIC_PHRASE || "",
+            process.env.MNEMONIC_PHRASE ||
+                "boss tackle shove capital merge angle slogan pause ginger artwork state patrol",
             "",
         );
         keypair = Keypair.fromSeed(seed.slice(0, 32));

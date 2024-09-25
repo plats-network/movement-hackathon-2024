@@ -19,6 +19,18 @@ class UserService(object):
             }
         return None
     
+    
+    @staticmethod
+    def check_synced(plat_id: str, wallet_addr: str):
+        user = mUser.get_item_with({"plat_id": plat_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        synced = user.get('synced', [])
+        if wallet_addr in synced:
+            return True
+        return False
+    
     @staticmethod
     def delete_user(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
@@ -43,7 +55,7 @@ class UserService(object):
             "plat_id": plat_id,
             "address": [eoa],
             "public_key": [public_key],
-            "is_new_user": True
+            "synced": []
         })
         return user
         

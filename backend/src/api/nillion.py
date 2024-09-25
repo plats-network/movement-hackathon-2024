@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 async def store(storeInput: StoreInputDTO, background_tasks: BackgroundTasks):
     try:
         plat_id = storeInput.plat_id
-        balances = storeInput.balances
-        volumes = storeInput.volumes
+        wallet_addr = storeInput.wallet_addr
+        secret_balance = storeInput.secret_balance
+        secret_volume = storeInput.secret_volume
 
         # in background
-        background_tasks.add_task(Nillion.store, plat_id, balances, volumes)
+        background_tasks.add_task(Nillion.store, plat_id, wallet_addr, secret_balance, secret_volume)
 
         return ResponseMsg.SUCCESS.to_json(msg="Store operation is in progress")
     
@@ -37,9 +38,9 @@ async def store(storeInput: StoreInputDTO, background_tasks: BackgroundTasks):
 
 
 @router.get('/retrieve')
-async def retrieve(plat_id: str):
+async def retrieve(plat_id: str = "khaihoang", wallet_addr: str = "GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB"):
     try:
-        data = await Nillion.retrieve(plat_id)
+        data = await Nillion.retrieve(plat_id, wallet_addr)
         return ResponseMsg.SUCCESS.to_json(data=data)
     
     except HTTPException as http_exc:
@@ -51,15 +52,15 @@ async def retrieve(plat_id: str):
         raise HTTPException(status_code=500, detail=f"Error storing data::{str(e)}")
     
 
-@router.get("/user")
-def check_register(address: str):
+@router.get("/synced")
+def check_synced(plat_id: str = "khaihoang", wallet_addr: str = "GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB"):
     try:
-        data = UserService.check_register(address)
-        if data:
-            return ResponseMsg.SUCCESS.to_json(data=data)
-        return ResponseMsg.NOT_FOUND.to_json(data={})
+        data = UserService.check_synced(plat_id, wallet_addr)
+        return ResponseMsg.SUCCESS.to_json(data={"synced": data})
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        return ResponseMsg.ERROR.to_json(msg=str(e))
+        return HTTPException(status_code=500, detail=str(e))
 
 @router.post('/user')
 def update_user(plat_id: str, is_new_user: bool):

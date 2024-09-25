@@ -7,7 +7,7 @@ class Nillion(object):
     
     
     @staticmethod
-    async def store(plat_id: str, balances: list, volumes: list):
+    async def store(plat_id: str, wallet_addr: str, secret_balance: float, secret_volume: float):
         '''
             Store value for a specific address using its `plat_id` and a `address`
         '''
@@ -17,34 +17,37 @@ class Nillion(object):
         
         nillion = NillionHelpers()
         public_key = user.get('public_key', [])
+        address = user.get('address', [])
+        synced = user.get('synced', [])
+        
+        try:
+            index = address.index(wallet_addr)
+
+        except ValueError:
+            raise HTTPException(status_code=404, detail="Wallet address not found")
         
         # 1. Convert string to int 
-        balances = [int(balance * settings.NILLION_MULTIPLIER) for balance in balances]
+        balance = int(secret_balance * settings.NILLION_MULTIPLIER)
+        volume = int(secret_volume * settings.NILLION_MULTIPLIER)
         
-        volumes = [int(volume * settings.NILLION_MULTIPLIER) for volume in volumes]
-        print("BALANCES::", balances)
-        print("VOLUMES::", volumes)
+        # 2. Store balance, volume to nillion
+        balance_id = await nillion.store_integer('secret_balance', balance)
+        volume_id = await nillion.store_integer('secret_volume', volume)
         
-        # 2. Store balances to nillion
-        import asyncio
-        balances_ids = []
-        volumes_ids = []
-        for i in range(len(balances)):
-            balance_id = await nillion.store_integer('secret_balance', balances[i])
-            volume_id = await nillion.store_integer('secret_volume', volumes[i])
-            balances_ids.append(balance_id)
-            volumes_ids.append(volume_id)
-        print("BALANCES_IDS::", balances_ids)
-        print("VOLUMES_IDS::", volumes_ids)
-        # 3. Store balances_ids, volumes_ids to solana
-        for i in range(len(balances_ids)):
-            Solana.update(plat_id=plat_id, public_key=public_key[i], store_balance=balances_ids[i], store_volume=volumes_ids[i])
+        # 3. Store balance, volume to solana
+        Solana.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id)
+        
+        # 4. Update synced
+        synced.append(wallet_addr)
+        mUser.update(user['_id'], {
+            "synced": synced
+        })
         
         print("STORE::SUCCESS")
     
     
     @staticmethod
-    async def retrieve(plat_id: str):
+    async def retrieve(plat_id: str, wallet_addr: str):
         '''
             Retrive data of a `plat_id`
         '''
@@ -55,26 +58,28 @@ class Nillion(object):
         nillion = NillionHelpers()
         address = user.get('address', [])
         
-        # 1. Retrieve balances, volumes from solana
-        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id)
+        # find index of address in address
+        try:
+            index = address.index(wallet_addr)
+            
+        except ValueError:
+            raise HTTPException(status_code=404, detail="Wallet address not found")
         
-        # 2. Retrieve balances, volumes, twitter from nillion
-        balances = []
-        volumes = []
-        for i in range(len(store_balance)):
-            balance, volume, _ = await Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i])
-            balances.append(balance)
-            volumes.append(volume)
+        # 1. Retrieve balances, volumes from solana
+        store_balance, store_volume, _, _ = Solana.get(plat_id)
+        
+        # 2. Get the balance and volume of the wallet_addr from nillion
+        balance = await nillion.retrieve(store_balance[index], 'secret_balance')
+        volume =  await nillion.retrieve(store_volume[index], 'secret_volume')
         
         # 3. Return raw_data
-        balances = [balance / settings.NILLION_MULTIPLIER if balance > 0 else 0 for balance in balances]
-        volumes = [volume / settings.NILLION_MULTIPLIER if volume > 0 else 0 for volume in volumes]
+        balance = balance / settings.NILLION_MULTIPLIER if balance > 0 else 0
+        volume = volume / settings.NILLION_MULTIPLIER if volume > 0 else 0
+
         
         return {
-            "balances": balances,
-            "volumes": volumes,
-            "addresses": address,
-            "is_new_user": user.get('is_new_user', False)
+            "secret_balance": balance,
+            "secret_volume": volume,
         }
         
         

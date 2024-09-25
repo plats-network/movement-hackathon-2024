@@ -3,8 +3,9 @@ from typing import List
 
 class StoreInputDTO(BaseModel):
     plat_id: str = Field(..., title="Plat ID", description="Plat ID of the user", examples=["khaihoang", ])
-    balances: List[float] = Field(..., title="Balances", description="List of balances", examples=[[20.60924, 9709.224]])
-    volumes: List[float] = Field(..., title="Volumes", description="List of volumes", examples=[[1520.24, 55520.224]])
+    wallet_addr: str = Field(..., title="Wallet Address", description="Wallet address of the user", examples=["GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB", ])
+    secret_balance: float = Field(..., title="Secret Balance", description="Secret balance of the user", examples=[3728.52, ])
+    secret_volume: float = Field(..., title="Secret Volume", description="Secret volume of the user", examples=[46720.81, ])
 
 
 class RetrieveInputDTO(BaseModel):
