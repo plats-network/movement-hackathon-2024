@@ -47,8 +47,7 @@ const initializeProgram = () => {
         });
 
         const seed = bip39.mnemonicToSeedSync(
-            process.env.MNEMONIC_PHRASE ||
-                "boss tackle shove capital merge angle slogan pause ginger artwork state patrol",
+            process.env.MNEMONIC_PHRASE || "",
             "",
         );
         keypair = Keypair.fromSeed(seed.slice(0, 32));
