@@ -343,7 +343,8 @@ class NillionHelpers:
             return {
                 "result_whale": -1,
                 "result_trade": -1,
-                "result_twitter": -1
+                "result_twitter": -1,
+                "result_score": -1
             }
             
             
@@ -427,7 +428,7 @@ async def test_blind_compute():
     twitter = int(nillion.safe_float_conversion(twitter) * 1000)
 
     balance_id = await nillion.store_integer("secret_balance", balance)
-    volume_id = await nillion.store_integer("secret_volumn", volume)
+    volume_id = await nillion.store_integer("secret_volume", volume)
     twitter_id = await nillion.store_integer("secret_twitter", int(twitter))
     print(f"STORED::BALANCE::{balance_id}::VOLUME::{volume_id}::TWITTER::{twitter_id}")
     store_ids = [balance_id, volume_id, twitter_id]
@@ -435,7 +436,7 @@ async def test_blind_compute():
     
     # Retrive value
     balance = await nillion.retrieve(balance_id, "secret_balance")
-    volume = await nillion.retrieve(volume_id, "secret_volumn")
+    volume = await nillion.retrieve(volume_id, "secret_volume")
     twitter = await nillion.retrieve(twitter_id, "secret_twitter")
     print(f"RETRIEVED::BALANCE::{balance}::VOLUME::{volume}::TWITTER::{twitter}")
     

@@ -16,8 +16,6 @@ logger = logging.getLogger(__name__)
 
 @router.get('')
 async def get_user(token: TokenData = Depends(Auth.verify_token)):
-    
-    # With the access token (plat_id)
     try:
         # get user from db
         user = await UserService.get_user(token.sub)
@@ -32,9 +30,14 @@ async def get_user(token: TokenData = Depends(Auth.verify_token)):
         }
         
         return ResponseMsg.SUCCESS.to_json(data=response)
+    
+    except HTTPException as http_exc:
+        raise http_exc
+    
     except Exception as e:
-        logger.error(f"Retrive failed::{e}")
-        return ResponseMsg.ERROR.to_json(msg=f"Retrive failed::{e}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
     
 
 @router.put('/address')

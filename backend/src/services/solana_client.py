@@ -29,18 +29,18 @@ class Solana(object):
             permissions = data.get('permissions')
             return store_balance, store_volume, store_twitter, permissions
         else:
-            return None, None, None, []
+            return [], [], [], []
         
     
     @staticmethod
     def update(plat_id, public_key, store_balance, store_volume, store_twitter):
+        '''
+            Update store balance, volume and twitter score for a specific address using its `public_key` and `plat_id` 
+        '''
         contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account"
         json = {
             "platId": plat_id,
-            "publicKey": public_key,
-            "secretNameBalance": "secret_balance",
-            "secretNameVolume": "secret_volume",
-            "secretNameTwitter": "secret_twitter",
+            "publicKey": public_key, 
             "storeIdBalance": store_balance if store_balance is not None else "",
             "storeIdVolume": store_volume if store_volume is not None  else "",
             "storeIdTwitter": store_twitter if store_twitter is not None  else ""
@@ -54,14 +54,17 @@ class Solana(object):
         
         
     @staticmethod
-    def add_address(plat_id, address, public_key):
+    def add_address(plat_id, public_key):
+        '''
+            Add address to a specific plat_id using its `public_key`
+        '''
         contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/identity"
         json = {
             "platId": plat_id,
             "publicKey": public_key
         }
         response = requests.put(contract_dns, json=json)
-        print(f"CONTRACT::ADD_ACCOUNT::{plat_id}::{address}::", response.json())
+        print(f"CONTRACT::ADD_ACCOUNT::{plat_id}::{public_key}::", response.json())
         if response.status_code == 200:
             return response.json()
         else:
@@ -70,6 +73,9 @@ class Solana(object):
         
     @staticmethod
     def update_permission(plat_id, public_key, permissions):
+        '''
+            This method is *deprecated*. Call using Frontend
+        '''
         contract_dns = f"{settings.CONTRACT_SERVICE_DNS}/api/v1/internal/account/permission"
         json = {
             "platId": plat_id,

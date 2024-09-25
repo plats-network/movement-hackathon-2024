@@ -49,40 +49,44 @@ class UserService(object):
     @staticmethod
     async def get_user(plat_id: str):
         user = mUser.get_item_with({"plat_id": plat_id})
-        # except ObjectId
-        except_list = ['_id', 'public_key', 'plat_id', 'address', 'date_created', 'date_updated', 'is_new_user']
-        temp_user = py_.clone(user)
-        
         if not user:
-            return None
+            raise HTTPException(status_code=404, detail="User not found")
         
-        # get store_id from solana
-        store_balance, store_volume, store_twitter = Solana.get(plat_id)
+        # get list of store_balance, store_volume, store_twitter
+        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id)
         
         # Log all variables
         print(f"store_balance: {store_balance}")
         print(f"store_volume: {store_volume}")
         print(f"store_twitter: {store_twitter}")
-        # get data from nillion
-        user_info = await Nillion.get_info(plat_id, store_balance, store_volume, store_twitter)
-        try:
-            twitter_name = await Nillion.retrieve(plat_id, 'twitter_name')
-        except:
-            twitter_name = ""
-        user_info['twitter_name'] = twitter_name
-        user_info['plat_id'] = plat_id
-        if user_info:
-            return user_info
-        # if user:
-        #     for key in except_list:
-        #         temp_user.pop(key, None)
+        
+        import asyncio
+        raw_data = await asyncio.gather(
+            *[Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i]) for i in range(len(store_balance))]
+        )
+    
+        raw_balance, raw_volume, raw_twitter = zip(*raw_data)
             
-        #     for key in temp_user:
-        #         value = await Nillion.retrieve(plat_id, key)
-        #         user[key] = value
-        #     user.pop("_id", None)
-        #     return user
-        return {}
+        # Get twitter_name
+        try:
+            twitter_name, twitter_score = await asyncio.gather(
+                Nillion.retrieve(plat_id, 'twitter_name'),
+                Nillion.retrieve(plat_id, 'twitter_score')
+            )
+        except Exception as e:
+            twitter_name = twitter_name if 'twitter_name' in locals() else ""
+            twitter_score = twitter_score if 'twitter_score' in locals() else -1
+        
+        # Remove _id from user
+        user.pop('_id', None)
+        user['twitter_name'] = twitter_name
+        user['twitter_score'] = twitter_score
+        user['balances'] = raw_balance
+        user['volumes'] = raw_volume
+        user['twitters'] = raw_twitter
+        
+        
+        return user
     
     @staticmethod
     def get_user_by_public_key(public_key: str):
@@ -119,7 +123,7 @@ class UserService(object):
             raise HTTPException(status_code=400, detail="Public key already exists")
         
         # add to solana
-        Solana.add_address(plat_id, eoa, public_key)
+        Solana.add_address(plat_id, public_key)
         
         mUser.update(user['_id'], {
             "address": user['address'] + [eoa],
