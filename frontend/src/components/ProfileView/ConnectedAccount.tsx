@@ -77,7 +77,7 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
      
        {
         //  user?.twitter_name !== -1 || user?.twitter_name 
-        typeof user?.twitter_name === 'string' && user?.twitter_name !== -1 && (
+         user?.twitter_name !== -1 && user?.twitter_name && (
           <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
           <div className="flex items-center gap-2">
             <TwitterIcon />
