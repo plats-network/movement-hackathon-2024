@@ -163,6 +163,12 @@ export const sliceAddressWallet = (publicKey: any) => {
 };
 
 
+export const sliceAddressWalletUser = (addressUser: string) => {
+ 
+  const address = addressUser.slice(0, 28) + ".." + addressUser.slice(-4);
+  return address;
+};
+
 export const configureAndSendCurrentTransaction = async (
   transaction: web3.Transaction,
   connection: web3.Connection,
