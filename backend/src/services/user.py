@@ -4,6 +4,7 @@ from .twitter import TwitterService
 from src.services import Nillion
 from src.services.solana_client import Solana
 from fastapi import HTTPException
+from src.libs.nillion_helpers import NillionHelpers
 class UserService(object):
     
     @staticmethod
@@ -72,9 +73,10 @@ class UserService(object):
             
         # Get twitter_name
         try:
+            nillion = NillionHelpers()
             twitter_name, twitter_score = await asyncio.gather(
-                Nillion.retrieve(plat_id, 'twitter_name'),
-                Nillion.retrieve(plat_id, 'twitter_score')
+                nillion.retrieve(user['twitter_name'], 'twitter_name'),
+                nillion.retrieve(user['twitter_score'], 'secret_twitter')
             )
         except Exception as e:
             twitter_name = twitter_name if 'twitter_name' in locals() else ""
