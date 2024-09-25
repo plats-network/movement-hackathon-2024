@@ -41,8 +41,8 @@ async def login(request: Request, plat_id: str):
         response = JSONResponse(content={"msg": "success", "code": 200, "data": {"auth_url": auth_url}})
         
         # Set cookies
-        response.set_cookie(key="request_token", value=oauth.request_token, httponly=True)
-        response.set_cookie(key="plat_id", value=plat_id, httponly=True)
+        # response.set_cookie(key="request_token", value=oauth.request_token, httponly=True)
+        # response.set_cookie(key="plat_id", value=plat_id, httponly=True)
         return response
         
     except tweepy.TweepyException as e:
