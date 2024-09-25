@@ -81,11 +81,13 @@ class PlatAppService(object):
         if app_id not in permissions:
             raise HTTPException(status_code=403, detail="Unauthorized")
         
-        # 3. Compute rank and score
-        # NOTE: store_balance is list, will handle later
+        # 3. Compute rank and score of the master account
+        store_balance = store_balance[0]
+        store_volume = store_volume[0]
+        store_twitter = store_twitter[0]
+        
         store_ids = [store_balance, store_volume, store_twitter]
         
-
         output = await Nillion.compute_rank_score(store_ids)
         
         return output
