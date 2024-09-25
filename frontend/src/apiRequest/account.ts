@@ -11,6 +11,8 @@ const accountApiRequest = {
 
     addTwitter: (platId: string) =>
       http.get(`/twitter/login?plat_id=${platId}`),
+    addNewWallet: (body: any) =>
+      http.put(`/user/address`, body),
 
 };
 

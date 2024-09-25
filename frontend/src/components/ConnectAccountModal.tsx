@@ -7,16 +7,27 @@ import TelegramIcon from "@/assets/TelegramIcon";
 import TwitterIcon from "@/assets/TwitterIcon";
 import WalletIcon from "@/assets/WalletIcom";
 import { LoadingButton } from "@/components/ui/loading-button";
+import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { PublicKey } from "@solana/web3.js";
 
-
-const ConnectAccountModal = ({ platId }: { platId: string }) => {
+const ConnectAccountModal = ({
+  platId,
+  listAddress,
+}: {
+  platId: string;
+  listAddress: any[];
+}) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
+  const { publicKey, disconnect, connect } = useWallet();
+  const [currentPublicKey, setCurrentPublicKey] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingWallet, setIsLoadingWallet] = useState<boolean>(false);
+
   const modalRef = useRef(null);
   const route = useRouter();
   useClickOutside(modalRef, () => setIsOpen(!isOpen));
@@ -36,6 +47,72 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
       setIsLoading(false);
     }
   };
+
+  const handleAddNewWallet = async () => {
+    try {
+      setIsLoadingWallet(true);
+      console.log("publicKey", publicKey?.toBase58());
+      console.log("listAddress", listAddress);
+
+      if (!publicKey) return;
+      if (
+        listAddress.some((address) => currentPublicKey?.toBase58() === address)
+        // currentPublicKey === address
+      ) {
+        toast({
+          className: "z-50 text-white",
+
+          description: "You need change another account to add unique ID",
+        });
+        return;
+      }
+      const data = {
+        public_key: Buffer.from(currentPublicKey.toBytes()).toString("base64"),
+        address: currentPublicKey?.toBase58(),
+      };
+      console.log("🚀 ~ handleAddNewWal ~ data:", data);
+
+      const response = await accountApiRequest.addNewWallet(data);
+      console.log("🚀 ~ handleAddNewWal ~ response:", response);
+      toast({
+        className: "z-50 text-white",
+
+        description: response.payload.msg,
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.log("🚀 ~ handleAddNewWal ~ error:", error);
+      setIsLoadingWallet(false);
+    } finally {
+      setIsLoadingWallet(false);
+    }
+  };
+
+  useEffect(() => {
+    if (publicKey) {
+      setCurrentPublicKey(publicKey); // Convert publicKey to string (base58)
+    } else {
+      setCurrentPublicKey(null); // Xử lý khi không có publicKey (chưa connect)
+    }
+  }, [publicKey]); // Chạy lại khi giá trị publicKey thay đổi
+
+  useEffect(() => {
+    const provider = window.solana;
+
+    if (provider && provider.isPhantom) {
+      provider.on("accountChanged", (newPublickey: PublicKey) => {
+        console.log("New wallet public key:", newPublickey?.toBase58());
+        // Handle the new wallet address
+        setCurrentPublicKey(newPublickey);
+      });
+    }
+
+    return () => {
+      if (provider && provider.isPhantom) {
+        provider.disconnect();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -63,10 +140,14 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
                 </button>
               </div>
               <div className="w-full h-full justify-center flex flex-col gap-4 text-center">
-                {/* <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
+                <LoadingButton
+                  loading={isLoadingWallet}
+                  onClick={handleAddNewWallet}
+                  className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4 h-[56px]  text-white text-base cursor-pointer rounded-xl"
+                >
                   <WalletIcon />
                   <p> Connect your Wallet</p>
-                </button> */}
+                </LoadingButton>
 
                 {/* <button className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl">
                   <GoogleIcon />
@@ -79,7 +160,7 @@ const ConnectAccountModal = ({ platId }: { platId: string }) => {
                 <LoadingButton
                   loading={isLoading}
                   onClick={handleAddTwitterAccount}
-                  className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4  text-white text-base cursor-pointer rounded-xl"
+                  className="flex items-center justify-center gap-2 bg-[#1A1A36] w-full py-4 h-[56px] text-white text-base cursor-pointer rounded-xl"
                 >
                   <TwitterIcon />
                   <p> Continue with twitter</p>

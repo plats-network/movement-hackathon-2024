@@ -107,7 +107,7 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
     }
    
    
-    <ConnectAccountModal platId={user?.plat_id}/>
+    <ConnectAccountModal platId={user?.plat_id} listAddress={user?.address}/>
 
   </div>
     </div>
