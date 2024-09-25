@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, BackgroundTasks
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from starlette.config import Config
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from pydantic import BaseModel
@@ -35,7 +35,16 @@ async def login(request: Request, plat_id: str):
         print("Request token", oauth.request_token)
         request.session['request_token'] = oauth.request_token
         request.session['plat_id'] = plat_id   
-        return ResponseMsg.SUCCESS.to_json(data={"auth_url": auth_url})
+        # set session to response
+        
+        # Create a JSON response object
+        response = JSONResponse(content={"msg": "success", "code": 200, "data": {"auth_url": auth_url}})
+        
+        # Set cookies
+        response.set_cookie(key="request_token", value=oauth.request_token, httponly=True)
+        response.set_cookie(key="plat_id", value=plat_id, httponly=True)
+        return response
+        
     except tweepy.TweepyException as e:
         # print traceback
         print(traceback.format_exc())
