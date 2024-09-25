@@ -33,7 +33,7 @@ class Solana(object):
         
     
     @staticmethod
-    def update(plat_id, public_key, store_balance, store_volume, store_twitter):
+    def update(plat_id, public_key, store_balance, store_volume, store_twitter = None):
         '''
             Update store balance, volume and twitter score for a specific address using its `public_key` and `plat_id` 
         '''

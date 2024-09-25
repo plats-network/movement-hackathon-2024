@@ -70,16 +70,16 @@ export const updateAccount = async (
         const {
             publicKey,
             platId,
-            storeIdTwitter,
             storeIdBalance,
             storeIdVolume,
+            storeIdTwitter,
         } = req.body;
         const data = await updateIdentity(
             publicKey,
             platId,
             storeIdBalance,
-            storeIdTwitter,
             storeIdVolume,
+            storeIdTwitter,
         );
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
