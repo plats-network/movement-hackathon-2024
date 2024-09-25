@@ -25,8 +25,8 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
                  {
             !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-             {Number(data?.balance) >= 0
-                ? '$' + Number(data?.balance).toFixed(1)
+             {Number(data?.balances[0]) >= 0
+                ? '$' + Number(data?.balances[0]).toFixed(1)
                 : "- -"}
             </p>
             )
@@ -39,8 +39,8 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
                 {
             !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-             {Number(data?.volume) >= 0
-                ? '$' + Number(data?.volume).toFixed(1)
+             {Number(data?.volumes[0]) >= 0
+                ? '$' + Number(data?.volumes[0]).toFixed(1)
                 : "- -"}
             </p>
             )
@@ -53,8 +53,8 @@ const YourUnifiedIdProfile = ({ data, isFirstLoad }: { data: any, isFirstLoad: b
            {
             !data ? (<Skeleton className="h-[35px] w-[160px] bg-slate-400"/>) : (
               <p className="text-[40px] font-bold group-hover:text-[#3AE7E7]">
-             {Number(data?.twitter) >= 0
-                ? Number(data?.twitter).toFixed(1)
+             {Number(data?.twitter_score) >= 0
+                ? Number(data?.twitter_score).toFixed(1)
                 : "- -"}
             </p>
             )

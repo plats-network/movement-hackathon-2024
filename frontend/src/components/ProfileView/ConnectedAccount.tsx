@@ -28,11 +28,11 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
       user?.twitter_name || user?.address ? (
         <div className="flex flex-col gap-3">
           {
-             user?.address && (
-              <div className="bg-[#1E2536] flex items-center py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
+             user?.address && user?.address.map((address: string, index: number) =>  (
+              <div key={index} className="bg-[#1E2536] flex items-center py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
               <div className="flex items-center gap-2">
                 <WalletIcon/>
-                <p>{sliceAddressWalletUser(user?.address[0]) }</p>
+                <p>{sliceAddressWalletUser(address) }</p>
               </div>
       
               {/* <div className="flex gap-3">
@@ -43,7 +43,7 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
                 <DeleteIcon />
               </div> */}
             </div>
-             )
+             ))
           }
        
         {/* <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
@@ -76,7 +76,8 @@ const ConnectedAccount = ({user, isFirstLoad}:{user: any, isFirstLoad:boolean}) 
         </div> */}
      
        {
-        user?.twitter_name && (
+        //  user?.twitter_name !== -1 || user?.twitter_name 
+        typeof user?.twitter_name === 'string' && user?.twitter_name !== -1 && (
           <div className="bg-[#1E2536] flex items-center justify-between py-[18px] px-[10px] gap-[20px] rounded-[8px] box-gradient-border-mask">
           <div className="flex items-center gap-2">
             <TwitterIcon />
