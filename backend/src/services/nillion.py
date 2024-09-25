@@ -25,7 +25,7 @@ class Nillion(object):
         # TODO: Store store_id and key(secret_name) to smart contract 
         print("store_id", store_id)
         
-        store_balance, store_volume, store_twitter = Solana.get(plat_id)
+        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id)
         # Logger
         print(f"STORE::GET from solana::{plat_id}::{key}::{value}::", store_balance, store_volume, store_twitter)
         print(f"store_balance: {store_balance}")
@@ -56,7 +56,7 @@ class Nillion(object):
             raise HTTPException(status_code=404, detail="User not found")
         
         # TODO: Retrieve store_id from smart contract using plat_id & key (secret_name)
-        store_balance, store_volume, store_twitter = Solana.get(plat_id)
+        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id)
         
         print(f"RETRIEVE::GET from solana::{plat_id}::{key}::", store_balance, store_volume, store_twitter)
         if key == 'secret_balance':
