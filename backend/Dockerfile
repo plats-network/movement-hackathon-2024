@@ -1,4 +1,4 @@
-FROM python:3.11.10-slim
+FROM python:3.10-slim-buster
 
 # Install build-essential for C++ compiler
 RUN apt-get update && apt-get install -y build-essential
