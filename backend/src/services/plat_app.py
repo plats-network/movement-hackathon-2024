@@ -5,6 +5,7 @@ from src.services.solana_client import Solana
 from src.models import mUser
 from src.models import mPlatApp
 from src.services.nillion import Nillion
+from src.libs.nillion_helpers import NillionHelpers
 class PlatAppService(object):
     
     @staticmethod
@@ -84,9 +85,19 @@ class PlatAppService(object):
         # 3. Compute rank and score of the master account
         store_balance = store_balance[0]
         store_volume = store_volume[0]
-        store_twitter = store_twitter[0]
+        # store_twitter = store_twitter[0]
+        
+        # ìf twitter is empty, then save to nillion 
+        store_twitter = user.get('twitter_score', None)
+        if store_twitter is None:
+            nillion = NillionHelpers()
+            store_twitter = await nillion.store_integer('secret_twitter', 0)
+            
+        # 4. Compute rank and score of the master account
         
         store_ids = [store_balance, store_volume, store_twitter]
+        
+        print(f"PLAT_APP::GET::INFO::{plat_id}", store_balance, store_volume, store_twitter)
         
         output = await Nillion.compute_rank_score(store_ids)
         
