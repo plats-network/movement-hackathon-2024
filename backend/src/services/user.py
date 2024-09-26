@@ -6,6 +6,7 @@ from src.services.solana_client import Solana
 from fastapi import HTTPException
 from src.libs.nillion_helpers import NillionHelpers
 from src.config import settings
+from src.services.indexer import Indexer
 class UserService(object):
     
     @staticmethod
@@ -135,6 +136,9 @@ class UserService(object):
         
         # add to solana
         Solana.add_address(plat_id, public_key)
+        
+        # Indexer
+        Indexer().send_message(plat_id, eoa)
         
         mUser.update(user['_id'], {
             "address": user['address'] + [eoa],
