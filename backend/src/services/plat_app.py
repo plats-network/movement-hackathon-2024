@@ -79,8 +79,8 @@ class PlatAppService(object):
         store_balance, store_volume, store_twitter, permissions = Solana.get(plat_id)
         
         # 2. Verify permission
-        # if app_id not in permissions:
-        #     raise HTTPException(status_code=403, detail="Unauthorized")
+        if app_id not in permissions:
+            raise HTTPException(status_code=403, detail="Unauthorized")
         
         # 3. Compute rank and score of the master account
         store_balance = store_balance[0]

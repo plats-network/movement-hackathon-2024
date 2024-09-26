@@ -3,6 +3,7 @@ import pydash as py_
 from src.config import settings
 import requests
 from src.libs.nillion_helpers import NillionHelpers
+from src.services.solana_client import Solana
 class TwitterService(object):
     
     @staticmethod
@@ -30,3 +31,11 @@ class TwitterService(object):
             'twitter_name': twitter_name
         })
         
+        # update to solana
+        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id=plat_id)
+        store_twitter[0] = twitter_score
+        Solana.update(plat_id=plat_id, public_key=user['public_key'][0], store_balance=store_balance[0], store_volume=store_volume[0], store_twitter=store_twitter[0])
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(TwitterService.save('khaihoang.ID', 'khaifade', 100))
