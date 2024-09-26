@@ -1,5 +1,4 @@
 "use client";
-import authApiRequest from "@/apiRequest/auth";
 import CloseIcon from "@/assets/CloseIcon";
 import GoogleIcon from "@/assets/GoogleIcon";
 import TelegramIcon from "@/assets/TelegramIcon";
@@ -8,122 +7,13 @@ import WalletIcon from "@/assets/WalletIcom";
 import RegisterIdForm from "@/components/RegisterIdForm";
 import WalletButton from "@/components/shared/WalletButton";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { decodeUTF8 } from "tweetnacl-util";
-
 import React, { useState } from "react";
-
-import getProviderPhantom from "@/hooks/getProviderPhantom";
-import { toast } from "@/hooks/use-toast";
+import useLogin from "@/hooks/useLogin";
 
 const LoginPage = () => {
-  const { publicKey } = useWallet();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [authenToken, setAuthenToken] = useState<string>("");
-  const [isConnect, setIsConnect] = useState<boolean>(false);
 
-  const phantomProvider = getProviderPhantom(); // see "Detecting the Provider"
-
-  const handleGetNonce = async () => {
-    try {
-      setIsLoading(true);
-      if (!publicKey) return;
-      // Get nonce
-      const publicKeyWallet = Buffer.from(publicKey.toBytes()).toString(
-        "base64"
-      );
-      console.log("publickey get Nonce", publicKeyWallet);
-      const responseNonce = await authApiRequest.nonce(
-        encodeURIComponent(publicKeyWallet)
-      );
-
-      // Sign message
-      if (responseNonce) {
-        handleGetSignature(responseNonce.payload.data.nonce);
-      }
-    } catch (error) {
-      setIsLoading(false);
-
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "Connect wallet failed",
-      });
-    }
-  };
-
-  const handleGetSignature = async (nonce: string) => {
-    try {
-      if (!phantomProvider) return;
-      const encodedMessage = decodeUTF8(nonce);
-      const signedMessage = await phantomProvider.signMessage(
-        encodedMessage,
-        "utf8"
-      );
-
-      // verify
-      if (signedMessage) {
-        handleVerifySignature(signedMessage.signature);
-      }
-    } catch (error) {
-      setIsLoading(false);
-
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "Connect wallet failed",
-      });
-    }
-  };
-
-  const handleVerifySignature = async (signature: string) => {
-    try {
-      if (!publicKey) return;
-
-      const data = {
-        public_key: Buffer.from(publicKey.toBytes()).toString("base64"),
-        signature: Buffer.from(signature).toString("base64"),
-      };
-
-      const responseVerify = await authApiRequest.verify(data);
-
-      toast({
-        className: "z-50 text-white",
-        description: responseVerify.payload.msg,
-      });
-      if (responseVerify) {
-        const responseLogin = await authApiRequest.login(
-          responseVerify.payload.data.authen_token
-        );
-
-        if (responseLogin && responseLogin?.payload.code !== 400) {
-          await authApiRequest.auth({
-            accessToken: responseLogin.payload.data.access_token,
-          });
-          toast({
-            className: "z-50 text-white",
-            description: "Login successful",
-          });
-          router.push("/");
-          router.refresh();
-        } else {
-          setAuthenToken(responseVerify.payload.data.authen_token);
-        }
-      }
-    } catch (error) {
-      console.log("🚀 ~ handleVerifySignature ~ error:", error);
-      setIsLoading(false);
-
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "Connect wallet failed",
-      });
-    }
-  };
+  const {authenToken, handleGetNonce, isConnect, isLoading, setIsConnect, currentPublicKey} = useLogin()
 
   return (
     <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white px-10 ">
@@ -167,6 +57,7 @@ const LoginPage = () => {
 
               <div className=" ">
                 <WalletButton
+                 currentPublickey={currentPublicKey}
                   isConnect={isConnect}
                   isLoading={isLoading}
                   handleGetNonce={handleGetNonce}
