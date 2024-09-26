@@ -3,6 +3,7 @@ from src.models import mUser
 from src.services.solana_client import Solana
 from src.config import settings
 from fastapi import HTTPException
+from src.libs.nillion_helpers import NillionHelpers
 class Nillion(object):
     
     
@@ -14,7 +15,6 @@ class Nillion(object):
         user = mUser.get_item_with({"plat_id": plat_id})
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        
         nillion = NillionHelpers()
         public_key = user.get('public_key', [])
         address = user.get('address', [])
@@ -33,9 +33,10 @@ class Nillion(object):
         # 2. Store balance, volume to nillion
         balance_id = await nillion.store_integer('secret_balance', balance)
         volume_id = await nillion.store_integer('secret_volume', volume)
+        twitter_id = await nillion.store_integer('secret_twitter', 0)
         
         # 3. Store balance, volume to solana
-        Solana.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id)
+        Solana.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id, store_twitter=twitter_id)
         
         # 4. Update synced
         synced.append(wallet_addr)
