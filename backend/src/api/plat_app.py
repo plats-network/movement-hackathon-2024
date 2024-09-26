@@ -122,10 +122,9 @@ async def delete_plat_app(app_id: str):
 @router.get('/{app_id}/account')
 async def get_user(app_id: str, plat_id: str):
     try:
-        rank, score = await PlatAppService.get_user(app_id, plat_id)
+        output = await PlatAppService.get_user(app_id, plat_id)
         return ResponseMsg.SUCCESS.to_json(data={
-            "rank": rank,
-            "score": score
+            "output": output,
         })
     
     except HTTPException as http_exc:
