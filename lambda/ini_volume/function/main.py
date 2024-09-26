@@ -91,12 +91,14 @@ def sync(wallet_addr: str, from_block: int, to_block: int):
     return total_volume
 
 
-def add_volume(plat_id: str, asset_symbol: str, volume: int) -> None:
-    # key = f"volume_{asset_symbol}_in_usd"
-    key = "secret_volume"
-
+def update_volume_and_balance(
+    plat_id: str,
+    wallet_addr: str,
+    volume_usd: float,
+    price_in_usd: float
+) -> None:
     # get current volume
-    current_volume = 0
+    secret_volume = 0
     response = requests.get(
         f"{BACKEND_URL}/api/v1/internal/nillion/retrieve",
         headers={
@@ -104,47 +106,20 @@ def add_volume(plat_id: str, asset_symbol: str, volume: int) -> None:
         },
         params={
             "plat_id": plat_id,
-            "key": key
+            "wallet_addr": wallet_addr
         }
     )
     if response.status_code == 200:
         response_json = response.json()
-        current_volume = response_json.get('data').get('value') or 0
-        print("Has current volume: ", current_volume)
+        secret_volume = response_json.get('data').get('secret_volume') or 0
+        print("Has current volume: ", secret_volume)
 
-    current_volume = float(current_volume)
+    secret_volume = float(secret_volume)
 
     # add new volume
-    new_volume: float = abs(current_volume) + abs(volume)
+    new_volume: float = abs(secret_volume) + abs(volume_usd)
 
-    # store new value
-    response = requests.post(
-        f"{BACKEND_URL}/api/v1/internal/nillion/store",
-        headers={
-            "accept": "application/json",
-            "Content-Type": "application/json"
-        },
-        json={
-            "plat_id": plat_id,
-            "key": key,
-            "value": f"{new_volume}"
-        }
-    )
-    print(f"added volume {plat_id}: ", response.json())
-    return
-
-
-def set_is_new_user(plat_id: str, is_new_user: bool) -> None:
-    is_new_user_str = "true" if is_new_user else "false"
-    url = f"{BACKEND_URL}/api/v1/internal/nillion/user?plat_id={plat_id}&is_new_user={is_new_user_str}"
-    payload = {}
-    headers = {'accept': 'application/json'}
-    response = requests.request("POST", url, headers=headers, data=payload)
-    print("Set is_new_user: ", response.json())
-    return
-
-
-def update_balance(plat_id: str, wallet_addr: str, price_in_usd: float):
+    # new balance
     url = "https://api.devnet.solana.com"
     payload = json.dumps({
         "jsonrpc": "2.0",
@@ -161,43 +136,32 @@ def update_balance(plat_id: str, wallet_addr: str, price_in_usd: float):
     print("display_balance_sol: ", display_balance_sol)
     balance_usd: float = display_balance_sol * price_in_usd
     print("balance_usd: ", balance_usd)
-    # update new balance
+
+    # store new value
+    new_value = {
+        "plat_id": plat_id,
+        "wallet_addr": wallet_addr,
+        "secret_volume": new_volume,
+        "secret_balance": balance_usd
+    }
     response = requests.post(
         f"{BACKEND_URL}/api/v1/internal/nillion/store",
         headers={
             "accept": "application/json",
             "Content-Type": "application/json"
         },
-        json={
-            "plat_id": plat_id,
-            "key": "secret_balance",
-            "value": f"{balance_usd}"
-        }
+        json=new_value
     )
-    print(f"update balance {plat_id}: ", response.json())
+    print(f"updated volume & balance {plat_id}: {new_value}", response.json())
     return
 
-# def main():
-#     plat_id = "odinhoang"
-#     my_addr = "H3xebErnGPc5JsFyjaDGYh4MN3rH1VBEzxsWu1bf5ryz"
-#     from_block = 325635587
-#     to_block = 325684254
-#     # get volume
-#     volume = sync(wallet_addr=my_addr, from_block=from_block, to_block=to_block)
-#     # add volume
-#     add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volume)
-#     return
-
-
-# main()
 
 def main(event, context):
     print("Event: ", event)
     print("Context: ", event)
     payload = json.loads(event.get("Records")[0].get("body"))
     plat_id = payload.get("plat_id")
-    # call set is_new_user to False
-    set_is_new_user(plat_id=plat_id, is_new_user=False)
+
     try:
         wallet_addr = payload.get("wallet_addr")
         from_block = payload.get("from_block")
@@ -209,12 +173,13 @@ def main(event, context):
         print("volume sol: ", volume)
         volumne_usd = usd_price * volume
         print("volume usd: ", volumne_usd)
-        # add volume
-        add_volume(plat_id=plat_id, asset_symbol="SOL", volume=volumne_usd)
-        # update_balance
-        update_balance(plat_id=plat_id, wallet_addr=wallet_addr, price_in_usd=usd_price)
-
+        # update_volume_and_balance
+        update_volume_and_balance(
+            plat_id=plat_id,
+            wallet_addr=wallet_addr,
+            volume_usd=volumne_usd,
+            price_in_usd=usd_price
+        )
     except Exception:
         traceback.print_exc()
-        set_is_new_user(plat_id=plat_id, is_new_user=True)
     return
