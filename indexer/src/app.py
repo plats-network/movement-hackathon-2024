@@ -152,10 +152,10 @@ class TransactionIndexer(object):
     @Decorator.cache_filter(timeout=10, is_class=True, include_null=True)
     def _get_plat_id(self, wallet_addr: str) -> str:
         url = f"{Conf.BACKEND_URL}/api/v1/internal/nillion/user"
-        params = {"address": wallet_addr}
+        params = {"wallet_addr": wallet_addr}
         headers = {"accept": "application/json"}
 
-        response = requests.get(url, headers=headers, params=params)
+        response = requests.post(url, headers=headers, params=params)
 
         if response.status_code != 200:
             # Print error message
