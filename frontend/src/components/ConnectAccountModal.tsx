@@ -9,24 +9,29 @@ import WalletIcon from "@/assets/WalletIcom";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import { PublicKey } from "@solana/web3.js";
+import React, { useRef, useState } from "react";
+
+
+
 
 const ConnectAccountModal = ({
   platId,
   listAddress,
+  currentPublicKey
 }: {
   platId: string;
   listAddress: any[];
+  currentPublicKey: any
 }) => {
+
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const { publicKey } = useWallet();
-  const { publicKey, disconnect, connect } = useWallet();
-  const [currentPublicKey, setCurrentPublicKey] = useState<any>(null);
+ 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState<boolean>(false);
+
+   
 
   const modalRef = useRef(null);
   const route = useRouter();
@@ -51,10 +56,10 @@ const ConnectAccountModal = ({
   const handleAddNewWallet = async () => {
     try {
       setIsLoadingWallet(true);
-      console.log("publicKey", publicKey?.toBase58());
+      console.log("publicKey", currentPublicKey?.toBase58());
       console.log("listAddress", listAddress);
 
-      if (!publicKey) return;
+      if (!currentPublicKey) return;
       if (
         listAddress.some((address) => currentPublicKey?.toBase58() === address)
         // currentPublicKey === address
@@ -88,31 +93,7 @@ const ConnectAccountModal = ({
     }
   };
 
-  useEffect(() => {
-    if (publicKey) {
-      setCurrentPublicKey(publicKey); // Convert publicKey to string (base58)
-    } else {
-      setCurrentPublicKey(null); // Xử lý khi không có publicKey (chưa connect)
-    }
-  }, [publicKey]); // Chạy lại khi giá trị publicKey thay đổi
 
-  useEffect(() => {
-    const provider = window.solana;
-
-    if (provider && provider.isPhantom) {
-      provider.on("accountChanged", (newPublickey: PublicKey) => {
-        console.log("New wallet public key:", newPublickey?.toBase58());
-        // Handle the new wallet address
-        setCurrentPublicKey(newPublickey);
-      });
-    }
-
-    return () => {
-      if (provider && provider.isPhantom) {
-        provider.disconnect();
-      }
-    };
-  }, []);
 
   return (
     <>
@@ -134,7 +115,7 @@ const ConnectAccountModal = ({
               className="relative  shadow-lg flex flex-col gap-8 "
             >
               <div className="flex items-center justify-between">
-                <p className="text-base font-semibold">Connect your account</p>
+                <p className="text-base font-semibold">Connect your account </p>
                 <button onClick={() => setIsOpen(false)}>
                   <CloseIcon />
                 </button>
