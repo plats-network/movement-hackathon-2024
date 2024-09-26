@@ -5,6 +5,7 @@ from src.services import Nillion
 from src.services.solana_client import Solana
 from fastapi import HTTPException
 from src.libs.nillion_helpers import NillionHelpers
+from src.config import settings
 class UserService(object):
     
     @staticmethod
@@ -72,8 +73,8 @@ class UserService(object):
         twitters = []
         for i in range(len(store_balance)):
             balance, volume, twitter = await Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i])
-            balances.append(balance)
-            volumes.append(volume)
+            balances.append(balance / settings.NILLION_MULTIPLIER)
+            volumes.append(volume / settings.NILLION_MULTIPLIER)
             twitters.append(twitter)
             
         # Get twitter_name
