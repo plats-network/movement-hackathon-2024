@@ -97,17 +97,46 @@ class PlatAppService(object):
         
         store_ids = [store_balance, store_volume, store_twitter]
         
+        party_name, program_id = await nillion.init_rank_program()
+        
         print(f"PLAT_APP::GET::INFO::{plat_id}", store_balance, store_volume, store_twitter)
         
-        output = await Nillion.compute_rank_score(store_ids)
+        output = await nillion.compute_rank(party_name, program_id, store_ids)
         
         return output
         
         
         
+async def test():
+    nillion = NillionHelpers()
+    party_name, program_id = await nillion.init_rank_program()
+    store_volume = await nillion.store_integer('secret_volume', 98)
+    store_balance = await nillion.store_integer('secret_balance', 1923)
+    store_twitter = await nillion.store_integer('secret_twitter', 90092)
+    store_ids = [store_balance, store_volume, store_twitter]
+    
+    # GET DATA
+    store_balance = await nillion.retrieve(store_balance, 'secret_balance')
+    store_volume = await nillion.retrieve(store_volume, 'secret_volume')
+    store_twitter = await nillion.retrieve(store_twitter, 'secret_twitter')
+    
+    print("store_balance", store_balance)
+    print("store_volume", store_volume)
+    print("store_twitter", store_twitter)
+    
+    print("store_ids", store_ids)
+    output = await nillion.compute_rank(party_name, program_id, store_ids)
+    return output        
         
-            
-            
+if __name__ == '__main__':
+    try:
+        import asyncio
+        asyncio.run(test())
+        
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        raise e
         
     
         

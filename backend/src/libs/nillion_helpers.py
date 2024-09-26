@@ -281,25 +281,25 @@ class NillionHelpers:
     async def compute_rank(self, party_name, program_id, store_ids: list):
         try:
             # Create a secret
-            stored_secret = nillion.NadaValues(
-                {
-                    "threshold_trade": nillion.Integer(self.threshold_trade),
-                    "threshold_whale": nillion.Integer(self.threshold_whale),
-                    "threshold_kol": nillion.Integer(self.threshold_kol),
-                }
-            )
-            receipt_store = await get_quote_and_pay(
-                self.client,
-                nillion.Operation.store_values(stored_secret, ttl_days=1),
-                self.payments_wallet,
-                self.payments_client,
-                self.cluster_id,
-            )
-            # Store a secret
-            store_id = await self.client.store_values(
-                self.cluster_id, stored_secret, self.permissions, receipt_store
-            )
-            print("Stored secret. store_id:", store_id)
+            # stored_secret = nillion.NadaValues(
+            #     {
+            #         "secret_volume": nillion.SecretInteger(0),
+            #         "secret_balance": nillion.SecretInteger(0),
+            #         "secret_twitter": nillion.SecretInteger(0),
+            #     }
+            # )
+            # receipt_store = await get_quote_and_pay(
+            #     self.client,
+            #     nillion.Operation.store_values(stored_secret, ttl_days=1),
+            #     self.payments_wallet,
+            #     self.payments_client,
+            #     self.cluster_id,
+            # )
+            # # Store a secret
+            # store_id = await self.client.store_values(
+            #     self.cluster_id, stored_secret, self.permissions, receipt_store
+            # )
+            # print("Stored secret. store_id:", store_id)
             # Bind the parties in the computation to the client to set input and output parties
             compute_bindings = nillion.ProgramBindings(program_id)
             compute_bindings.add_input_party(party_name, self.client.party_id)
@@ -308,7 +308,11 @@ class NillionHelpers:
             print(f"Computing using program {program_id}")
             # print(f"Use secret store_id: {store_id}")
 
-            computation_time_secrets = nillion.NadaValues({})
+            computation_time_secrets = nillion.NadaValues({
+                    "threshold_trade": nillion.SecretInteger(self.threshold_trade),
+                    "threshold_whale": nillion.SecretInteger(self.threshold_whale),
+                    "threshold_kol": nillion.SecretInteger(self.threshold_kol),
+                })
             # Pay for the compute
             receipt_compute = await get_quote_and_pay(
                 self.client,
@@ -323,7 +327,7 @@ class NillionHelpers:
             compute_id = await self.client.compute(
                 self.cluster_id,
                 compute_bindings,
-                [store_id] + store_ids,
+                store_ids,
                 computation_time_secrets,
                 receipt_compute,
             )
