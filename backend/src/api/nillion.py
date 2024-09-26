@@ -63,20 +63,15 @@ def check_synced(plat_id: str = "khaihoang", wallet_addr: str = "GJeggjDKerwUaFp
         return HTTPException(status_code=500, detail=str(e))
 
 @router.post('/user')
-def update_user(plat_id: str, is_new_user: bool):
+def update_user(wallet_addr: str = "GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB"):
     try:
-        UserService.update_user_info(plat_id, {"is_new_user": is_new_user})
-        return ResponseMsg.SUCCESS.to_json(data={})
+        data = UserService.check_register(wallet_addr)
+        return ResponseMsg.SUCCESS.to_json(data={
+            "plat_id": data
+        })
+    
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
         return ResponseMsg.ERROR.to_json(msg=str(e))
     
-
-@router.post('/rank')
-async def rank():
-    try:
-        data = await Nillion.rank()
-        return ResponseMsg.SUCCESS.to_json(data=data)
-        
-    except Exception as e:
-        logger.error(e)
-        return ResponseMsg.ERROR.to_json(msg=str(e))

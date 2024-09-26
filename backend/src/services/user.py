@@ -11,14 +11,7 @@ class UserService(object):
     def check_register(address: str):
         # filter User in db has address array contains address
         user = mUser.get_item_with({"address": {"$elemMatch": {"$eq": address}}})
-        if user:
-            return {
-                "plat_id": user['plat_id'],
-                "address": user['address'],
-                "is_new_user": user['is_new_user']
-            }
-        return None
-    
+        return user['plat_id'] if user else None
     
     @staticmethod
     def check_synced(plat_id: str, wallet_addr: str):
