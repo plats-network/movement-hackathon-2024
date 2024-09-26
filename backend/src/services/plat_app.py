@@ -100,9 +100,10 @@ class PlatAppService(object):
         party_name, program_id = await nillion.init_rank_program()
         
         print(f"PLAT_APP::GET::INFO::{plat_id}", store_balance, store_volume, store_twitter)
-        
-        output = await nillion.compute_rank(party_name, program_id, store_ids)
-        
+        try:
+            output = await nillion.compute_rank(party_name, program_id, store_ids)
+        except:
+            print("ERROR::PLAT_APP::GET::INFO::", traceback.format_exc())
         return output
         
         
