@@ -36,14 +36,25 @@ const ConnectedPlatsApp = () => {
         <div className="flex sm:flex-row flex-col gap-2">
   
           {
-  data?.payload?.data?.plat_apps.map((plat: any, index: number) => (
-    <div key={index} className="group sm:max-w-[251px] w-full flex items-center justify-center gap-2 text-center py-[42px]  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
-      <PlatsAppLogo />
-      <p className="text-[17px] text-[#B7B4BB] group-hover:bg-gradient-to-r from-[#3AE7E7] to-[#8737E9] group-hover:text-transparent group-hover:bg-clip-text">
-        {plat.app_name || `Plats App 0${index + 1}`}
-      </p>
-    </div>
-  ))
+     data ? (
+      data?.payload?.data?.plat_apps.map((plat: any, index: number) => (
+        <div key={index} className="group sm:max-w-[251px] w-full flex items-center justify-center gap-2 text-center py-[42px]  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
+          <PlatsAppLogo />
+          <p className="text-[17px] text-[#B7B4BB] group-hover:bg-gradient-to-r from-[#3AE7E7] to-[#8737E9] group-hover:text-transparent group-hover:bg-clip-text">
+            {plat.app_name || `Plats App 0${index + 1}`}
+          </p>
+        </div>
+      ))
+     ) : (
+      PLATAPPS.map((plat: any, index: number) => (
+        <div key={index} className="group sm:max-w-[251px] w-full flex items-center justify-center gap-2 text-center py-[42px]  bg-[#1A1A36] hover:bg-[#060625] cursor-pointer rounded-[12px]">
+          <PlatsAppLogo />
+          <p className="text-[17px] text-[#B7B4BB] group-hover:bg-gradient-to-r from-[#3AE7E7] to-[#8737E9] group-hover:text-transparent group-hover:bg-clip-text">
+            {`Plats App 0${index + 1}`}
+          </p>
+        </div>
+      ))
+     )
 }
           
         </div>
@@ -53,3 +64,5 @@ const ConnectedPlatsApp = () => {
 };
 
 export default ConnectedPlatsApp;
+
+const PLATAPPS = [1,2,3]
