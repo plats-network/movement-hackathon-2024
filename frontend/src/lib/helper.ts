@@ -187,3 +187,11 @@ export const configureAndSendCurrentTransaction = async (
   });
   return signature;
 };
+
+
+export const sumBalances = (arr: any[]) => {
+  return arr.reduce((total, num) => {
+    const roundedNum = Number(num) < 0 ? 0 : Number(num);
+    return total + roundedNum;
+  }, 0);
+};
