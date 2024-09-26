@@ -73,20 +73,6 @@ class TransactionIndexer(object):
                     if not plat_id:
                         continue
 
-                    # check if is new user
-                    is_new_user = self._check_is_new_user(signer_addr)
-                    if is_new_user:
-                        print("New User: ", plat_id, signer_addr)
-                        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol) or self.symbol_to_latest_price[self.chain_base_asset_symbol]
-                        queue_msg = {
-                            "plat_id": plat_id,
-                            "wallet_addr": signer_addr,
-                            "from_block": block_num - 1_500_000,
-                            "to_block": block_num,
-                            "usd_price": f"{price_in_usd}"
-                        }
-                        self._send_msg_to_queue(queue_msg)
-
                     print("signatures: ", signatures)
                     print("signer_addr: ", signer_addr)
                     # get base token volume (SOL)
@@ -101,14 +87,12 @@ class TransactionIndexer(object):
                     print(total_transaction_volume)
                     # add volume
                     try:
-                        self._add_volume(
+                        self._update_volume_and_balance(
                             plat_id=plat_id,
-                            asset_symbol=self.chain_base_asset_symbol,
-                            volume=total_transaction_volume
-                        )
-                        self._update_balance(
-                            plat_id=plat_id,
-                            balance_sol=abs(post_balance[0])
+                            wallet_addr=signer_addr,
+                            volume=total_transaction_volume,
+                            balance=abs(post_balance[0]),
+                            asset_symbol=self.chain_base_asset_symbol
                         )
                     except Exception:
                         traceback.print_exc()
@@ -182,28 +166,16 @@ class TransactionIndexer(object):
         plat_id = response_json.get('data').get('plat_id') or ""
         return plat_id
 
-    def _check_is_new_user(self, wallet_addr: str) -> bool:
-        url = f"{Conf.BACKEND_URL}/api/v1/internal/nillion/user"
-        params = {"address": wallet_addr}
-        headers = {"accept": "application/json"}
-
-        response = requests.get(url, headers=headers, params=params)
-
-        if response.status_code != 200:
-            # Print error message
-            print(f"Not Plat User: {response.status_code}, {response.text}")
-            return ""
-        # Print the response content
-        response_json = response.json()
-        is_new_user = response_json.get('data').get('is_new_user') or False
-        return is_new_user
-
-    def _add_volume(self, plat_id: str, asset_symbol: str, volume: int) -> None:
-        # key = f"volume_{asset_symbol}_in_usd"
-        key = "secret_volume"
-
+    def _update_volume_and_balance(
+        self,
+        plat_id: str,
+        wallet_addr: str,
+        volume: int,
+        balance: int,
+        asset_symbol: str = "SOL"
+    ) -> None:
         # get current volume
-        current_volume = 0
+        secret_volume = 0
         response = requests.get(
             f"{Conf.BACKEND_URL}/api/v1/internal/nillion/retrieve",
             headers={
@@ -211,68 +183,44 @@ class TransactionIndexer(object):
             },
             params={
                 "plat_id": plat_id,
-                "key": key
+                "wallet_addr": wallet_addr
             }
         )
         if response.status_code == 200:
             response_json = response.json()
-            current_volume = response_json.get('data').get('value') or 0
-            print("Has current volume: ", current_volume)
+            secret_volume = response_json.get('data').get('secret_volume') or 0
+            print("Has current volume: ", secret_volume)
 
-        current_volume = float(current_volume)
+        secret_volume = float(secret_volume)
+
+        # price in usd
+        price_in_usd = self._get_price_by_asset(asset_symbol)
 
         # asset to usd
-        price_in_usd = self._get_price_by_asset(asset_symbol)
         display_asset_volume: float = volume * 10 ** (-1 * self.chain_base_asset_decimals)
         display_asset_in_usd_volume: float = display_asset_volume * price_in_usd
 
         # add new volume
-        new_volume: float = abs(current_volume) + abs(display_asset_in_usd_volume)
+        new_volume: float = abs(secret_volume) + abs(display_asset_in_usd_volume)
+
+        # new balance
+        display_balance_sol: float = balance * 10 ** (-1 * self.chain_base_asset_decimals)
+        balance_usd: float = display_balance_sol * price_in_usd
 
         # store new value
+        new_value = {
+            "plat_id": plat_id,
+            "wallet_addr": wallet_addr,
+            "secret_volume": new_volume,
+            "secret_balance": balance_usd
+        }
         response = requests.post(
             f"{Conf.BACKEND_URL}/api/v1/internal/nillion/store",
             headers={
                 "accept": "application/json",
                 "Content-Type": "application/json"
             },
-            json={
-                "plat_id": plat_id,
-                "key": key,
-                "value": f"{new_volume}"
-            }
+            json=new_value
         )
-        print(f"added volume {plat_id}: ", response.json())
-        return
-
-    def _send_msg_to_queue(self, msg: dict) -> None:
-        print("send_msg_to_queue: ", msg)
-        response = self.sqs.send_message(
-            QueueUrl=Conf.SQS_QUEUE_URL,
-            DelaySeconds=10,
-            MessageAttributes={},
-            MessageBody=json.dumps(msg)
-        )
-        print("sended: ", response)
-        return
-
-    def _update_balance(self, plat_id: str, balance_sol: int):
-        price_in_usd = self._get_price_by_asset(self.chain_base_asset_symbol) or self.symbol_to_latest_price[self.chain_base_asset_symbol]
-        display_balance_sol: float = balance_sol * 10 ** (-1 * self.chain_base_asset_decimals)
-        balance_usd: float = display_balance_sol * price_in_usd
-        print("balance_usd: ", balance_usd)
-        # update new balance
-        response = requests.post(
-            f"{Conf.BACKEND_URL}/api/v1/internal/nillion/store",
-            headers={
-                "accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            json={
-                "plat_id": plat_id,
-                "key": "secret_balance",
-                "value": f"{balance_usd}"
-            }
-        )
-        print(f"update balance {plat_id}: ", response.json())
+        print(f"updated volume & balance {plat_id}: {new_value}", response.json())
         return
