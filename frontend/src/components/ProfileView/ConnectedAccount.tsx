@@ -5,8 +5,10 @@ import TwitterIcon from "@/assets/TwitterIcon";
 import WalletIcon from "@/assets/WalletIcom";
 import ConnectAccountModal from "@/components/ConnectAccountModal";
 import { sliceAddressWallet, sliceAddressWalletUser } from "@/lib/helper";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const ConnectedAccount = ({
   user,
@@ -15,6 +17,37 @@ const ConnectedAccount = ({
   user: any;
   isFirstLoad: boolean;
 }) => {
+
+  const { publicKey } = useWallet(); // Get the current public key from the wallet adapter
+
+  const [currentPublicKey, setCurrentPublicKey] = useState<any>(null)
+    useEffect(() => {
+    if (publicKey) {
+      console.log("🚀 ~ useEffect ~ publicKey:", publicKey.toBase58())
+      setCurrentPublicKey(publicKey); // Convert publicKey to string (base58)
+    } else {
+      setCurrentPublicKey(null); // Xử lý khi không có publicKey (chưa connect)
+    }
+  }, [publicKey]); // Chạy lại khi giá trị publicKey thay đổi
+
+  useEffect(() => {
+    const provider = window.solana;
+
+    if (provider && provider.isPhantom) {
+      provider.on("accountChanged", (newPublickey: PublicKey) => {
+        console.log("New wallet public key:", newPublickey?.toBase58());
+        // Handle the new wallet address
+        setCurrentPublicKey(newPublickey);
+      });
+    }
+
+    return () => {
+      if (provider && provider.isPhantom) {
+        provider.disconnect();
+      }
+    };
+  }, []);
+
   return (
     <div className="relative w-full z-10  lg:max-w-[455px]">
       <div
@@ -89,6 +122,7 @@ const ConnectedAccount = ({
         <ConnectAccountModal
           platId={user?.plat_id}
           listAddress={user?.address}
+          currentPublicKey={currentPublicKey}
         />
       </div>
     </div>
