@@ -19,7 +19,7 @@ resource "aws_lambda_function" "ini_volume" {
   runtime                        = "python3.11"
   skip_destroy                   = false
   source_code_hash               = data.archive_file.func_zip.output_base64sha256
-  timeout                        = 300
+  timeout                        = 900
   layers                         = [aws_lambda_layer_version.ini_volume_all_layer.arn]
 
   vpc_config {
