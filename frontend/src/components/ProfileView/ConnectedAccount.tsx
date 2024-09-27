@@ -41,11 +41,7 @@ const ConnectedAccount = ({
       });
     }
 
-    return () => {
-      if (provider && provider.isPhantom) {
-        provider.disconnect();
-      }
-    };
+   
   }, []);
 
   return (

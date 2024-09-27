@@ -137,11 +137,7 @@ const useLogin = () => {
       });
     }
 
-    return () => {
-      if (provider && provider.isPhantom) {
-        provider.disconnect();
-      }
-    };
+   
   }, []);
   return {
     isLoading,
