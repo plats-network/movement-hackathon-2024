@@ -1,82 +1,121 @@
 {
-  "address": "9HXYNdRGdKDAe7nK5ahRRjyhw6bi3tzifiC7RsdGTW1r",
+  "address": "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
   "metadata": {
-    "name": "counter",
+    "name": "plats_id",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "increment",
+      "name": "add_identity",
       "discriminator": [
-        11,
-        18,
+        212,
+        100,
         104,
-        9,
-        104,
-        174,
-        59,
-        33
+        34,
+        15,
+        136,
+        248,
+        225
       ],
       "accounts": [
         {
-          "name": "counter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initialize",
-      "discriminator": [
-        175,
-        175,
-        109,
-        31,
-        13,
-        152,
-        155,
-        237
-      ],
-      "accounts": [
-        {
-          "name": "user",
+          "name": "signer",
           "writable": true,
           "signer": true
         },
         {
-          "name": "counter",
+          "name": "identity",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  99,
-                  111,
-                  117,
+                  105,
+                  100,
+                  101,
                   110,
                   116,
-                  101,
-                  114
+                  105,
+                  116,
+                  121
                 ]
+              },
+              {
+                "kind": "arg",
+                "path": "name_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name_id",
+          "type": "string"
+        },
+        {
+          "name": "store_ids",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "secret_names",
+          "type": {
+            "vec": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "add_permissions",
+      "discriminator": [
+        104,
+        43,
+        218,
+        66,
+        174,
+        89,
+        7,
+        143
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "name_id"
               }
             ]
           }
@@ -86,37 +125,401 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "name_id",
+          "type": "string"
+        },
+        {
+          "name": "app_ids",
+          "type": {
+            "vec": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "register_identity",
+      "discriminator": [
+        164,
+        118,
+        227,
+        177,
+        47,
+        176,
+        187,
+        248
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "name_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "master_owner"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name_id",
+          "type": "string"
+        },
+        {
+          "name": "store_ids",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "secret_names",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "revoke_permissions",
+      "discriminator": [
+        115,
+        59,
+        136,
+        227,
+        198,
+        42,
+        189,
+        236
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "name_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name_id",
+          "type": "string"
+        },
+        {
+          "name": "app_ids",
+          "type": {
+            "vec": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_identity",
+      "discriminator": [
+        130,
+        54,
+        88,
+        104,
+        222,
+        124,
+        238,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "identity",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "name_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name_id",
+          "type": "string"
+        },
+        {
+          "name": "store_ids",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "secret_names",
+          "type": {
+            "vec": "string"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
     {
-      "name": "Counter",
+      "name": "Identity",
       "discriminator": [
-        255,
+        58,
+        132,
+        5,
+        12,
         176,
-        4,
-        245,
-        188,
-        253,
-        124,
-        25
+        164,
+        85,
+        112
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "IdWrong",
+      "msg": "Id is mismatch"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidType",
+      "msg": "Get invalid type"
+    },
+    {
+      "code": 6002,
+      "name": "IdentityIsExisted",
+      "msg": "Id is existed"
+    },
+    {
+      "code": 6003,
+      "name": "PrivacyInfoNotSupport",
+      "msg": "Privacy Info Not Support"
+    },
+    {
+      "code": 6004,
+      "name": "AccountIsNotRegister",
+      "msg": "Account is not registered ID"
+    },
+    {
+      "code": 6005,
+      "name": "AccountExisted",
+      "msg": "Account is existing"
+    },
+    {
+      "code": 6006,
+      "name": "AppIdNotFound",
+      "msg": "App Id not found"
+    },
+    {
+      "code": 6007,
+      "name": "NotMasterOwner",
+      "msg": "Not master owner"
     }
   ],
   "types": [
     {
-      "name": "Counter",
+      "name": "Identity",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "count",
-            "type": "u64"
+            "name": "master_owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "name_id",
+            "type": "string"
+          },
+          {
+            "name": "slave_accounts",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "balance_privacy",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PrivacyBalanceInfo"
+                }
+              }
+            }
+          },
+          {
+            "name": "volume_privacy",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PrivacyVolumeInfo"
+                }
+              }
+            }
+          },
+          {
+            "name": "twitter_privacy",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "PrivacyTwitterInfo"
+                }
+              }
+            }
+          },
+          {
+            "name": "permissions",
+            "type": {
+              "vec": "string"
+            }
           },
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrivacyBalanceInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "store_id",
+            "type": "string"
+          },
+          {
+            "name": "secret_name",
+            "type": "string"
+          },
+          {
+            "name": "type_info",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrivacyTwitterInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "store_id",
+            "type": "string"
+          },
+          {
+            "name": "secret_name",
+            "type": "string"
+          },
+          {
+            "name": "type_info",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrivacyVolumeInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "store_id",
+            "type": "string"
+          },
+          {
+            "name": "secret_name",
+            "type": "string"
+          },
+          {
+            "name": "type_info",
+            "type": "string"
           }
         ]
       }

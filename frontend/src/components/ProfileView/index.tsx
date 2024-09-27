@@ -41,7 +41,7 @@ export default function ProfileView() {
               isFirstLoad={isFirstLoad}
             />
 
-            <ConnectedPlatsApp />
+            <ConnectedPlatsApp   platId={data ? data?.payload?.data?.user?.plat_id : ""}/>
           </div>
         </div>
       </div>
