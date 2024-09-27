@@ -16,7 +16,7 @@ const LogoutPage = () => {
   useEffect(() => {
     handleLogout();
   }, [handleLogout]);
-  return <div className="h-[100vh]"></div>;
+  return <div className="h-[100vh] bg-[#08082C]"></div>;
 };
 
 export default LogoutPage;
