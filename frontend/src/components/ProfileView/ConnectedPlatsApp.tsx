@@ -30,7 +30,15 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
   const handleActivePlatApp = async (appId: any) => {
     console.log("platId", platId);
     console.log("appId", appId);
-    if (!publicKey && platId && appId) return;
+    console.log("publicKey", publicKey?.toBase58());
+    if (!platId ) {
+      toast({
+        className: "z-50 text-white",
+        description: "platId not found",
+      });
+      return
+    }
+   
 
     try {
       const transaction = await program.methods
@@ -65,7 +73,13 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
   const handleUnActivePlatApp = async (appId: any) => {
     console.log("platId", platId);
     console.log("appId", appId);
-    if (!publicKey && platId && appId) return;
+    if (!platId ) {
+      toast({
+        className: "z-50 text-white",
+        description: "platId not found",
+      });
+      return
+    }
 
     try {
       const transaction = await program.methods
