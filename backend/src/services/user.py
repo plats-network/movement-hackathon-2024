@@ -124,6 +124,11 @@ class UserService(object):
     @staticmethod
     def add_address(plat_id: str, eoa: str, public_key: str):
         user = mUser.get_item_with({"plat_id": plat_id})
+        existed_user = mUser.get_item_with({"public_key": { "$elemMatch": {"$eq": public_key}}})
+        
+        if existed_user:
+            raise HTTPException(status_code=400, detail="This address already associated with another user")
+        
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
