@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/plats_id.json`.
  */
 export type PlatsId = {
-  "address": "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
+  "address": "4ASkhwUReTWmvp8aLASbD8ppbcEMBxhcQmGHDbXMh7iN",
   "metadata": {
     "name": "platsId",
     "version": "0.1.0",
@@ -535,8 +535,10 @@ export type PlatsId = {
 
 
 
+
+
 export const IDL: PlatsId = {
-  "address": "3gnANHhWYgGnifv4V2xqmCBmqiDQvJ6xqrey3ciKoUbk",
+  "address": "4ASkhwUReTWmvp8aLASbD8ppbcEMBxhcQmGHDbXMh7iN",
   "metadata": {
     "name": "platsId",
     "version": "0.1.0",
