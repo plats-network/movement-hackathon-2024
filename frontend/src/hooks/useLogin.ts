@@ -1,15 +1,30 @@
 import authApiRequest from "@/apiRequest/auth";
-import getProviderPhantom from "@/hooks/getProviderPhantom";
 import { toast } from "@/hooks/use-toast";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { decodeUTF8 } from "tweetnacl-util";
 
 import React, { useEffect, useState } from "react";
-import { PublicKey } from "@solana/web3.js";
+import { useWallet } from "@manahippo/aptos-wallet-adapter";
+
+declare global {
+    interface Window {
+      pontem?: {
+        signMessage: (params: {
+          address?: boolean;
+          application?: boolean;
+          chainId?: boolean;
+          message: string | Uint8Array;
+          nonce: string;
+        }) => Promise<any>;
+      };
+    }
+  }
+  
+
 
 const useLogin = () => {
-  const { publicKey } = useWallet();
+    const { connected, account, disconnect, wallets, select } = useWallet();
+ 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [authenToken, setAuthenToken] = useState<string>("");
@@ -17,21 +32,21 @@ const useLogin = () => {
   const [currentPublicKey, setCurrentPublicKey] = useState<any>(null);
 
 
-  const phantomProvider = getProviderPhantom(); // see "Detecting the Provider"
-
   const handleGetNonce = async () => {
     try {
       setIsLoading(true);
-      if (!currentPublicKey) return;
-      console.log("currentPublicKey",currentPublicKey.toBase58())
+      if (!account?.publicKey) return;
+      console.log("currentPublicKey",account.publicKey)
       // Get nonce
-      const publicKeyWallet = Buffer.from(currentPublicKey.toBytes()).toString(
+      const publicKeyWallet = Buffer.from(account.publicKey.toString()).toString(
         "base64"
       );
-      console.log("publickey get Nonce", publicKeyWallet);
+      
+      console.log("publickey get Nonce base 64", publicKeyWallet);
       const responseNonce = await authApiRequest.nonce(
         encodeURIComponent(publicKeyWallet)
       );
+      console.log("🚀 ~ handleGetNonce ~ responseNonce:", responseNonce)
 
       // Sign message
       if (responseNonce) {
@@ -49,63 +64,86 @@ const useLogin = () => {
   };
 
   const handleGetSignature = async (nonce: string) => {
-    try {
-      if (!phantomProvider) return;
-      const encodedMessage = decodeUTF8(nonce);
-      const signedMessage = await phantomProvider.signMessage(
-        encodedMessage,
-        "utf8"
-      );
+    // try {
+     
+    // const message = new TextEncoder().encode(nonce);
+    //   const signedMessage = await phantomProvider.signMessage(
+    //     encodedMessage,
+    //     "utf8"
+    //   );
 
-      // verify
-      if (signedMessage) {
-        handleVerifySignature(signedMessage.signature);
+
+    const encodedMessage = decodeUTF8(nonce);
+    console.log("🚀 ~ handleGetSignature ~ message:", encodedMessage)
+
+    if (typeof window !== 'undefined' && window.pontem) {
+        
+          try {
+            const resultMessage = await window?.pontem?.signMessage({
+              address: true,
+              application: true,
+              chainId: true,
+              message: encodedMessage,
+              nonce: nonce,
+            });
+            console.log('Signed Message', resultMessage?.result?.signature );
+
+      //verify
+      if (resultMessage) {
+        handleVerifySignature(resultMessage?.result?.signature);
       }
-    } catch (error) {
-      setIsLoading(false);
+          } catch (e) {
+            console.log('Error', e);
+            setIsLoading(false);
 
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "Connect wallet failed",
-      });
+            toast({
+              variant: "destructive",
+              className: "z-50 text-white",
+              description: "Connect wallet failed",
+            });
+          }
+        
+  
+
+ 
     }
   };
 
   const handleVerifySignature = async (signature: string) => {
     try {
-      if (!currentPublicKey) return;
+      if (!account?.publicKey) return;
 
       const data = {
-        public_key: Buffer.from(currentPublicKey.toBytes()).toString("base64"),
+        public_key: Buffer.from(account.publicKey.toString()).toString("base64"),
         signature: Buffer.from(signature).toString("base64"),
       };
 
       const responseVerify = await authApiRequest.verify(data);
+      console.log("🚀 ~ handleVerifySignature ~ responseVerify:", responseVerify)
 
       toast({
         className: "z-50 text-white",
         description: responseVerify.payload.msg,
       });
-      if (responseVerify) {
-        const responseLogin = await authApiRequest.login(
-          responseVerify.payload.data.authen_token
-        );
+    //   if (responseVerify) {
+    //     const responseLogin = await authApiRequest.login(
+    //       responseVerify.payload.data.authen_token
+    //     );
 
-        if (responseLogin && responseLogin?.payload.code !== 400) {
-          await authApiRequest.auth({
-            accessToken: responseLogin.payload.data.access_token,
-          });
-          toast({
-            className: "z-50 text-white",
-            description: "Login successful",
-          });
-          router.push("/");
-          router.refresh();
-        } else {
-          setAuthenToken(responseVerify.payload.data.authen_token);
-        }
-      }
+    //     if (responseLogin && responseLogin?.payload.code !== 400) {
+    //       await authApiRequest.auth({
+    //         accessToken: responseLogin.payload.data.access_token,
+    //       });
+    //       toast({
+    //         className: "z-50 text-white",
+    //         description: "Login successful",
+    //       });
+    //       router.push("/");
+    //       router.refresh();
+    //     } else {
+    //       setAuthenToken(responseVerify.payload.data.authen_token);
+    //     }
+    //   }
     } catch (error) {
       console.log("🚀 ~ handleVerifySignature ~ error:", error);
       setIsLoading(false);
@@ -118,27 +156,7 @@ const useLogin = () => {
     }
   };
 
-  useEffect(() => {
-    if (publicKey) {
-      setCurrentPublicKey(publicKey); // Convert publicKey to string (base58)
-    } else {
-      setCurrentPublicKey(null); // Xử lý khi không có publicKey (chưa connect)
-    }
-  }, [publicKey]); // Chạy lại khi giá trị publicKey thay đổi
-
-  useEffect(() => {
-    const provider = window.solana;
-
-    if (provider && provider.isPhantom) {
-      provider.on("accountChanged", (newPublickey: PublicKey) => {
-        console.log("New wallet public key:", newPublickey?.toBase58());
-        // Handle the new wallet address
-        setCurrentPublicKey(newPublickey);
-      });
-    }
-
-   
-  }, []);
+ 
   return {
     isLoading,
     isConnect,

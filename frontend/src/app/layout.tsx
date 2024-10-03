@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import SolWalletProvider from "@/providers/SolWalletProvider";
-import "@solana/wallet-adapter-react-ui/styles.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import AppProvider from "@/providers/AppProvider";
 import { cookies } from "next/headers";
+import { AptosProvider } from "@/providers/AptosContext";
+import SuiWalletProvider from "@/providers/SuiWalletProvider";
+
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,15 +30,22 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SolWalletProvider>
-          <AppProvider initialAccessToken={accessToken?.value} user={user}>
+      <AptosProvider>
+        <SuiWalletProvider
+       
+        >
+        <AppProvider initialAccessToken={accessToken?.value} user={user}>
           <Toaster />
           <div className="bg-[url('/background.jpg')] bg-no-repeat bg-cover bg-center">
           {children}
           </div>
         
           </AppProvider>
-       </SolWalletProvider>
+        </SuiWalletProvider>
+
+      </AptosProvider>
+         
+      
       </body>
     </html>
   );

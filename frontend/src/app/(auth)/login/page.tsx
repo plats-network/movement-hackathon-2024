@@ -13,7 +13,7 @@ import useLogin from "@/hooks/useLogin";
 
 const LoginPage = () => {
 
-  const {authenToken, handleGetNonce, isConnect, isLoading, setIsConnect, currentPublicKey} = useLogin()
+  const {authenToken, handleGetNonce, isConnect, isLoading, setIsConnect} = useLogin()
 
   return (
     <div className="h-[100vh] w-full py-[97px] flex items-center justify-center  text-white px-10 ">
@@ -57,7 +57,7 @@ const LoginPage = () => {
 
               <div className=" ">
                 <WalletButton
-                 currentPublickey={currentPublicKey}
+                
                   isConnect={isConnect}
                   isLoading={isLoading}
                   handleGetNonce={handleGetNonce}

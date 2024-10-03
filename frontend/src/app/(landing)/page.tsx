@@ -4,16 +4,14 @@ import WalletIcon from "@/assets/WalletIcom";
 import { cookies } from "next/headers";
 import ProfileView from "@/components/ProfileView";
 import Header from "@/components/shared/Header";
+import ConnectWallet from "@/components/shared/ConnectWallet";
 
 export default function Home() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken");
   return (
     <>
-    <Header/>
-      {accessToken ? (
-        <ProfileView />
-      ) : (
+
         <div className="relative h-[100vh] flex items-center justify-center">
           <div className="absolute bottom-0 left-0">
             <div className="relative md:w-[488px] w-[200px] md:h-[360px] h-[150px]">
@@ -65,7 +63,7 @@ export default function Home() {
             {/* )} */}
           </div>
         </div>
-      )}
+    
     </>
   );
 }
