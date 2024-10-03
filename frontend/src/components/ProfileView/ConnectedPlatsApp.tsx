@@ -5,21 +5,20 @@ import PlatsAppLogo from "@/assets/PlatsAppLogo";
 import useSWR from "swr";
 import platsApiRequest from "@/apiRequest/plats";
 import { useState } from "react";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { getIdentityPDA, program } from "@/anchor/setup";
+
 import { Switch } from "@/components/ui/switch";
-import useProviderConnect from "@/hooks/useProviderConnect";
+
 import { toast } from "@/hooks/use-toast";
 import ActivePlatAppButton from "@/components/shared/ActivePlatAppButton";
 
 const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
-  const { publicKey, sendTransaction } = useWallet();
+ 
   const [isLoading, setIsLoading] = useState(false);
   const [activePlatApps, setActivePlatApps] = useState<string[]>([]);
 
-  const { getProvider } = useProviderConnect();
+ 
 
-  const provider = getProvider();
+
 
   const { data, error } = useSWR("/app", platsApiRequest.app, {
     revalidateOnFocus: false,
@@ -27,89 +26,6 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
   });
   console.log("🚀 ~ ConnectedPlatsApp ~ data:", data?.payload?.data?.plat_apps);
 
-  const handleActivePlatApp = async (appId: any) => {
-    console.log("platId", platId);
-    console.log("appId", appId);
-    console.log("publicKey", publicKey?.toBase58());
-    if (!platId ) {
-      toast({
-        className: "z-50 text-white",
-        description: "platId not found",
-      });
-      return
-    }
-   
-
-    try {
-      const transaction = await program.methods
-        .addPermissions(platId, [appId])
-        .accounts({
-          // @ts-ignore
-          signer: publicKey,
-          identity: getIdentityPDA(platId),
-        })
-        .transaction();
-
-      const transactionSignature = await sendTransaction(
-        transaction,
-        provider.connection
-      );
-      console.log("🚀 ~ onClick ~ transactionSignature:", transactionSignature);
-
-      toast({
-        className: "z-50 text-white",
-        description: "Active plat app successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "Active failed",
-      });
-    }
-  };
-
-  const handleUnActivePlatApp = async (appId: any) => {
-    console.log("platId", platId);
-    console.log("appId", appId);
-    if (!platId ) {
-      toast({
-        className: "z-50 text-white",
-        description: "platId not found",
-      });
-      return
-    }
-
-    try {
-      const transaction = await program.methods
-        .revokePermissions(platId, [appId])
-        .accounts({
-          // @ts-ignore
-          signer: publicKey,
-          identity: getIdentityPDA(platId),
-        })
-        .transaction();
-
-      const transactionSignature = await sendTransaction(
-        transaction,
-        provider.connection
-      );
-      console.log("🚀 ~ onClick ~ transactionSignature:", transactionSignature);
-
-      toast({
-        className: "z-50 text-white",
-        description: "UnActive plat app successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        className: "z-50 text-white",
-        description: "UnActive failed",
-      });
-    }
-  };
 
   return (
     <div className="relative w-full">
@@ -151,8 +67,7 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
                 <div className=" flex gap-3 w-full justify-end items-center pb-3">
                   <ActivePlatAppButton
                     appId={plat.app_id}
-                    handleActivePlatApp={handleActivePlatApp}
-                    handleUnActivePlatApp={handleUnActivePlatApp}
+                   
                   />
                 </div>
               </div>

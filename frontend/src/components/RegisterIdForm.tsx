@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import authApiRequest from "@/apiRequest/auth";
-import { useWallet } from "@solana/wallet-adapter-react";
+
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { LoadingButton } from "@/components/ui/loading-button";
@@ -29,7 +29,7 @@ const formSchema = z.object({
 const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
   const router = useRouter();
 
-  const { publicKey } = useWallet();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // 1. Define your form.
@@ -43,53 +43,53 @@ const RegisterIdForm = ({ authenToken }: { authenToken: string }) => {
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    handleRegister(values.platId);
+    // handleRegister(values.platId);
   }
 
-  const handleRegister = async (platId: string) => {
-    try {
-      setIsLoading(true)
-      if (!authenToken) return;
-      if (!publicKey) return;
+  // const handleRegister = async (platId: string) => {
+  //   try {
+  //     setIsLoading(true)
+  //     if (!authenToken) return;
+  //     if (!publicKey) return;
       
-      const data = {
-        eoa: publicKey?.toBase58(),
-        plat_id: platId+".ID",
-        public_key: Buffer.from(publicKey.toBytes()).toString("base64"),
-      };
+  //     const data = {
+  //       eoa: publicKey?.toBase58(),
+  //       plat_id: platId+".ID",
+  //       public_key: Buffer.from(publicKey.toBytes()).toString("base64"),
+  //     };
 
-      const response = await authApiRequest.register(data, authenToken);
+  //     const response = await authApiRequest.register(data, authenToken);
 
-      toast({
-        className: "z-50 text-white",
-        description: response.payload.msg,
-      });
-      if (response) {
-        const responseLogin = await authApiRequest.login(authenToken);
-        console.log("🚀 ~ handleRegister ~ responseLogin:", responseLogin)
+  //     toast({
+  //       className: "z-50 text-white",
+  //       description: response.payload.msg,
+  //     });
+  //     if (response) {
+  //       const responseLogin = await authApiRequest.login(authenToken);
+  //       console.log("🚀 ~ handleRegister ~ responseLogin:", responseLogin)
      
 
-        await authApiRequest.auth({
-          accessToken: responseLogin.payload.data.access_token,
-        });
-        toast({
-          className: "z-50 text-white",
-          description: "Login successful",
-        });
-        router.push("/");
-        router.refresh();
-      }
-    } catch (error) {
-      setIsLoading(false)
-      console.log("🚀 ~ handleRegister ~ error:", error)
-      toast({
-        variant: "destructive",
-        className:"z-50 text-white",
-        description: "Connect wallet failed",
-      });
+  //       await authApiRequest.auth({
+  //         accessToken: responseLogin.payload.data.access_token,
+  //       });
+  //       toast({
+  //         className: "z-50 text-white",
+  //         description: "Login successful",
+  //       });
+  //       router.push("/");
+  //       router.refresh();
+  //     }
+  //   } catch (error) {
+  //     setIsLoading(false)
+  //     console.log("🚀 ~ handleRegister ~ error:", error)
+  //     toast({
+  //       variant: "destructive",
+  //       className:"z-50 text-white",
+  //       description: "Connect wallet failed",
+  //     });
       
-    } 
-  };
+  //   } 
+  // };
 
   return (
     <div className="w-full h-full text-center flex flex-col gap-[120px] items-center justify-center ">

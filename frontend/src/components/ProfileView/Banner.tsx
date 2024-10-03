@@ -1,6 +1,5 @@
 'use client'
 import { Skeleton } from '@/components/ui/skeleton';
-import { useWallet } from '@solana/wallet-adapter-react';
 import Image from 'next/image'
 import React from 'react'
 
