@@ -1,5 +1,5 @@
 resource "aws_security_group" "ecs" {
-  name        = "plat-fellowship-${var.environment_name}-nillion-ecs"
+  name        = "plat-movement-${var.environment_name}-nillion-ecs"
   description = "ECS Service security group"
   vpc_id      = var.vpc_id
 
@@ -23,7 +23,7 @@ resource "aws_security_group" "ecs" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "nillion"
   }
 }

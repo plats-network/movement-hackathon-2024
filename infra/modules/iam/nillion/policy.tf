@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "ecs_task_execution_policy" {
-  name = "plat-fellowship-${var.environment_name}-nillion-ecs-task-exec"
+  name = "plat-movement-${var.environment_name}-nillion-ecs-task-exec"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -32,7 +32,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" {
 }
 
 resource "aws_iam_policy" "ecs_task_container_policy" {
-  name = "plat-fellowship-${var.environment_name}-nillion-ecs-task-con"
+  name = "plat-movement-${var.environment_name}-nillion-ecs-task-con"
 
   policy = jsonencode({
     Version = "2012-10-17"

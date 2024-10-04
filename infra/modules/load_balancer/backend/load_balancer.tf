@@ -1,5 +1,5 @@
 resource "aws_lb" "load_balancer" {
-  name               = "plat-fellowship-${var.environment_name}-backend"
+  name               = "plat-movement-${var.environment_name}-backend"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.aws_security_group_load_balancer_id]
@@ -20,7 +20,7 @@ resource "aws_lb" "load_balancer" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "backend"
   }
 }

@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "cluster" {
-  name = "plat-fellowship-${var.environment_name}-backend"
+  name = "plat-movement-${var.environment_name}-backend"
 
   setting {
     name  = "containerInsights"

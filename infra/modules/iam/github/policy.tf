@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "github_deployment_policy" {
-  name = "plat-fellowship-github-deployment-policy"
+  name = "plat-movement-github-deployment-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"

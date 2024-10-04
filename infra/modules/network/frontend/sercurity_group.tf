@@ -1,5 +1,5 @@
 resource "aws_security_group" "ecs" {
-  name        = "plat-fellowship-${var.environment_name}-frontend-ecs"
+  name        = "plat-movement-${var.environment_name}-frontend-ecs"
   description = "ECS Service security group"
   vpc_id      = var.vpc_id
 
@@ -22,13 +22,13 @@ resource "aws_security_group" "ecs" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "frontend"
   }
 }
 
 resource "aws_security_group" "elb_sg" {
-  name        = "plat-fellowship-${var.environment_name}-frontend-elb"
+  name        = "plat-movement-${var.environment_name}-frontend-elb"
   description = "ELB security group"
   vpc_id      = var.vpc_id
 
@@ -56,7 +56,7 @@ resource "aws_security_group" "elb_sg" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "frontend"
   }
 }

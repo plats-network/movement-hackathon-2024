@@ -73,7 +73,7 @@ class Settings():
     SOLANA_PROGRAM_ID = os.getenv("SOLANA_PROGRAM_ID")
     CONTRACT_SERVICE_DNS = os.getenv("CONTRACT_SERVICE_DNS")
     
-    SQS_QUEUE_URL = "https://sqs.ap-southeast-1.amazonaws.com/905418230863/plat-fellowship-dev-ini-volume"
+    SQS_QUEUE_URL = "https://sqs.ap-southeast-1.amazonaws.com/905418230863/plat-movement-dev-ini-volume"
     RPC_URL = os.getenv("RPC_URL") or "https://api.devnet.solana.com"
     
     NILLION_MULTIPLIER = int(os.getenv("NILLION_MULTIPLIER") or 1000)

@@ -6,7 +6,7 @@ data "archive_file" "func_zip" {
 }
 # main function
 resource "aws_lambda_function" "ini_volume" {
-  function_name                  = "plat-fellowship-${var.environment_name}-ini-volume"
+  function_name                  = "plat-movement-${var.environment_name}-ini-volume"
   role                           = var.lambda_execution_role_arn
   architectures                  = ["x86_64"]
   description                    = "To Initialize Volume"

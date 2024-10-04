@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_execution_role" {
-  name               = "plat-fellowship-${var.environment_name}-ini-volume-lambda-execution-role"
+  name               = "plat-movement-${var.environment_name}-ini-volume-lambda-execution-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
   managed_policy_arns = [
     aws_iam_policy.cloud_watch_log.arn,

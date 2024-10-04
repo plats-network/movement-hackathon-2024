@@ -16,7 +16,7 @@ from src.extensions import redis_client
 class TransactionIndexer(object):
     def __init__(self) -> None:
         self.sqs = boto3.client('sqs')
-        self.latest_sync_block_key = "plat_fellowship:indexer:latest_sync_block"
+        self.latest_sync_block_key = "plat_movement:indexer:latest_sync_block"
         self.chain_base_asset_symbol = "SOL"
         self.chain_base_asset_decimals = 9
         # get latest block in redis

@@ -1,6 +1,6 @@
 # policy: read-write log
 resource "aws_iam_policy" "cloud_watch_log" {
-  name = "plat-fellowship-${var.environment_name}-ini-volume-cloud-watch-log"
+  name = "plat-movement-${var.environment_name}-ini-volume-cloud-watch-log"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,7 @@ resource "aws_iam_policy" "cloud_watch_log" {
 
 # policy: full sqs
 resource "aws_iam_policy" "sqs_io" {
-  name = "plat-fellowship-${var.environment_name}-ini-volume-sqs-io"
+  name = "plat-movement-${var.environment_name}-ini-volume-sqs-io"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -43,7 +43,7 @@ resource "aws_iam_policy" "sqs_io" {
 
 # policy: full lambda
 resource "aws_iam_policy" "lambda_io" {
-  name = "plat-fellowship-${var.environment_name}-ini-volume-lambda-io"
+  name = "plat-movement-${var.environment_name}-ini-volume-lambda-io"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "lambda_io" {
 }
 # policy: secret manager readonly
 resource "aws_iam_policy" "secret_manager_readonly" {
-  name = "plat-fellowship-${var.environment_name}-ini-volume-secret-manager-readonly"
+  name = "plat-movement-${var.environment_name}-ini-volume-secret-manager-readonly"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -77,7 +77,7 @@ resource "aws_iam_policy" "secret_manager_readonly" {
 }
 # policy: secret manager readonly
 resource "aws_iam_policy" "network_connect" {
-  name = "plat-fellowship-${var.environment_name}-ini-volume-network"
+  name = "plat-movement-${var.environment_name}-ini-volume-network"
 
   policy = jsonencode({
     Version = "2012-10-17"

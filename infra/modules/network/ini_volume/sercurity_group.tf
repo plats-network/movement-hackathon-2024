@@ -1,5 +1,5 @@
 resource "aws_security_group" "lambda" {
-  name        = "plat-fellowship-${var.environment_name}-ini-volume-lambda"
+  name        = "plat-movement-${var.environment_name}-ini-volume-lambda"
   description = "ECS Service security group"
   vpc_id      = var.vpc_id
 
@@ -22,7 +22,7 @@ resource "aws_security_group" "lambda" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "ini-volume-lambda"
   }
 }
