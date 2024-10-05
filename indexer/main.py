@@ -16,4 +16,17 @@ def run_forever():
     return
 
 
+def test_dns():
+    import os
+    import requests
+    from dotenv import load_dotenv
+    load_dotenv()
+    backend_url = os.getenv("BACKEND_URL")
+    url = f"{backend_url}/api/v1/internal/nillion/user?wallet_addr=GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB"
+    headers = {'accept': 'application/json'}
+    response = requests.request("POST", url, headers=headers)
+    print("Check dns result: ", response.text)
+
+
+test_dns()
 run_forever()
