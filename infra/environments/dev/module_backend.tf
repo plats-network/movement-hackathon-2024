@@ -47,7 +47,7 @@ module "backend_ecs" {
   frontend_domain_name            = module.frontend_route_53.record_name
   backend_domain_name             = module.backend_route_53.record_name
   rpc_url                         = var.rpc_url
-  desired_count                   = 0
+  desired_count                   = 1
 }
 
 

@@ -37,7 +37,7 @@ module "frontend_ecs" {
   public_subnet_id                = var.public_subnet_a_id
   target_group_arn                = module.frontend_load_balancer.load_balancer_target_group_arn
   backend_domain_name             = module.backend_route_53.record_name
-  desired_count                   = 0
+  desired_count                   = 1
 }
 
 
