@@ -65,21 +65,24 @@ export const updateAccount = async (req: Request, res: Response) => {
     }
 };
 
-// export const updatePermission = async (
-//     req: Request,
-//     res: Response,
-// ): Promise<void> => {
-//     try {
-//         initializeProgram();
-//         const { publicKey, platId, permissions } = req.body;
-//         const data = await grantPermissions(platId, publicKey, permissions);
+export const grantPermissions = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const { address, platId, permissions } = req.body;
+        const data = await movementClient.grantPermissions(
+            address,
+            platId,
+            permissions,
+        );
 
-//         res.json({ msg: "success", code: 200, data });
-//     } catch (error) {
-//         console.log(error);
-//         res.json({ msg: error, code: 500 }).status(500);
-//     }
-// };
+        res.json({ msg: "success", code: 200, data });
+    } catch (error) {
+        console.log(error);
+        res.json({ msg: error, code: 500 }).status(500);
+    }
+};
 
 export const addAddress = async (req: Request, res: Response) => {
     try {

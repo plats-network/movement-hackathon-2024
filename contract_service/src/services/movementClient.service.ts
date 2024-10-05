@@ -215,5 +215,38 @@ class MovementClient {
         });
         return response.success;
     };
+    grantPermissions = async (
+        address: string,
+        platId: string,
+        appIds: string[],
+    ) => {
+        const accountAddress = this.account.accountAddress;
+        console.log(`Using account: ${accountAddress}`);
+        console.log("\n=== Granting Permissions ===\n");
+
+        const transaction = await this.aptos.transaction.build.simple({
+            sender: accountAddress,
+            data: {
+                function: this.GRANT_PERMISSIONS_FUNCTION,
+                functionArguments: [`${address}`, `${platId}`, appIds],
+            },
+        });
+
+        const signature = this.aptos.transaction.sign({
+            signer: this.account,
+            transaction,
+        });
+
+        const committedTxn = await this.aptos.transaction.submit.simple({
+            transaction,
+            senderAuthenticator: signature,
+        });
+
+        console.log(`Submitted transaction: ${committedTxn.hash}`);
+        const response = await this.aptos.waitForTransaction({
+            transactionHash: committedTxn.hash,
+        });
+        return response.success;
+    };
 }
 export const movementClient = new MovementClient();
