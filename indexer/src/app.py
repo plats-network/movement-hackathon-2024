@@ -1,156 +1,138 @@
-import logging
+from typing import Tuple
 import traceback
-import time
-import json
 
-import boto3
 import requests
-from solana.rpc.api import Client
-from jsonrpcclient import request, parse, Ok
 
-import src.decorators as Decorator
-from src.config import BaseConfig as Conf
 from src.extensions import redis_client
+from src.config import BaseConfig as Conf
+import src.decorators as Decorator
 
 
 class TransactionIndexer(object):
     def __init__(self) -> None:
-        self.sqs = boto3.client('sqs')
-        self.latest_sync_block_key = "plat_movement:indexer:latest_sync_block"
-        self.chain_base_asset_symbol = "SOL"
-        self.chain_base_asset_decimals = 9
+        self.latest_sync_ledger_version = "plat_movement:indexer:latest_sync_ledger_version"
         # get latest block in redis
-        latest_sync_block = redis_client.get(self.latest_sync_block_key)
-        if latest_sync_block:
-            latest_sync_block = int(latest_sync_block) + 1
-        current_block = self._get_current_block()
-        self.start_block = min(latest_sync_block, latest_sync_block) if latest_sync_block else current_block
-
-        self.solana_client: Client = Client(Conf.RPC_URL)
-        self.symbol_to_latest_price = {}
-        '''
-        sample record in DB (legacy)
-        {
-            "block_timestamp": 1345594949,
-            "asset": "SOL"
-            "asset_volume": 1343493294,
-            "asset_decimals": 9,
-            "chain_name": "SOL",
-            "chain_id": 900,
-            "tx_hash": "0x134354623747834"
-            "usd_volume": 134432,
-            "unit_price": 23456789,
-            "usd_decimals":6
-        }
-        '''
-
-    def __call__(self):
-        while True:
-            latest_block = self._get_current_block()
-            # loop through blocks
-            for block_num in range(self.start_block, latest_block):
-                print("block_num: ", block_num)
-                blocks = self.solana_client.get_block(block_num, "jsonParsed", max_supported_transaction_version=0)
-
-                # loop through transactions in blocks
-                transactions = blocks.value.transactions
-                for transaction in transactions:
-                    message = transaction.transaction.message
-                    signatures = transaction.transaction.signatures
-
-                    # find signer addr
-                    signer_addr: str = ""
-                    for account_key in message.account_keys:
-                        if not account_key.signer:
-                            continue
-                        signer_addr = str(account_key.pubkey)
-                        break
-                    if not signer_addr:
-                        continue
-
-                    # check if this is our users
-                    plat_id = self._get_plat_id(signer_addr)
-                    if not plat_id:
-                        continue
-
-                    print("signatures: ", signatures)
-                    print("signer_addr: ", signer_addr)
-                    # get base token volume (SOL)
-                    meta = transaction.meta
-                    pre_balance = meta.pre_balances
-                    post_balance = meta.post_balances
-
-                    print(f"Pre Balances: {pre_balance}")
-                    print(f"Post Balances: {post_balance}")
-
-                    total_transaction_volume = abs(pre_balance[0] - post_balance[0])
-                    print(total_transaction_volume)
-                    # add volume
-                    try:
-                        self._update_volume_and_balance(
-                            plat_id=plat_id,
-                            wallet_addr=signer_addr,
-                            volume=total_transaction_volume,
-                            balance=abs(post_balance[0]),
-                            asset_symbol=self.chain_base_asset_symbol
-                        )
-                    except Exception:
-                        traceback.print_exc()
-                    print("===" * 30)
-                    # get others token volume (coming soon)
-
-                # set latest block to redis
-                redis_client.set(self.latest_sync_block_key, block_num)
-
-            time.sleep(1)
-            self.start_block = latest_block
+        latest_ledger_version = redis_client.get(self.latest_sync_ledger_version)
+        self.start: int = 0 if not latest_ledger_version else int(latest_ledger_version)
+        self.move_decimal = 8
         return
 
-    def _get_current_block(self) -> int:
-        # get current block
-        response = requests.post(
-            Conf.RPC_URL,
-            json=request("getSlot")
-        )
-        parsed = parse(response.json())
-        if isinstance(parsed, Ok):
-            return parsed.result
-        else:
-            logging.error(parsed.message)
+    def __call__(self):
+        num_new_transactions: int = 1
+        max_limit: int = 100
 
-    @Decorator.cache_filter(timeout=60, is_class=True)
-    def _get_price_by_asset(self, asset_symbol: str):
-        symbol_to_id = {
-            "SOL": "solana"
-        }
-        asset_id: str = symbol_to_id.get(asset_symbol)
+        while True:
+            # latest ledger version
+            if self.start != 0:
+                latest_ledger_version = self.__get_newest_ledger_version()
+                print("latest_ledger_version: ", latest_ledger_version)
+                num_new_transactions = max(abs(latest_ledger_version - self.start), 1)
 
-        if not asset_id:
-            return 0
+            # get all transaction
+            print(f"Getting transaction from {self.start}, to {self.start + num_new_transactions -1},  limit {num_new_transactions}")
 
-        url = "https://api.coingecko.com/api/v3/simple/price"
-        params = {
-            "ids": asset_id,
-            "vs_currencies": "usd"
-        }
+            # loop through chunks
+            if self.start != 0:
+                ls_limit = [max_limit] * (num_new_transactions // max_limit)
+                ls_limit += [num_new_transactions - max_limit * (num_new_transactions // max_limit)]
+            else:
+                ls_limit = [1]
+            print("ls_limit: ", ls_limit)
 
-        headers = {
-            "accept": "application/json"
-        }
+            for limit in ls_limit:
+                transactions, next_start = self.__get_transactions(limit=limit, start=self.start)
+                self.start = next_start
 
-        response = requests.get(url, headers=headers, params=params)
+                # set latest ledger version to redis
+                redis_client.set(self.latest_sync_ledger_version, next_start)
 
-        # Check if the request was successful
+                # process transactions
+                for transaction in transactions:
+                    try:
+                        self.__process_transaction(transaction)
+                    except Exception:
+                        traceback.print_exc()
+
+                print("num transactions: ", len(transactions))
+                print("next start: ", next_start)
+
+    def __get_transactions(self, limit: int = 100, start: int = 0) -> Tuple[list, int]:
+        url: str = f"{Conf.RPC_URL}/transactions"
+        params = {"limit": limit}
+        if start:
+            params.update({"start": start})
+        headers = {"accept": "application/json", "user-agent": "plat-server"}
+        response = requests.get(url, params=params, headers=headers)
         if response.status_code != 200:
-            print(f"Get Price Error: {response.status_code}, {response.text}")
-            return self.symbol_to_latest_price.get(asset_symbol) or 0
+            # print(f"Get transaction Error: {response.status_code}, {response.text}")
+            return [], 0
+        transactions = response.json() or []
+        if not transactions:
+            return [], 0
+        next_start = int(transactions[-1].get("version")) + 1
+        return response.json(), next_start
 
-        price_in_usd = response.json().get(asset_id).get('usd')
-        self.symbol_to_latest_price[asset_symbol] = price_in_usd
-        return float(price_in_usd)
+    def __get_newest_ledger_version(self) -> int:
+        url: str = f"{Conf.RPC_URL}"
+        params = {}
+        headers = {"accept": "application/json", "user-agent": "plat-server"}
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            # print(f"Get transaction Error: {response.status_code}, {response.text}")
+            return 0
+        ledger_info = response.json()
+        return int(ledger_info.get("ledger_version") or 0)
+
+    def __process_transaction(self, transaction_data: dict):
+        # only process success transaction
+        if transaction_data.get("success"):
+            return
+
+        # get signer addr
+        signer_addr: str = transaction_data.get("sender")
+        if not signer_addr:
+            print("There is no signer_addr of tx", transaction_data.get("hash"))
+            return
+
+        # check if this is our users
+        plat_id = self.__get_plat_id(signer_addr)
+        if not plat_id:
+            return
+
+        # get volume (usd)
+        gas_used: int = int(transaction_data.get("gas_used") or 0)
+        if not gas_used:
+            return
+        gas_unit_price: int = int(transaction_data.get("gas_used") or 100)
+        move_used = gas_used * gas_unit_price
+
+        # get balance
+        move_transfer: int = 0
+        balance: int = 0
+        changes = transaction_data.get("changes")
+        for change in changes:
+            if change.get("data").get("type") != "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>":
+                continue
+            if change.get("address") == signer_addr:
+                balance: int = int(change.get("data").get("data").get("coin").get("value") or 0)
+                continue
+            if change.get("address") != signer_addr:
+                move_transfer += int(change.get("data").get("data").get("coin").get("value") or 0)
+
+        # total volume
+        volume: int = abs(move_used) + abs(move_transfer)
+
+        # update volume and balance
+        self.__update_volume_and_balance(
+            plat_id=plat_id,
+            wallet_addr=signer_addr,
+            volume=volume,
+            balance=balance
+        )
+        return
 
     @Decorator.cache_filter(timeout=10, is_class=True, include_null=True)
-    def _get_plat_id(self, wallet_addr: str) -> str:
+    def __get_plat_id(self, wallet_addr: str) -> str:
         url = f"{Conf.BACKEND_URL}/api/v1/internal/nillion/user"
         params = {"wallet_addr": wallet_addr}
         headers = {"accept": "application/json"}
@@ -166,13 +148,12 @@ class TransactionIndexer(object):
         plat_id = response_json.get('data').get('plat_id') or ""
         return plat_id
 
-    def _update_volume_and_balance(
+    def __update_volume_and_balance(
         self,
         plat_id: str,
         wallet_addr: str,
         volume: int,
-        balance: int,
-        asset_symbol: str = "SOL"
+        balance: int
     ) -> None:
         # get current volume
         secret_volume = 0
@@ -190,22 +171,17 @@ class TransactionIndexer(object):
             response_json = response.json()
             secret_volume = response_json.get('data').get('secret_volume') or 0
             print("Has current volume: ", secret_volume)
-
         secret_volume = float(secret_volume)
 
-        # price in usd
-        price_in_usd = self._get_price_by_asset(asset_symbol)
+        # we currently hard code 1 MOVE == 5 USD
+        unit_price_usd: float = 5.0
 
-        # asset to usd
-        display_asset_volume: float = volume * 10 ** (-1 * self.chain_base_asset_decimals)
-        display_asset_in_usd_volume: float = display_asset_volume * price_in_usd
+        # calc new volume
+        volume_usd = volume * (10 ** self.move_decimal) * unit_price_usd
+        new_volume = secret_volume + volume_usd
 
-        # add new volume
-        new_volume: float = abs(secret_volume) + abs(display_asset_in_usd_volume)
-
-        # new balance
-        display_balance_sol: float = balance * 10 ** (-1 * self.chain_base_asset_decimals)
-        balance_usd: float = display_balance_sol * price_in_usd
+        # balance_usd
+        balance_usd = balance * (10 ** self.move_decimal) * unit_price_usd
 
         # store new value
         new_value = {

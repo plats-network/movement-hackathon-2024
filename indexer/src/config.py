@@ -9,8 +9,8 @@ class BackendConfig(object):
     BACKEND_URL = os.getenv("BACKEND_URL")
 
 
-class QueueConfig(object):
-    SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
+class BlockchainNetwork(object):
+    RPC_URL = os.getenv("RPC_URL")
 
 
 class RedisConfig(object):
@@ -23,6 +23,6 @@ class RedisConfig(object):
 class BaseConfig(
     RedisConfig,
     BackendConfig,
-    QueueConfig
+    BlockchainNetwork
 ):
     ''''''

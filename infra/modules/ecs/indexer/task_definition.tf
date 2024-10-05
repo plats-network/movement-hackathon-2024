@@ -22,10 +22,6 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "BACKEND_URL",
           "value" : "http://${var.backend_dns}"
-        },
-        {
-          "name" : "SQS_QUEUE_URL",
-          "value" : var.sqs_queue_url
         }
       ]
       environmentFiles = []
