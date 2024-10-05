@@ -149,7 +149,7 @@ class TransactionIndexer(object):
 
         if response.status_code != 200:
             # Print error message
-            print(f"Not Plat User: {response.status_code}, {response.text}")
+            # print(f"Not Plat User: {response.status_code}, {response.text}")
             return ""
         # Print the response content
         response_json = response.json()
