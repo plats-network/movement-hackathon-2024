@@ -22,11 +22,7 @@ resource "aws_ecs_task_definition" "core" {
       command    = []
       environment = [
         {
-          "name" : "NEXT_PUBLIC_SOL_NETWORK",
-          "value" : "devnet"
-        },
-        {
-          "name" : "NEXT_PUBLIC_SOL_ADDRESS",
+          "name" : "NEXT_PUBLIC_CONTRACT_ADDRESS",
           "value" : "9HXYNdRGdKDAe7nK5ahRRjyhw6bi3tzifiC7RsdGTW1r"
         },
         {

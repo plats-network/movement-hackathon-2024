@@ -10,15 +10,15 @@ import { Switch } from "@/components/ui/switch";
 
 import { toast } from "@/hooks/use-toast";
 import ActivePlatAppButton from "@/components/shared/ActivePlatAppButton";
+import useSubmitTransaction from "@/hooks/useSubmitTransaction";
+import { CONTRACT_ADDRESS } from "@/lib/env.config";
+
+const ADD_PERMISSIONS_FUNCTION = `${CONTRACT_ADDRESS}::plats_id::add_permissions`;
+const REVOKE_PERMISSIONS_FUNCTION = `${CONTRACT_ADDRESS}::plats_id::revoke_permissions`;
 
 const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
- 
   const [isLoading, setIsLoading] = useState(false);
   const [activePlatApps, setActivePlatApps] = useState<string[]>([]);
-
- 
-
-
 
   const { data, error } = useSWR("/app", platsApiRequest.app, {
     revalidateOnFocus: false,
@@ -26,6 +26,49 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
   });
   console.log("🚀 ~ ConnectedPlatsApp ~ data:", data?.payload?.data?.plat_apps);
 
+  const { submitTransaction } = useSubmitTransaction();
+
+  const handleActivePlatApp = async (appId: any) => {
+    try {
+      const payload = {
+        type: "entry_function_payload",
+        function: ADD_PERMISSIONS_FUNCTION,
+        arguments: [
+          "nhatnguyen1.ID",
+          ["be94da783e0ee11bbdb9de2f9c6745f15b1f9bfc3007dab7f77ec2eed2400b05"],
+        ],
+        type_arguments: [],
+      };
+
+      const success = await submitTransaction(payload, {
+        title: "Add Permissions Succeeded",
+        description: `You have successfully added`,
+      });
+
+      console.log("🚀 ~ setMessage ~ success:", success);
+    } catch (error) {}
+  };
+
+  const handleUnActivePlatApp = async (appId: any) => {
+    try {
+      const payload = {
+        type: "entry_function_payload",
+        function: REVOKE_PERMISSIONS_FUNCTION,
+        arguments: [
+          "nhatnguyen1.ID",
+          ["be94da783e0ee11bbdb9de2f9c6745f15b1f9bfc3007dab7f77ec2eed2400b05"],
+        ],
+        type_arguments: [],
+      };
+
+      const success = await submitTransaction(payload, {
+        title: "Add Permissions Succeeded",
+        description: `You have successfully added`,
+      });
+
+      console.log("🚀 ~ setMessage ~ success:", success);
+    } catch (error) {}
+  };
 
   return (
     <div className="relative w-full">
@@ -67,7 +110,8 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
                 <div className=" flex gap-3 w-full justify-end items-center pb-3">
                   <ActivePlatAppButton
                     appId={plat.app_id}
-                   
+                    handleActivePlatApp={handleActivePlatApp}
+                    handleUnActivePlatApp={handleUnActivePlatApp}
                   />
                 </div>
               </div>

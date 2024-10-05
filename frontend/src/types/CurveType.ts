@@ -1,0 +1,1 @@
+export type CurveType = 'Stable' | 'Uncorrelated';
