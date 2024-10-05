@@ -14,13 +14,16 @@ import random
 import base64
 import nacl.utils
 import os
+import threading
 load_dotenv()
 class NillionHelpers:
     _instance = None
+    _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(NillionHelpers, cls).__new__(cls, *args, **kwargs)
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(NillionHelpers, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self) -> None:
