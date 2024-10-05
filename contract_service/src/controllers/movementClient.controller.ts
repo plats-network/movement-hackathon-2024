@@ -1,60 +1,49 @@
 import { Request, Response } from "express";
-import {
-    initializeProgram,
-    fetchIdentity,
-    registerIdentity,
-    updateIdentity,
-    grantPermissions,
-    addIdentity,
-    generateKeypair,
-} from "../services/movementClient.service";
-/**
- * GET /
- * Home page.
- */
+import { movementClient } from "../services/movementClient.service";
 export const retriveAccount = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
     try {
-        initializeProgram();
-
         const { platId } = req.body;
         if (typeof platId !== "string") {
             res.status(400).json({ msg: "Invalid plat id", code: 400 });
             return;
         }
-        const data = await fetchIdentity(platId as string);
+        const data = await movementClient.fetchIdentity(platId);
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);
         res.json({ msg: error, code: 500 }).status(500);
     }
 };
-export const createKeypair = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
-    try {
-        initializeProgram();
-        const keypair = generateKeypair();
-        res.json({ msg: "success", code: 200, data: keypair });
-    } catch (error) {
-        console.log(error);
-        res.json({ msg: error, code: 500 }).status(500);
-    }
-};
+// export const createKeypair = async (
+//     req: Request,
+//     res: Response,
+// ): Promise<void> => {
+//     try {
+//         initializeProgram();
+//         const keypair = generateKeypair();
+//         res.json({ msg: "success", code: 200, data: keypair });
+//     } catch (error) {
+//         console.log(error);
+//         res.json({ msg: error, code: 500 }).status(500);
+//     }
+// };
 
 export const createAccount = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
     try {
-        initializeProgram();
-        console.log(req.body);
-        const { platId, publicKey } = req.body;
-        const keys = await registerIdentity(publicKey, platId);
-        res.json({ msg: "success", code: 200, data: keys });
+        const { platId, address, storeIds } = req.body;
+
+        const success = await movementClient.registerIdentity(
+            address,
+            platId,
+            storeIds,
+        );
+        res.json({ msg: "success", code: 200, data: success });
     } catch (error) {
         console.log(error);
         res.json({ msg: error, code: 500 }).status(500);
@@ -66,20 +55,11 @@ export const updateAccount = async (
     res: Response,
 ): Promise<void> => {
     try {
-        initializeProgram();
-        const {
-            publicKey,
+        const { address, platId, storeIds } = req.body;
+        const data = await movementClient.updateIdentity(
+            address,
             platId,
-            storeIdBalance,
-            storeIdVolume,
-            storeIdTwitter,
-        } = req.body;
-        const data = await updateIdentity(
-            publicKey,
-            platId,
-            storeIdBalance,
-            storeIdVolume,
-            storeIdTwitter,
+            storeIds,
         );
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
@@ -88,30 +68,33 @@ export const updateAccount = async (
     }
 };
 
-export const updatePermission = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
-    try {
-        initializeProgram();
-        const { publicKey, platId, permissions } = req.body;
-        const data = await grantPermissions(platId, publicKey, permissions);
+// export const updatePermission = async (
+//     req: Request,
+//     res: Response,
+// ): Promise<void> => {
+//     try {
+//         initializeProgram();
+//         const { publicKey, platId, permissions } = req.body;
+//         const data = await grantPermissions(platId, publicKey, permissions);
 
-        res.json({ msg: "success", code: 200, data });
-    } catch (error) {
-        console.log(error);
-        res.json({ msg: error, code: 500 }).status(500);
-    }
-};
+//         res.json({ msg: "success", code: 200, data });
+//     } catch (error) {
+//         console.log(error);
+//         res.json({ msg: error, code: 500 }).status(500);
+//     }
+// };
 
 export const addAddress = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
     try {
-        initializeProgram();
-        const { publicKey, platId } = req.body;
-        const data = await addIdentity(platId, publicKey);
+        const { address, platId, storeIds } = req.body;
+        const data = await movementClient.addIdentity(
+            address,
+            platId,
+            storeIds,
+        );
         res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);

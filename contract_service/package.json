@@ -26,6 +26,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@aptos-labs/ts-sdk": "^1.29.0",
         "@coral-xyz/anchor": "^0.30.1",
         "@solana/web3.js": "^1.95.3",
         "base-x": "^5.0.0",
@@ -37,6 +38,7 @@
         "express": "^4.16.2",
         "http-errors": "^1.7.1",
         "morgan": "^1.9.1",
+        "pnpm": "^9.12.0",
         "pug": "^3.0.1"
     },
     "devDependencies": {
