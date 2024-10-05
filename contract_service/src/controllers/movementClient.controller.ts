@@ -7,7 +7,7 @@ import {
     grantPermissions,
     addIdentity,
     generateKeypair,
-} from "../services/solanaClient.service";
+} from "../services/movementClient.service";
 /**
  * GET /
  * Home page.
