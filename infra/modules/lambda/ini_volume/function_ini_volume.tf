@@ -19,7 +19,7 @@ resource "aws_lambda_function" "ini_volume" {
   runtime                        = "python3.11"
   skip_destroy                   = false
   source_code_hash               = data.archive_file.func_zip.output_base64sha256
-  timeout                        = 900
+  timeout                        = 300
   layers                         = [aws_lambda_layer_version.ini_volume_all_layer.arn]
 
   vpc_config {
@@ -29,7 +29,8 @@ resource "aws_lambda_function" "ini_volume" {
   }
   environment {
     variables = {
-      BACKEND_URL = "http://172.31.21.6"
+      BACKEND_URL = "http://${var.backend_dns}"
+      RPC_URL     = var.rpc_url
     }
   }
 }

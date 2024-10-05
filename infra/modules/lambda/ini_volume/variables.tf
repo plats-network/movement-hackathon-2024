@@ -35,3 +35,13 @@ variable "aws_security_group_id" {
   type        = string
   description = "aws_security_group_id"
 }
+
+variable "backend_dns" {
+  type        = string
+  description = "backend_dns"
+}
+
+variable "rpc_url" {
+  type        = string
+  description = "rpc_url"
+}
