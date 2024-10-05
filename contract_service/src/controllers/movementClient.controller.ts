@@ -50,10 +50,7 @@ export const createAccount = async (
     }
 };
 
-export const updateAccount = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
+export const updateAccount = async (req: Request, res: Response) => {
     try {
         const { address, platId, storeIds } = req.body;
         const data = await movementClient.updateIdentity(
@@ -61,10 +58,10 @@ export const updateAccount = async (
             platId,
             storeIds,
         );
-        res.json({ msg: "success", code: 200, data });
+        return res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);
-        res.json({ msg: error, code: 500 }).status(500);
+        return res.json({ msg: error, code: 500 }).status(500);
     }
 };
 
@@ -84,10 +81,7 @@ export const updateAccount = async (
 //     }
 // };
 
-export const addAddress = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
+export const addAddress = async (req: Request, res: Response) => {
     try {
         const { address, platId, storeIds } = req.body;
         const data = await movementClient.addIdentity(
@@ -95,9 +89,9 @@ export const addAddress = async (
             platId,
             storeIds,
         );
-        res.json({ msg: "success", code: 200, data });
+        return res.json({ msg: "success", code: 200, data });
     } catch (error) {
         console.log(error);
-        res.json({ msg: error, code: 500 }).status(500);
+        return res.json({ msg: error, code: 500 }).status(500);
     }
 };

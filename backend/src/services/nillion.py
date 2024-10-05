@@ -1,6 +1,6 @@
 from src.libs.nillion_helpers import NillionHelpers
 from src.models import mUser
-from src.services.solana_client import Solana
+from src.services.movement_client import Movement
 from src.config import settings
 from fastapi import HTTPException
 from src.libs.nillion_helpers import NillionHelpers
@@ -35,8 +35,8 @@ class Nillion(object):
         volume_id = await nillion.store_integer('secret_volume', volume)
         twitter_id = await nillion.store_integer('secret_twitter', 0)
         
-        # 3. Store balance, volume to solana
-        Solana.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id, store_twitter=twitter_id)
+        # 3. Store balance, volume to Movement
+        Movement.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id, store_twitter=twitter_id)
         
         # 4. Update synced
         synced.append(wallet_addr)
@@ -66,8 +66,8 @@ class Nillion(object):
         except ValueError:
             raise HTTPException(status_code=404, detail="Wallet address not found")
         
-        # 1. Retrieve balances, volumes from solana
-        store_balance, store_volume, _, _ = Solana.get(plat_id)
+        # 1. Retrieve balances, volumes from Movement
+        store_balance, store_volume, _, _ = Movement.get(plat_id)
         
         # 2. Get the balance and volume of the wallet_addr from nillion
         balance = await nillion.retrieve(store_balance[index], 'secret_balance')

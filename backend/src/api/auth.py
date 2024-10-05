@@ -14,7 +14,7 @@ from src.dtos import TokenData
 from src.config.db import redis_client
 from src.services import UserService
 import hashlib
-from src.services.solana_client import Solana
+from src.services.movement_client import Movement
 from src.services.indexer import Indexer
 
 router = APIRouter()
@@ -79,16 +79,16 @@ async def verify_signature(request: VerifyRequestDTO):
     redis_client.delete(unique_key)
     
     # ! Uncomment to verify signature
-    try:
-        # Decode the base64 public key and signature
-        verify_key = VerifyKey(public_key, encoder=Base64Encoder)
-        decoded_signature = Base64Encoder.decode(signature)
+    # try:
+    #     # Decode the base64 public key and signature
+    #     verify_key = VerifyKey(public_key, encoder=Base64Encoder)
+    #     decoded_signature = Base64Encoder.decode(signature)
         
-        # Verify the signature against the message
-        verify_key.verify(nonce.encode("utf-8"), decoded_signature)
-    except Exception as e:
-        logger.error(f"Error verifying signature: {e}")
-        return ResponseMsg.INVALID.to_json(msg="Verification failed")
+    #     # Verify the signature against the message
+    #     verify_key.verify(nonce.encode("utf-8"), decoded_signature)
+    # except Exception as e:
+    #     logger.error(f"Error verifying signature: {e}")
+    #     return ResponseMsg.INVALID.to_json(msg="Verification failed")
     
     
     
@@ -115,15 +115,15 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
         UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
 
         try:
-            # Register the user on Solana
-            response = Solana.register(plat_id, public_key)
+            # Register the user on Movement
+            response = Movement.register(plat_id, eoa)
             
             if response is None:
-                raise HTTPException(status_code=500, detail="Failed to register on Solana::{}".format(e))
+                raise HTTPException(status_code=500, detail="Failed to register on Movement::{}".format(e))
             
             logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
             
-            Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
+            # Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
 
             return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")
         except Exception as e:

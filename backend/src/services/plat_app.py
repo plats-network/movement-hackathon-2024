@@ -1,7 +1,7 @@
 from src.models import mPlatApp
 from src.utils import generate_hash, tzware_datetime
 from fastapi import HTTPException
-from src.services.solana_client import Solana
+from src.services.movement_client  import Movement
 from src.models import mUser
 from src.models import mPlatApp
 from src.services.nillion import Nillion
@@ -71,12 +71,12 @@ class PlatAppService(object):
         
     @staticmethod
     async def get_user(app_id: str, plat_id: str):
-        # 1. Get permission of app for plat_id on Solana
+        # 1. Get permission of app for plat_id on Movement
         user = mUser.get_item_with({"plat_id": plat_id})
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        store_balance, store_volume, store_twitter, permissions = Solana.get(plat_id)
+        store_balance, store_volume, store_twitter, permissions = Movement.get(plat_id)
         
         # 2. Verify permission
         if app_id not in permissions:

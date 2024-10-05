@@ -5,10 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class SolanaConfig(object):
-    RPC_URL = os.getenv("RPC_URL")
-
-
 class BackendConfig(object):
     BACKEND_URL = os.getenv("BACKEND_URL")
 
@@ -25,7 +21,6 @@ class RedisConfig(object):
 
 
 class BaseConfig(
-    SolanaConfig,
     RedisConfig,
     BackendConfig,
     QueueConfig

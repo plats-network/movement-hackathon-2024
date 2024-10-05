@@ -8,7 +8,7 @@ class Movement(object):
         if response.status_code == 200:
             return response.json()
         else:
-            return None
+            raise Exception(response.text)
         
     
     @staticmethod

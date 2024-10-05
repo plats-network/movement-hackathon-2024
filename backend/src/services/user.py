@@ -2,7 +2,7 @@ from src.models import mUser
 import pydash as py_
 from .twitter import TwitterService
 from src.services import Nillion
-from src.services.solana_client import Solana
+from src.services.movement_client  import Movement
 from fastapi import HTTPException
 from src.libs.nillion_helpers import NillionHelpers
 from src.config import settings
@@ -61,21 +61,24 @@ class UserService(object):
             raise HTTPException(status_code=404, detail="User not found")
         
         # get list of store_balance, store_volume, store_twitter
-        store_balance, store_volume, store_twitter, _ = Solana.get(plat_id)
+        store_balance, store_volume, store_twitter, _ = Movement.get(plat_id)
         
         # Log all variables
         print(f"store_balance: {store_balance}")
         print(f"store_volume: {store_volume}")
         print(f"store_twitter: {store_twitter}")
-        
+        def handle_empty(value):
+            if value < 0:
+                return -1
+            return value / settings.NILLION_MULTIPLIER
         import asyncio
         balances = []
         volumes = []
         twitters = []
         for i in range(len(store_balance)):
             balance, volume, twitter = await Nillion.get_raw(plat_id, store_balance[i], store_volume[i], store_twitter[i])
-            balances.append(balance / settings.NILLION_MULTIPLIER)
-            volumes.append(volume / settings.NILLION_MULTIPLIER)
+            balances.append(handle_empty(balance))
+            volumes.append(handle_empty(volume))
             twitters.append(twitter)
             
         # Get twitter_name
@@ -139,8 +142,8 @@ class UserService(object):
         if public_key in user['public_key']:
             raise HTTPException(status_code=400, detail="Public key already exists")
         
-        # add to solana
-        Solana.add_address(plat_id, public_key)
+        # add to Movement
+        Movement.add_address(plat_id, eoa)
         
         # Indexer
         Indexer().send_message(plat_id, eoa)
@@ -152,10 +155,3 @@ class UserService(object):
         
 
         
-    @staticmethod
-    def update_permission(plat_id: str, permissions: list):
-        user = mUser.get_item_with({"plat_id": plat_id})
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        # Update permissions on Solana
-        Solana.update_permission(plat_id, user['public_key'][0], permissions)
