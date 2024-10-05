@@ -11,7 +11,7 @@ export default function Home() {
   const accessToken = cookieStore.get("accessToken");
   return (
     <>
-
+<Header/>
 {
       !accessToken ? (
 <div className="relative h-[100vh] flex items-center justify-center">
