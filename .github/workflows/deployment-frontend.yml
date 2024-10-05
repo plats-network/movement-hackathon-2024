@@ -64,6 +64,11 @@ jobs:
           echo "ECR_REPOSITORY=${{ steps.login-ecr.outputs.registry }}/${REPOSITORY_NAME}" >> $GITHUB_ENV
           echo "ECS_TASK_SERVICE_NAME=plat-movement-${{ env.ENVIRONMENT }}-frontend" >> $GITHUB_ENV
           echo "ECS_CLUSTER_NAME=plat-movement-${{ env.ENVIRONMENT }}-frontend" >> $GITHUB_ENV
+          echo "TASK_DEFINITION_NAME=plat-movement-${{ env.ENVIRONMENT }}-frontend" >> $GITHUB_ENV
+        
+      - name: Create Dot Env
+        run: | 
+          cd frontend && node createEnv.js TASK_DEFINITION_NAME=${{ env.TASK_DEFINITION_NAME }}
 
       - name: Build Docker image
         run: |
