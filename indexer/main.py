@@ -24,7 +24,7 @@ def test_dns():
     backend_url = os.getenv("BACKEND_URL")
     url = f"{backend_url}/api/v1/internal/nillion/user?wallet_addr=GJeggjDKerwUaFpbkL9DnDC2S9C5ez2HEomcb9LjWKJB"
     headers = {'accept': 'application/json'}
-    response = requests.request("POST", url, headers=headers)
+    response = requests.post(url, headers=headers, verify=False)
     print("Check dns result: ", response.text)
 
 

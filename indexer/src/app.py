@@ -145,7 +145,7 @@ class TransactionIndexer(object):
         params = {"wallet_addr": wallet_addr}
         headers = {"accept": "application/json"}
 
-        response = requests.post(url, headers=headers, params=params)
+        response = requests.post(url, headers=headers, params=params, verify=False)
 
         if response.status_code != 200:
             # Print error message
@@ -173,7 +173,8 @@ class TransactionIndexer(object):
             params={
                 "plat_id": plat_id,
                 "wallet_addr": wallet_addr
-            }
+            },
+            verify=False
         )
         if response.status_code == 200:
             response_json = response.json()
@@ -204,7 +205,8 @@ class TransactionIndexer(object):
                 "accept": "application/json",
                 "Content-Type": "application/json"
             },
-            json=new_value
+            json=new_value,
+            verify=False
         )
         print(f"updated volume & balance {plat_id}: {new_value}", response.json())
         return
