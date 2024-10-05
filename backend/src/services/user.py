@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from src.libs.nillion_helpers import NillionHelpers
 from src.config import settings
 from src.services.indexer import Indexer
+from src.utils.functions import random_in_range
 class UserService(object):
     
     @staticmethod
@@ -35,7 +36,7 @@ class UserService(object):
         return False
         
     @staticmethod
-    def register(plat_id: str, eoa: str, public_key: str):
+    async def register(plat_id: str, eoa: str, public_key: str):
         # check exist public_key
         exist_user = mUser.get_item_with({"public_key": { "$elemMatch": {"$eq": public_key}}})
         
@@ -52,6 +53,12 @@ class UserService(object):
             "public_key": [public_key],
             "synced": []
         })
+
+        # init data nillion
+        random1 = random_in_range(100, 300)
+        random2 = random_in_range(400, 700)
+        await Nillion.store(plat_id, eoa, random1, random2)
+
         return user
         
     @staticmethod
@@ -125,7 +132,7 @@ class UserService(object):
         
     
     @staticmethod
-    def add_address(plat_id: str, eoa: str, public_key: str):
+    async def add_address(plat_id: str, eoa: str, public_key: str):
         user = mUser.get_item_with({"plat_id": plat_id})
         existed_user = mUser.get_item_with({"public_key": { "$elemMatch": {"$eq": public_key}}})
         
@@ -153,6 +160,7 @@ class UserService(object):
                 "address": user['address'] + [eoa],
                 "public_key": user['public_key'] + [public_key]
             })
+
         except Exception as e:
             # Rollback db
             mUser.update(user['_id'], {
@@ -161,6 +169,9 @@ class UserService(object):
             })
             raise e
             
-        
+        # init data nillion
+        random1 = random_in_range(100, 300)
+        random2 = random_in_range(400, 700)
+        await Nillion.store(plat_id, eoa, random1, random2)
 
         

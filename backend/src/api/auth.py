@@ -89,7 +89,7 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
             return ResponseMsg.UNAUTHORIZED.to_json(msg="Unauthorized")
         
         # Create a new user with plat_id
-        UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
+        await UserService.register(plat_id=plat_id, eoa=eoa, public_key=public_key)
 
         try:
             # Register the user on Movement

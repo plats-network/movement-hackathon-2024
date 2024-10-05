@@ -46,7 +46,7 @@ async def add_address(body: UpdateAccountDTO, token: TokenData = Depends(Auth.ve
         if not body.address or not body.public_key:
             return HTTPException(status_code=400, detail="Address is required")
         # Get user from db with plat_id
-        UserService.add_address(token.sub, body.address, body.public_key)
+        await UserService.add_address(token.sub, body.address, body.public_key)
         return ResponseMsg.SUCCESS.to_json(msg="Address added successfully")
     
     except HTTPException as http_exc:

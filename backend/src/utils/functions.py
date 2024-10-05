@@ -1,7 +1,7 @@
 import datetime as dt
 import pytz
 import hashlib
-
+import random
 
 def tzware_datetime():
     """
@@ -22,5 +22,8 @@ def generate_hash(data):
     return hashlib.sha256(data.encode()).hexdigest()
 
 
+def random_in_range(min_value: float, max_value: float) -> float:
+    return random.uniform(min_value, max_value)
+
 if __name__ == '__main__':
-    print(generate_hash("plat_app"))
+    print(random_in_range(1, 10))
