@@ -122,8 +122,8 @@ async def register(registerInput: RegisterInputDTO, token: TokenData = Depends(A
                 raise HTTPException(status_code=500, detail="Failed to register on Movement::{}".format(e))
             
             logger.info(f"REGISTER::SYNC VOLUME::{plat_id}::address::{eoa}::publickey::{public_key}")
-            
-            Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
+            # NOTE: Uncomment to send message to SQS
+            # Indexer().send_message(plat_id=plat_id, wallet_addr=eoa)
 
             return ResponseMsg.SUCCESS.to_json(data={}, msg="Registration successful")
         except Exception as e:
