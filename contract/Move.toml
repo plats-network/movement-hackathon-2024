@@ -1,0 +1,11 @@
+[package]
+name = "plats_id"
+version = "0.0.1"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "main" }
+
+
+[addresses]
+std = "0x1"
+plats_id="0x6284582fbb8061b0909ee186aa87f136a9b0b0818c03bf53fe35409da74be61d"
