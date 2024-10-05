@@ -22,4 +22,4 @@ solana
 solders
 anchorpy
 boto3
-aptos_sdk
+aptos-sdk
