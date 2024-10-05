@@ -45,3 +45,18 @@ variable "sqs_queue_url" {
   type        = string
   description = "sqs_queue_url"
 }
+
+variable "backend_dns" {
+  type        = string
+  description = "backend_dns"
+}
+
+variable "rpc_url" {
+  type        = string
+  description = "rpc_url"
+}
+
+variable "desired_count" {
+  type        = number
+  description = "desired_count"
+}

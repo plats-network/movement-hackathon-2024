@@ -46,3 +46,14 @@ variable "target_group_arn" {
   type        = string
   description = "target_group_arn"
 }
+
+
+variable "rpc_url" {
+  type        = string
+  description = "rpc_url"
+}
+
+variable "desired_count" {
+  type        = number
+  description = "desired_count"
+}

@@ -17,11 +17,11 @@ resource "aws_ecs_task_definition" "core" {
       environment = [
         {
           "name" : "RPC_URL",
-          "value" : "https://api.devnet.solana.com"
+          "value" : var.rpc_url
         },
         {
           "name" : "BACKEND_URL",
-          "value" : "http://172.31.21.6"
+          "value" : "http://${var.backend_dns}"
         },
         {
           "name" : "SQS_QUEUE_URL",

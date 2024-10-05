@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "MONGO_DB",
-          "value" : "plat"
+          "value" : "movement"
         },
         {
           "name" : "MONGO_USER_COLLECTION",
@@ -55,11 +55,11 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "TWITTER_REDIRECT_URI",
-          "value" : "https://api.movement.plats.network/api/v1/twitter/callback"
+          "value" : "https://${var.backend_domain_name}/api/v1/twitter/callback"
         },
         {
           "name" : "FRONTEND_URL",
-          "value" : "https://movement.plats.network"
+          "value" : "https://${var.frontend_domain_name}"
         },
         {
           "name" : "TWITTER_API_URL",
@@ -75,7 +75,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "RPC_URL",
-          "value" : "https://api.devnet.solana.com"
+          "value" : var.rpc_url
         }
       ]
       environmentFiles = []

@@ -40,4 +40,6 @@ module "contract_service_ecs" {
   security_group_ecs_task_service = module.contract_service_network.ecs_sg_id
   public_subnet_id                = var.public_subnet_a_id
   target_group_arn                = module.contract_service_load_balancer.load_balancer_target_group_arn
+  rpc_url                         = var.rpc_url
+  desired_count                   = 0
 }

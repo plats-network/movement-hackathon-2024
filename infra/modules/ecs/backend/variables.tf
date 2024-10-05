@@ -56,3 +56,23 @@ variable "sqs_queue_url" {
   type        = string
   description = "sqs_queue_url"
 }
+variable "frontend_domain_name" {
+  type        = string
+  description = "frontend_domain_name"
+}
+
+variable "backend_domain_name" {
+  type        = string
+  description = "backend_domain_name"
+}
+
+
+variable "rpc_url" {
+  type        = string
+  description = "rpc_url"
+}
+
+variable "desired_count" {
+  type        = number
+  description = "desired_count"
+}

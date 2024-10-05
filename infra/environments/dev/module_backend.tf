@@ -44,6 +44,10 @@ module "backend_ecs" {
   target_group_arn                = module.backend_load_balancer.load_balancer_target_group_arn
   contract_service_dns            = module.contract_service_load_balancer.lb_dns_name
   sqs_queue_url                   = module.ini_volume_sqs.aws_sqs_queue_url
+  frontend_domain_name            = module.frontend_route_53.record_name
+  backend_domain_name             = module.backend_route_53.record_name
+  rpc_url                         = var.rpc_url
+  desired_count                   = 0
 }
 
 

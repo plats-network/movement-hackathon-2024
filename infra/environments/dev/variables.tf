@@ -29,3 +29,7 @@ variable "domain_name" {
   type        = string
   description = "domain_name"
 }
+variable "rpc_url" {
+  type        = string
+  description = "rpc_url"
+}

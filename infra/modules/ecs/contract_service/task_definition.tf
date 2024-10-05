@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "RPC_URL",
-          "value" : "https://api.devnet.solana.com"
+          "value" : var.rpc_url
         }
       ]
       environmentFiles = []
@@ -35,8 +35,8 @@ resource "aws_ecs_task_definition" "core" {
       volumesFrom      = []
       secrets = [
         {
-          name      = "MNEMONIC_PHRASE",
-          valueFrom = "${var.secret_arn}:mnemonicPhrase::"
+          name      = "PRIVATE_KEY",
+          valueFrom = "${var.secret_arn}:privateKey::"
         }
       ]
       dnsServers            = []
