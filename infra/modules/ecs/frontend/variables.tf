@@ -40,3 +40,7 @@ variable "target_group_arn" {
   type        = string
   description = "target_group_arn"
 }
+variable "api_domain_name" {
+  type        = string
+  description = "api_domain_name"
+}

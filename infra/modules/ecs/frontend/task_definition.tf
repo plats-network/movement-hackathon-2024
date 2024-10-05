@@ -22,12 +22,16 @@ resource "aws_ecs_task_definition" "core" {
       command    = []
       environment = [
         {
-          "name" : "NEXT_PUBLIC_CONTRACT_ADDRESS",
-          "value" : "9HXYNdRGdKDAe7nK5ahRRjyhw6bi3tzifiC7RsdGTW1r"
+          "name" : "PORT",
+          "value" : "80"
+        },
+        {
+          "name" : "HOST",
+          "value" : "0.0.0.0"
         },
         {
           "name" : "NEXT_PUBLIC_API",
-          "value" : "https://api.movement.plats.network/api/v1"
+          "value" : "https://${var.api_domain_name}/api/v1"
         }
       ]
       environmentFiles      = []
