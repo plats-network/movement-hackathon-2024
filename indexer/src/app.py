@@ -12,8 +12,9 @@ class TransactionIndexer(object):
     def __init__(self) -> None:
         self.latest_sync_ledger_version = "plat_movement:indexer:latest_sync_ledger_version"
         # get latest block in redis
-        latest_ledger_version = redis_client.get(self.latest_sync_ledger_version)
-        self.start: int = 0 if not latest_ledger_version else int(latest_ledger_version)
+        # latest_ledger_version = redis_client.get(self.latest_sync_ledger_version)
+        # self.start: int = 0 if not latest_ledger_version else int(latest_ledger_version)
+        self.start: int = 0
         self.move_decimal = 8
         return
 
