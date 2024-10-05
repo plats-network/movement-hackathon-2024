@@ -9,6 +9,7 @@ import WalletIcon from "@/assets/WalletIcom";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "@/hooks/use-toast";
 import useClickOutside from "@/hooks/useClickOutside";
+import { useWallet } from "@manahippo/aptos-wallet-adapter";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
@@ -18,12 +19,13 @@ import React, { useRef, useState } from "react";
 const ConnectAccountModal = ({
   platId,
   listAddress,
-  currentPublicKey
+  
 }: {
   platId: string;
   listAddress: any[];
-  currentPublicKey: any
+  
 }) => {
+  const { account} = useWallet();
 
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -56,12 +58,12 @@ const ConnectAccountModal = ({
   const handleAddNewWallet = async () => {
     try {
       setIsLoadingWallet(true);
-      console.log("publicKey", currentPublicKey?.toBase58());
+      console.log("currentAddress", account?.address);
       console.log("listAddress", listAddress);
 
-      if (!currentPublicKey) return;
+      if (!account?.address) return;
       if (
-        listAddress.some((address) => currentPublicKey?.toBase58() === address)
+        listAddress.some((address) => account?.address === address)
         // currentPublicKey === address
       ) {
         toast({
@@ -72,8 +74,8 @@ const ConnectAccountModal = ({
         return;
       }
       const data = {
-        public_key: Buffer.from(currentPublicKey.toBytes()).toString("base64"),
-        address: currentPublicKey?.toBase58(),
+        public_key: account?.publicKey,
+        address: account?.address,  
       };
       console.log("🚀 ~ handleAddNewWal ~ data:", data);
 
@@ -102,7 +104,7 @@ const ConnectAccountModal = ({
         className="bg-gradient-to-r from-[#8737E9] to-[#3AE7E7]  rounded-xl w-full py-4 text-base font-bold text-center text-white cursor-pointer flex items-center justify-center gap-2"
       >
         <AddIcon />
-        <p> Add New Account</p>
+        <p> Add New Account </p>
       </button>
 
       {/* Main modal */}

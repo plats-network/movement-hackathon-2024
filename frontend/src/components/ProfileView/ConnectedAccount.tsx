@@ -7,6 +7,7 @@ import ConnectAccountModal from "@/components/ConnectAccountModal";
 import { sliceAddressWallet, sliceAddressWalletUser } from "@/lib/helper";
 
 
+
 import React, { useEffect, useState } from "react";
 
 const ConnectedAccount = ({
@@ -17,10 +18,11 @@ const ConnectedAccount = ({
   isFirstLoad: boolean;
 }) => {
 
- // Get the current public key from the wallet adapter
 
-  const [currentPublicKey, setCurrentPublicKey] = useState<any>(null)
 
+
+  
+  
 
   return (
     <div className="relative w-full z-10  lg:max-w-[455px]">
@@ -92,11 +94,12 @@ const ConnectedAccount = ({
             </p>
           </div>
         )}
+    
 
         <ConnectAccountModal
           platId={user?.plat_id}
           listAddress={user?.address}
-          currentPublicKey={currentPublicKey}
+      
         />
       </div>
     </div>

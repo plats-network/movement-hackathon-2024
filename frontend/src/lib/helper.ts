@@ -27,6 +27,6 @@ export const sliceAddressWalletUser = (addressUser: string) => {
 export const sumBalances = (arr: any[]) => {
   return arr.reduce((total, num) => {
     const roundedNum = Number(num) < 0 ? 0 : Number(num);
-    return total + roundedNum;
+    return (total + roundedNum)/10**15;
   }, 0);
 };

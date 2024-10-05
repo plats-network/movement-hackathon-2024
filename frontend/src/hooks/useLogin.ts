@@ -38,13 +38,9 @@ const useLogin = () => {
       if (!account?.publicKey) return;
       console.log("currentPublicKey",account.publicKey)
       // Get nonce
-      const publicKeyWallet = Buffer.from(account.publicKey.toString()).toString(
-        "base64"
-      );
-      
-      console.log("publickey get Nonce base 64", publicKeyWallet);
+
       const responseNonce = await authApiRequest.nonce(
-        encodeURIComponent(publicKeyWallet)
+        encodeURIComponent(account?.publicKey as string)
       );
       console.log("🚀 ~ handleGetNonce ~ responseNonce:", responseNonce)
 
@@ -114,8 +110,8 @@ const useLogin = () => {
       if (!account?.publicKey) return;
 
       const data = {
-        public_key: Buffer.from(account.publicKey.toString()).toString("base64"),
-        signature: Buffer.from(signature).toString("base64"),
+        public_key: account.publicKey,
+        signature: signature.toString(),
       };
 
       const responseVerify = await authApiRequest.verify(data);
@@ -125,25 +121,25 @@ const useLogin = () => {
         className: "z-50 text-white",
         description: responseVerify.payload.msg,
       });
-    //   if (responseVerify) {
-    //     const responseLogin = await authApiRequest.login(
-    //       responseVerify.payload.data.authen_token
-    //     );
+      if (responseVerify) {
+        const responseLogin = await authApiRequest.login(
+          responseVerify.payload.data.authen_token
+        );
 
-    //     if (responseLogin && responseLogin?.payload.code !== 400) {
-    //       await authApiRequest.auth({
-    //         accessToken: responseLogin.payload.data.access_token,
-    //       });
-    //       toast({
-    //         className: "z-50 text-white",
-    //         description: "Login successful",
-    //       });
-    //       router.push("/");
-    //       router.refresh();
-    //     } else {
-    //       setAuthenToken(responseVerify.payload.data.authen_token);
-    //     }
-    //   }
+        if (responseLogin && responseLogin?.payload.code !== 400) {
+          await authApiRequest.auth({
+            accessToken: responseLogin.payload.data.access_token,
+          });
+          toast({
+            className: "z-50 text-white",
+            description: "Login successful",
+          });
+          router.push("/");
+          router.refresh();
+        } else {
+          setAuthenToken(responseVerify.payload.data.authen_token);
+        }
+      }
     } catch (error) {
       console.log("🚀 ~ handleVerifySignature ~ error:", error);
       setIsLoading(false);
