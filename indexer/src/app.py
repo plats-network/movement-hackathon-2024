@@ -85,7 +85,7 @@ class TransactionIndexer(object):
 
     def __process_transaction(self, transaction_data: dict):
         # only process success transaction
-        if transaction_data.get("success"):
+        if not transaction_data.get("success"):
             return
 
         # get signer addr
@@ -99,28 +99,35 @@ class TransactionIndexer(object):
         if not plat_id:
             return
 
-        # get volume (usd)
+        # get move used (gas)
         gas_used: int = int(transaction_data.get("gas_used") or 0)
         if not gas_used:
             return
         gas_unit_price: int = int(transaction_data.get("gas_used") or 100)
         move_used = gas_used * gas_unit_price
+        print("move_used: ", move_used)
 
         # get balance
-        move_transfer: int = 0
         balance: int = 0
         changes = transaction_data.get("changes")
         for change in changes:
             if change.get("data").get("type") != "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>":
                 continue
-            if change.get("address") == signer_addr:
-                balance: int = int(change.get("data").get("data").get("coin").get("value") or 0)
-                continue
             if change.get("address") != signer_addr:
-                move_transfer += int(change.get("data").get("data").get("coin").get("value") or 0)
+                continue
+            balance: int = int(change.get("data").get("data").get("coin").get("value") or 0)
+            break
+
+        # get move transfer
+        move_transfer: int = 0
+        if transaction_data.get("payload").get("function") == "0x1::aptos_account::transfer":
+            move_transfer = int(transaction_data.get("payload").get("arguments")[1])
+        print("move_transfer: ", move_transfer)
 
         # total volume
         volume: int = abs(move_used) + abs(move_transfer)
+
+        print(f"Updating volume {volume} and balance {balance} of address {signer_addr}")
 
         # update volume and balance
         self.__update_volume_and_balance(
