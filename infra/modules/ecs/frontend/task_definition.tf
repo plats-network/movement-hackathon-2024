@@ -32,6 +32,10 @@ resource "aws_ecs_task_definition" "core" {
         {
           "name" : "NEXT_PUBLIC_API",
           "value" : "https://${var.backend_domain_name}/api/v1"
+        },
+        {
+          "name" : "NEXT_PUBLIC_CONTRACT_ADDRESS",
+          "value" : "0x4e87d8b7cceaedd5ae81c213daade2b451003c8205bbc71231223c9457c45467"
         }
       ]
       environmentFiles      = []
