@@ -1,5 +1,5 @@
 resource "aws_sqs_queue" "queue" {
-  name                       = "plat-fellowship-${var.environment_name}-ini-volume"
+  name                       = "plat-movement-${var.environment_name}-ini-volume"
   visibility_timeout_seconds = 300
   message_retention_seconds  = 3600
   max_message_size           = 2048
@@ -10,7 +10,7 @@ resource "aws_sqs_queue" "queue" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "ini-volume"
   }
 }

@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "core" {
   memory                   = 512
   container_definitions = jsonencode([
     {
-      name  = "plat-fellowship-${var.environment_name}-frontend"
+      name  = "plat-movement-${var.environment_name}-frontend"
       image = "${var.ecr_uri}:latest"
       links = []
       portMappings = [
@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "NEXT_PUBLIC_API",
-          "value" : "https://api.fellowship.plats.network/api/v1"
+          "value" : "https://api.movement.plats.network/api/v1"
         }
       ]
       environmentFiles      = []
@@ -78,7 +78,7 @@ resource "aws_ecs_task_definition" "core" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "frontend"
   }
 }

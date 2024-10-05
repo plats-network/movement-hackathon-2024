@@ -6,6 +6,7 @@ ENV NEXT_PUBLIC_CONTRACT_ADDRESS 9HXYNdRGdKDAe7nK5ahRRjyhw6bi3tzifiC7RsdGTW1r
 ENV NEXT_PUBLIC_API https://api.fellowship.plats.network/api/v1
 
 
+
 COPY . .
 
 RUN yarn install

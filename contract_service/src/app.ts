@@ -7,7 +7,7 @@ import cors from "cors";
 import { errorHandler, errorNotFoundHandler } from "./middlewares/errorHandler";
 
 // Routes
-import { router as solanaRoute } from "./routes/solanaClient.route";
+import { router as solanaRoute } from "./routes/movementClient.route";
 // Create Express server
 export const app = express();
 app.use(cors());

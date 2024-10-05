@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "core" {
   memory                   = 512
   container_definitions = jsonencode([
     {
-      name         = "plat-fellowship-${var.environment_name}-indexer"
+      name         = "plat-movement-${var.environment_name}-indexer"
       image        = "${var.ecr_uri}:latest"
       links        = []
       portMappings = []
@@ -93,7 +93,7 @@ resource "aws_ecs_task_definition" "core" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "indexer"
   }
 }

@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "main" {
-  name                 = "plat-fellowship-${var.environment_name}-contract-svc"
+  name                 = "plat-movement-${var.environment_name}-contract-svc"
   image_tag_mutability = "IMMUTABLE"
   force_delete         = true
 
@@ -9,7 +9,7 @@ resource "aws_ecr_repository" "main" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "contract-svc"
   }
 }

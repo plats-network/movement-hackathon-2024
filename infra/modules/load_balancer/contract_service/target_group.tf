@@ -1,5 +1,5 @@
 resource "aws_lb_target_group" "target_group" {
-  name                              = "plat-fellowship-${var.environment_name}-contract-svc"
+  name                              = "plat-movement-${var.environment_name}-contract-svc"
   port                              = 80
   protocol                          = "HTTP"
   target_type                       = "ip"
@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "target_group" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "contract-svc"
   }
 }

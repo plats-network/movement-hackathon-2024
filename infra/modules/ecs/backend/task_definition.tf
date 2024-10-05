@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "core" {
   memory                   = 4096
   container_definitions = jsonencode([
     {
-      name  = "plat-fellowship-${var.environment_name}-backend"
+      name  = "plat-movement-${var.environment_name}-backend"
       image = "${var.ecr_uri}:latest"
       links = []
       portMappings = [
@@ -55,11 +55,11 @@ resource "aws_ecs_task_definition" "core" {
         },
         {
           "name" : "TWITTER_REDIRECT_URI",
-          "value" : "https://api.fellowship.plats.network/api/v1/twitter/callback"
+          "value" : "https://api.movement.plats.network/api/v1/twitter/callback"
         },
         {
           "name" : "FRONTEND_URL",
-          "value" : "https://fellowship.plats.network"
+          "value" : "https://movement.plats.network"
         },
         {
           "name" : "TWITTER_API_URL",
@@ -231,7 +231,7 @@ resource "aws_ecs_task_definition" "core" {
   tags = {
     Environment = var.environment_name
     SystemName  = "plat"
-    ProductName = "plat-fellowship"
+    ProductName = "plat-movement"
     Service     = "backend"
   }
 }
