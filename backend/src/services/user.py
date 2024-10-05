@@ -143,15 +143,24 @@ class UserService(object):
             raise HTTPException(status_code=400, detail="Public key already exists")
         
         # add to Movement
-        Movement.add_address(plat_id, eoa)
-        
-        # Indexer
-        Indexer().send_message(plat_id, eoa)
-        
-        mUser.update(user['_id'], {
-            "address": user['address'] + [eoa],
-            "public_key": user['public_key'] + [public_key]
-        })
+        try:
+            Movement.add_address(plat_id, eoa)
+            
+            # Indexer
+            Indexer().send_message(plat_id, eoa)
+            
+            mUser.update(user['_id'], {
+                "address": user['address'] + [eoa],
+                "public_key": user['public_key'] + [public_key]
+            })
+        except Exception as e:
+            # Rollback db
+            mUser.update(user['_id'], {
+                "address": [addr for addr in user['address'] if addr != eoa],
+                "public_key": [key for key in user['public_key'] if key != public_key]
+            })
+            raise e
+            
         
 
         

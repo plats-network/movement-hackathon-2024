@@ -30,7 +30,7 @@ class MovementClient {
             faucet: "https://faucet.testnet.suzuka.movementlabs.xyz",
         });
         this.MODULE_ADDRESS =
-            "6284582fbb8061b0909ee186aa87f136a9b0b0818c03bf53fe35409da74be61d";
+            "0x4e87d8b7cceaedd5ae81c213daade2b451003c8205bbc71231223c9457c45467";
         this.REGISTER_IDENTITY_FUNCTION = `${this.MODULE_ADDRESS}::plats_id::register_identity`;
         this.FETCH_IDENTITY_FUNCTION = `${this.MODULE_ADDRESS}::plats_id::get_secret_identity`;
         this.GET_PERMISSIONS_FUNCTION = `${this.MODULE_ADDRESS}::plats_id::get_permissions_identity`;

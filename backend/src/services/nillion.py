@@ -36,7 +36,7 @@ class Nillion(object):
         twitter_id = await nillion.store_integer('secret_twitter', 0)
         
         # 3. Store balance, volume to Movement
-        Movement.update(plat_id=plat_id, public_key=public_key[index], store_balance=balance_id, store_volume=volume_id, store_twitter=twitter_id)
+        Movement.update(plat_id=plat_id, address=address[index], store_balance=balance_id, store_volume=volume_id, store_twitter=twitter_id)
         
         # 4. Update synced
         synced.append(wallet_addr)
