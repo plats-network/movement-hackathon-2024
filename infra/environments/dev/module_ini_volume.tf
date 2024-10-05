@@ -3,11 +3,11 @@
 #   environment_name = var.environment_name
 # }
 
-# module "ini_volume_sqs" {
-#   source = "../../modules/sqs/ini_volume"
+module "ini_volume_sqs" {
+  source = "../../modules/sqs/ini_volume"
 
-#   environment_name = var.environment_name
-# }
+  environment_name = var.environment_name
+}
 
 # module "ini_volume_network" {
 #   source           = "../../modules/network/ini_volume"
