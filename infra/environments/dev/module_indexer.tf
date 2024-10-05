@@ -32,7 +32,7 @@ module "indexer_ecs" {
   security_group_ecs_task_service = module.indexer_network.ecs_sg_id
   public_subnet_id                = var.public_subnet_a_id
   sqs_queue_url                   = module.ini_volume_sqs.aws_sqs_queue_url
-  backend_dns                     = module.backend_load_balancer.lb_dns_name
+  backend_dns                     = "172.31.35.181" # private ip
   rpc_url                         = var.rpc_url
   desired_count                   = 1
 }
