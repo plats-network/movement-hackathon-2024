@@ -147,7 +147,7 @@ class UserService(object):
             Movement.add_address(plat_id, eoa)
             
             # NOTE: Uncomment to send message to SQS
-            # Indexer().send_message(plat_id, eoa)
+            Indexer().send_message(plat_id, eoa)
             
             mUser.update(user['_id'], {
                 "address": user['address'] + [eoa],
