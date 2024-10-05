@@ -4,98 +4,36 @@ import traceback
 
 import requests
 
-SOL_DECIMALS = 9
-BACKEND_URL = os.getenv("BACKEND_URL")
+RPC_URL = os.getenv("RPC_URL") or "https://aptos.testnet.suzuka.movementlabs.xyz/v1"
+BACKEND_URL = os.getenv("BACKEND_URL") or "https://api.movement.plats.network"
+MOVE_DECIMAL = 8
 
 
-def get_tx_hashes(wallet_addr: str, from_tx_hash: str = "", limit=100) -> list:
-    url = "https://explorer-api.devnet.solana.com/"
-    paging_config = {"before": from_tx_hash, "limit": limit} if from_tx_hash else {"limit": limit}
-    payload = json.dumps({
-        "method": "getSignaturesForAddress",
-        "jsonrpc": "2.0",
-        "params": [wallet_addr, paging_config],
-        "id": "ee1cf2f6-f9bb-495a-9a37-efcec96872be"
-    })
-    headers = {'content-type': 'application/json'}
-    response = requests.request("POST", url, headers=headers, data=payload)
-    if response.status_code != 200:
-        return []
-    results = response.json().get("result") or []
-    return [
-        {
-            "block_time_stamp": result.get("blockTime"),
-            "tx_hash": result.get("signature"),
-            "block_number": result.get("slot"),
-        } for result in results
-    ]
-
-
-def get_tx_volume(signature: str):
-    url = "https://explorer-api.devnet.solana.com/"
-    payload = json.dumps({
-        "method": "getTransaction",
-        "jsonrpc": "2.0",
-        "params": [
-            signature,
-            {
-                "encoding": "jsonParsed",
-                "commitment": "confirmed",
-                "maxSupportedTransactionVersion": 0
-            }
-        ],
-        "id": "2ff85a0f-e423-40bf-9455-bcf4e324ff40"
-    })
-    headers = {'content-type': 'application/json'}
-    response = requests.request("POST", url, headers=headers, data=payload)
+def get_wallet_balance(wallet_addr: str) -> int:
+    url = f"{RPC_URL}/accounts/{wallet_addr}/resource/0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
+    response = requests.get(url, headers={"accept": "application/json", "user-agent": "plat-server"})
     if response.status_code != 200:
         return 0
-    pre_balances = response.json().get("result").get("meta").get("preBalances")[0]
-    post_balances = response.json().get("result").get("meta").get("postBalances")[0]
-    volume = abs(abs(pre_balances) - abs(post_balances))
-    return volume * 10 ** (-1 * SOL_DECIMALS)
+    return int(response.json().get("data").get("coin").get("value") or 0)
 
 
-def sync(wallet_addr: str, from_block: int, to_block: int):
-    total_volume = 0
-    latest_tx_hash = ""
-    is_end = False
-    while True:
-        tx_hashes = get_tx_hashes(wallet_addr, from_tx_hash=latest_tx_hash)
-
-        if not tx_hashes:
-            break
-
-        for tx_hash_obj in tx_hashes:
-            block_number = tx_hash_obj.get("block_number")
-
-            if block_number >= to_block:
-                continue
-
-            if block_number <= from_block:
-                is_end = True
-                break
-
-            tx_hash = tx_hash_obj.get("tx_hash")
-            volume = get_tx_volume(tx_hash)
-            # TODO: sol to usd by timestamp
-            total_volume += volume
-
-        if is_end:
-            break
-
-        latest_tx_hash = tx_hashes[-1].get("tx_hash")
-
-    # NOTE: we currently convert total volume to USD by using the latest price
-
-    return total_volume
+def get_transaction_of_account(wallet_addr: str, limit: int = 100, start: int = 0):
+    url = f"{RPC_URL}/accounts/{wallet_addr}/transactions"
+    params = {"limit": limit}
+    if start:
+        params.update({"start": start})
+    headers = {"accept": "application/json", "user-agent": "plat-server"}
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code != 200:
+        return []
+    return response.json()
 
 
 def update_volume_and_balance(
     plat_id: str,
     wallet_addr: str,
-    volume_usd: float,
-    price_in_usd: float
+    volume: int,
+    balance: int
 ) -> None:
     # get current volume
     secret_volume = 0
@@ -107,35 +45,24 @@ def update_volume_and_balance(
         params={
             "plat_id": plat_id,
             "wallet_addr": wallet_addr
-        }
+        },
+        verify=False
     )
     if response.status_code == 200:
         response_json = response.json()
         secret_volume = response_json.get('data').get('secret_volume') or 0
         print("Has current volume: ", secret_volume)
-
     secret_volume = float(secret_volume)
 
-    # add new volume
-    new_volume: float = abs(secret_volume) + abs(volume_usd)
+    # we currently hard code 1 MOVE == 5 USD
+    unit_price_usd: float = 5.0
 
-    # new balance
-    url = "https://api.devnet.solana.com"
-    payload = json.dumps({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "getBalance",
-        "params": [wallet_addr]
-    })
-    headers = {'Content-Type': 'application/json'}
-    response = requests.request("POST", url, headers=headers, data=payload)
+    # calc new volume
+    volume_usd = volume * (10 ** MOVE_DECIMAL) * unit_price_usd
+    new_volume = secret_volume + volume_usd
 
-    balance_sol = response.json().get("result").get("value")
-    print("balance_sol: ", balance_sol)
-    display_balance_sol: float = balance_sol * 10 ** (-1 * SOL_DECIMALS)
-    print("display_balance_sol: ", display_balance_sol)
-    balance_usd: float = display_balance_sol * price_in_usd
-    print("balance_usd: ", balance_usd)
+    # balance_usd
+    balance_usd = balance * (10 ** MOVE_DECIMAL) * unit_price_usd
 
     # store new value
     new_value = {
@@ -150,36 +77,66 @@ def update_volume_and_balance(
             "accept": "application/json",
             "Content-Type": "application/json"
         },
-        json=new_value
+        json=new_value,
+        verify=False
     )
     print(f"updated volume & balance {plat_id}: {new_value}", response.json())
     return
 
 
-def main(event, context):
-    print("Event: ", event)
-    print("Context: ", event)
-    payload = json.loads(event.get("Records")[0].get("body"))
-    plat_id = payload.get("plat_id")
+def sync(wallet_addr: str, plat_id: str):
+    transactions = get_transaction_of_account(wallet_addr=wallet_addr, limit=1000)
 
+    # calculate volume
+    total_volume: int = 0
+    for transaction_data in transactions:
+        # only process success transaction
+        if not transaction_data.get("success"):
+            return
+
+        # get move used (gas)
+        gas_used: int = int(transaction_data.get("gas_used") or 0)
+        if not gas_used:
+            return
+        gas_unit_price: int = int(transaction_data.get("gas_used") or 100)
+        move_used = gas_used * gas_unit_price
+        print("move_used: ", move_used)
+
+        # get move transfer
+        move_transfer: int = 0
+        if transaction_data.get("payload").get("function") == "0x1::aptos_account::transfer":
+            move_transfer = int(transaction_data.get("payload").get("arguments")[1])
+        print("move_transfer: ", move_transfer)
+
+        # total volume
+        volume: int = abs(move_used) + abs(move_transfer)
+
+        print(f"Updating volume {volume} of address {wallet_addr}")
+        total_volume += volume
+    print("total volume: ", total_volume)
+
+    # get current balance
+    balance = get_wallet_balance(wallet_addr=wallet_addr)
+    print("balance: ", balance)
+
+    # update volume and balance
+    update_volume_and_balance(
+        plat_id=plat_id,
+        wallet_addr=wallet_addr,
+        volume=total_volume,
+        balance=balance
+    )
+    return
+
+
+def main(event, context):
     try:
+        print("Event: ", event)
+        print("Context: ", event)
+        payload = json.loads(event.get("Records")[0].get("body"))
+        plat_id = payload.get("plat_id")
         wallet_addr = payload.get("wallet_addr")
-        from_block = payload.get("from_block")
-        to_block = payload.get("to_block")
-        usd_price = payload.get("usd_price")
-        usd_price = float(usd_price)
-        # get volume
-        volume = sync(wallet_addr=wallet_addr, from_block=from_block, to_block=to_block)
-        print("volume sol: ", volume)
-        volumne_usd = usd_price * volume
-        print("volume usd: ", volumne_usd)
-        # update_volume_and_balance
-        update_volume_and_balance(
-            plat_id=plat_id,
-            wallet_addr=wallet_addr,
-            volume_usd=volumne_usd,
-            price_in_usd=usd_price
-        )
+        sync(wallet_addr=wallet_addr, plat_id=plat_id)
     except Exception:
         traceback.print_exc()
     return
