@@ -11,8 +11,10 @@ export default function Home() {
   const accessToken = cookieStore.get("accessToken");
   return (
     <>
-
-        <div className="relative h-[100vh] flex items-center justify-center">
+<Header/>
+{
+      !accessToken ? (
+<div className="relative h-[100vh] flex items-center justify-center">
           <div className="absolute bottom-0 left-0">
             <div className="relative md:w-[488px] w-[200px] md:h-[360px] h-[150px]">
               <Image
@@ -63,7 +65,10 @@ export default function Home() {
             {/* )} */}
           </div>
         </div>
-    
+      ) : (
+        <ProfileView/>
+      )
+    }
     </>
   );
 }

@@ -34,8 +34,9 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
         type: "entry_function_payload",
         function: ADD_PERMISSIONS_FUNCTION,
         arguments: [
-          "nhatnguyen1.ID",
-          ["be94da783e0ee11bbdb9de2f9c6745f15b1f9bfc3007dab7f77ec2eed2400b05"],
+          "0x998d7cca2dd5ebf2c0d1ff3000f5f0cd49d409a830ab488fb4436e7392480a29",
+          platId,
+          [appId],
         ],
         type_arguments: [],
       };
@@ -55,8 +56,9 @@ const ConnectedPlatsApp = ({ platId }: { platId: string }) => {
         type: "entry_function_payload",
         function: REVOKE_PERMISSIONS_FUNCTION,
         arguments: [
-          "nhatnguyen1.ID",
-          ["be94da783e0ee11bbdb9de2f9c6745f15b1f9bfc3007dab7f77ec2eed2400b05"],
+          "0x998d7cca2dd5ebf2c0d1ff3000f5f0cd49d409a830ab488fb4436e7392480a29",
+          platId,
+          [appId],
         ],
         type_arguments: [],
       };
