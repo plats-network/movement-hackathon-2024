@@ -258,8 +258,7 @@ class NillionHelpers:
         # permissions : nillion.Permissions = self.permissions
         # permissions.is_retrieve_allowed(self.client.user_id)
 
-        print("=== PERMISSIONS ===")
-        print(self.permissions.is_compute_allowed(self.client.user_id, program_id))
+        print("=== PERMISSIONS ===", self.permissions.is_compute_allowed(self.client.user_id, program_id))
     
     
     async def init_score_program(self):

@@ -79,8 +79,8 @@ class PlatAppService(object):
         store_balance, store_volume, store_twitter, permissions = Movement.get(plat_id)
         
         # 2. Verify permission
-        # if app_id not in permissions:
-        #     raise HTTPException(status_code=403, detail="Unauthorized")
+        if app_id not in permissions:
+            raise HTTPException(status_code=403, detail="Unauthorized")
 
         print("PLAT_APP::GET::INFO::", plat_id, store_balance, store_volume, store_twitter)
         
