@@ -30,9 +30,13 @@ class NillionHelpers:
         if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
             self.cluster_id, self.client, self.payments_client, self.payments_wallet, self.permissions = self.get_client()
             self.initialized = True
+            self.user_id = self.client.user_id
             self.threshold_whale = int(os.getenv("THRESHOLD_WHALE") or 500 * settings.NILLION_MULTIPLIER ) 
             self.threshold_trade = int(os.getenv("THRESHOLD_TRADE") or 1000 * settings.NILLION_MULTIPLIER) 
             self.threshold_kol = int(os.getenv("THRESHOLD_KOL") or 200 * settings.NILLION_MULTIPLIER)
+            self.party_name = "Plats"
+            self.program_id = f"{self.client.user_id}/platscall"
+            self.permissions.add_compute_permissions({self.client.user_id: {self.program_id}})
     
     
     def get_client(self):
@@ -80,6 +84,7 @@ class NillionHelpers:
     
     
     async def store_integer(self, key:str, value: int) -> str:
+        print("=== USER_ID ===", self.client.user_id)
         # Create a SecretBlob
         secret_name = key
         # create a bytearray from the string using UTF-8 encoding
@@ -105,6 +110,7 @@ class NillionHelpers:
             
             
     async def retrieve(self, store_id: str, key: str) -> str:
+        print("=== USER_ID ===", self.client.user_id)
         try:
             # Get cost quote, then pay for operation to retrieve the secret
             receipt_retrieve = await get_quote_and_pay(
@@ -225,7 +231,7 @@ class NillionHelpers:
                 "result_twitter": -1
             }
     async def init_rank_program(self):
-        party_name = "Plats"
+        party_name = self.party_name
         program_name = "platscall"
         program_mir_path = os.path.join(os.path.dirname(__file__), f"{program_name}.nada.bin")
         print(f"program_mir_path: {program_mir_path}")
@@ -249,8 +255,11 @@ class NillionHelpers:
         
         
         # Set permissions for the client to compute on the program
-        self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
-        return party_name, program_id
+        # permissions : nillion.Permissions = self.permissions
+        # permissions.is_retrieve_allowed(self.client.user_id)
+
+        print("=== PERMISSIONS ===")
+        print(self.permissions.is_compute_allowed(self.client.user_id, program_id))
     
     
     async def init_score_program(self):
@@ -279,10 +288,21 @@ class NillionHelpers:
         
         # Set permissions for the client to compute on the program
         self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
+
         return party_name, program_id
-        
-    async def compute_rank(self, party_name, program_id, store_ids: list):
+    
+
+    async def compute_rank(self, store_ids= []):
+        party_name = self.party_name
+        program_id = self.program_id
+        print("=== Party Name ===", party_name)
+        print("=== Program ID ===", program_id)
         try:
+            print("=== USER_ID ===", self.client.user_id)
+            print("=== IS HAS PERMISSION ===")
+            print(self.permissions.is_compute_allowed(self.client.user_id, program_id))
+            print(self.permissions.is_retrieve_allowed(self.client.user_id))
+            
             # Create a secret
             # stored_secret = nillion.NadaValues(
             #     {
@@ -304,9 +324,11 @@ class NillionHelpers:
             # )
             # print("Stored secret. store_id:", store_id)
             # Bind the parties in the computation to the client to set input and output parties
+            self.permissions.add_compute_permissions({self.client.user_id: {program_id}})
             compute_bindings = nillion.ProgramBindings(program_id)
             compute_bindings.add_input_party(party_name, self.client.party_id)
             compute_bindings.add_output_party(party_name, self.client.party_id)
+
             
             print(f"Computing using program {program_id}")
             # print(f"Use secret store_id: {store_id}")
@@ -330,7 +352,7 @@ class NillionHelpers:
             compute_id = await self.client.compute(
                 self.cluster_id,
                 compute_bindings,
-                store_ids,
+                list(store_ids),
                 computation_time_secrets,
                 receipt_compute,
             )

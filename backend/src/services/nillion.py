@@ -107,7 +107,7 @@ class Nillion(object):
     @staticmethod
     async def compute_rank_score(store_ids: list):
         nillion = NillionHelpers()
-        party_name, program_id = await nillion.init_rank_program()
-        output = await nillion.compute_rank(party_name, program_id, store_ids)
+        await nillion.init_rank_program()
+        output = await nillion.compute_rank(store_ids=store_ids)
         
         return output
