@@ -77,7 +77,7 @@ class Nillion(object):
         balance = balance / settings.NILLION_MULTIPLIER if balance > 0 else 0
         volume = volume / settings.NILLION_MULTIPLIER if volume > 0 else 0
 
-        
+        print("RETRIEVE::SUCCESS", balance, volume)
         return {
             "secret_balance": balance,
             "secret_volume": volume,
